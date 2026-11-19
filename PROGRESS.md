@@ -480,4 +480,6 @@ Not measured on the iPhone.
 
 Conclusion: the site and the design system are the dictionary world, the folder and the packages are named infer, and the repository is ready to push.
 
+Push: `gh repo create infer --private --source . --remote origin --push` created https://github.com/teimurjan/infer (private) and pushed commit d2eae64 to `main`.
+
 Next step: the user opens the site on the iPhone with `bun run serve:lan` and looks at the landing, the entry page and the tests page.
