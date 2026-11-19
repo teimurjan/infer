@@ -1,0 +1,62 @@
+/* The book around every page: the running head with guide words, the thumb index on the fore-edge,
+   and the reverse page showing through the thin paper. */
+
+/* The page column, with room on the right for the thumb tabs. */
+.ui-page { position: relative; max-width: var(--page-width); margin: 0 auto; padding: 0 var(--fore-edge) var(--s-8) var(--gutter); }
+
+/* The running head: the first guide word links home, the second names the page. It stays on top while you read. */
+.ui-running-head {
+  position: sticky; top: 0; z-index: 5;
+  max-width: var(--page-width); margin: 0 auto; padding: var(--s-3) var(--fore-edge) 0 var(--gutter);
+  background: var(--paper);
+}
+.ui-running-head-row {
+  display: flex; justify-content: space-between; align-items: baseline; gap: var(--s-4);
+  padding-bottom: var(--s-2); border-bottom: var(--rule) solid var(--ink);
+  font: 700 var(--size-small) / 1 var(--face-head); font-stretch: 80%; letter-spacing: 0.01em;
+}
+.ui-running-head a { text-decoration: none; }
+.ui-running-head nav { display: flex; gap: var(--s-4); }
+.ui-running-head nav a { font-weight: 500; color: var(--ink-2); }
+.ui-running-head nav a[aria-current="page"] { color: var(--ink); text-decoration: underline; }
+.ui-guide { transition: opacity 120ms; }
+
+/* The thumb index: cut tabs on the right edge, one per entry that runs, in blue. The open entry's tab sticks out further. */
+.ui-thumbs { position: fixed; right: 0; top: 112px; z-index: 6; display: flex; flex-direction: column; gap: 6px; }
+.ui-thumb {
+  display: grid; place-items: center; width: 30px; height: 84px;
+  border-radius: 5px 0 0 5px; background: var(--live); color: var(--paper);
+  font: 850 1.0625rem / 1 var(--face-head); text-decoration: none;
+  transition: width 200ms var(--ease-out), background 200ms;
+}
+.ui-thumb:hover { width: 36px; color: var(--paper); }
+/* The open entry's tab sticks out further, as an open book shows the tab you hold. */
+.ui-thumb[aria-current="page"] { width: 38px; }
+/* An empty cut: the next letter of the book, not yet printed. */
+.ui-thumb-empty { background: var(--hair); pointer-events: none; }
+@media (min-width: 760px) {
+  .ui-thumb { width: 44px; height: 112px; font-size: 1.375rem; }
+  .ui-thumb:hover, .ui-thumb[aria-current="page"] { width: 54px; }
+}
+
+/* The reverse page: real text of the book, mirrored and faint, as on thin dictionary paper. It never takes a tap.
+   Each column is its own block of text cut at the foot of the screen, so no column is empty and none runs off the paper. */
+.ui-show-through {
+  position: fixed; inset: 0; z-index: -1; overflow: hidden; pointer-events: none;
+  display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: var(--s-5);
+  padding: 90px var(--fore-edge) 0 var(--gutter);
+  transform: scaleX(-1); opacity: 0.028;
+  font: 400 0.9rem / 1.38 var(--face-text); text-align: justify; hyphens: auto;
+}
+.ui-show-through-col { overflow: hidden; }
+/* A phone shows two columns; a wide screen shows the third. */
+.ui-show-through-col:nth-child(3) { display: none; }
+@media (min-width: 760px) {
+  .ui-show-through { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .ui-show-through-col:nth-child(3) { display: block; }
+}
+.ui-show-through b { font-family: var(--face-head); font-weight: 800; }
+
+/* Layout helpers: a column with even gaps, and a row that wraps on a narrow screen. */
+.ui-stack { display: flex; flex-direction: column; gap: var(--s-4); }
+.ui-row { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s-2); }

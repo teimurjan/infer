@@ -1,0 +1,14 @@
+{
+  "name": "@infer/site",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "bun build.ts",
+    "typecheck": "tsc -p ."
+  },
+  "dependencies": {
+    "@infer/browser": "workspace:*",
+    "@infer/sd-turbo": "workspace:*",
+    "@infer/ui": "workspace:*"
+  }
+}

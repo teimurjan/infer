@@ -1,0 +1,38 @@
+[package]
+name = "engine"
+version = "0.1.0"
+edition = "2024"
+
+[lib]
+# cdylib is the .wasm file for the browser. rlib lets the native tests use the crate.
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+# metal is the native GPU backend on the Mac. webgpu is the browser backend. wgsl lets us load WGSL shaders.
+wgpu = { version = "30", default-features = false, features = ["std", "metal", "webgpu", "wgsl"] }
+# A one-shot channel. It turns the "buffer is mapped" callback into a value we can await.
+futures-channel = "0.3"
+# A clock that works natively and in the browser. std::time::Instant does not work in WASM.
+web-time = "1"
+# Derive turns each line of the weight index into a Rust struct.
+serde = { version = "1", features = ["derive"] }
+# Parses the JSON weight index that convert_weights.py writes, and the tokenizer vocabulary.
+serde_json = "1"
+# The tokenizer finds the pieces of a prompt with Unicode letter and digit classes (\p{L}, \p{N}) and \s.
+# Only these Unicode tables are built in, to keep the .wasm file small.
+regex = { version = "1", default-features = false, features = ["std", "unicode-gencat", "unicode-perl"] }
+# The tokenizer composes characters (NFC) before it reads them, as the SD-Turbo tokenizer does.
+unicode-normalization = "0.1"
+
+# These two crates are only built for the browser.
+[target.'cfg(target_arch = "wasm32")'.dependencies]
+# Exports Rust functions to JavaScript.
+wasm-bindgen = "0.2"
+# Turns a Rust async function into a JavaScript Promise.
+wasm-bindgen-futures = "0.4"
+
+[dev-dependencies]
+# Runs one async function to the end on the native test thread.
+pollster = "1"
+# Reads the golden safetensors files and compares tensors. It is our own crate in ../compare.
+compare = { path = "../compare" }

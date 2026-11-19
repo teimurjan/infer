@@ -1,0 +1,60 @@
+/* The tokens of infer: a pocket dictionary on bible paper.
+   Black ink on bright paper. Ultramarine marks only what runs now and the open thumb tab. Red marks a failure. */
+
+:root {
+  /* Faces. The fallbacks keep the same voices while the files load. */
+  --face-head: "Archivo Variable", "Helvetica Neue", Arial, sans-serif;
+  --face-text: "Source Serif 4 Variable", Georgia, "Times New Roman", serif;
+  /* Raw engine output only: logs and kernel tables are data, so they keep a fixed width. */
+  --face-data: ui-monospace, "SF Mono", Menlo, monospace;
+
+  /* Paper and ink. */
+  --paper: #fafaf7;
+  --ink: #0b0b0c;
+  --ink-2: #3a3a37;
+  --ink-3: #6b6b66;
+  --hair: #d8d8d1;
+  --rule: 1.5px;
+
+  /* The live colour: the run that goes on now, and the tab of the page you are on. */
+  --live: #1d2bd9;
+  --live-wash: #1d2bd914;
+  --fail: #c4161c;
+
+  /* The type scale. Headwords scale with the screen. Body text stays readable on a phone. */
+  --size-headword: clamp(6rem, 33vw, 15rem);
+  --size-entry: clamp(2.75rem, 12vw, 5.5rem);
+  --size-title: clamp(1.75rem, 6vw, 2.5rem);
+  --size-text: 1.0625rem;
+  --size-small: 0.875rem;
+  --size-tiny: 0.75rem;
+
+  /* Space: one 4 px step. */
+  --s-1: 4px;
+  --s-2: 8px;
+  --s-3: 12px;
+  --s-4: 16px;
+  --s-5: 24px;
+  --s-6: 32px;
+  --s-7: 48px;
+  --s-8: 72px;
+
+  /* The page: a gutter on the left, and room for the thumb index on the right. */
+  --gutter: 18px;
+  --fore-edge: 46px;
+  --measure: 68ch;
+  --page-width: 1180px;
+
+  /* Motion: one curve. A line snaps into place with a small overshoot, like a stepped roll. */
+  --snap: cubic-bezier(0.2, 1.4, 0.4, 1);
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+
+  color-scheme: light;
+}
+
+@media (min-width: 760px) {
+  :root {
+    --gutter: 40px;
+    --fore-edge: 72px;
+  }
+}

@@ -1,0 +1,1212 @@
+{"page":"1317d791","t":77,"subject":"gpu","stage":"capabilities","event":"report","userAgent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36","secureContext":true,"webgpu":true,"adapterInfo":{"vendor":"apple","architecture":"metal-3","device":"","description":"","subgroupMinSize":32,"subgroupMaxSize":32,"isFallbackAdapter":false},"features":{"shader-f16":true,"subgroups":true,"timestamp-query":true},"allFeatures":["bgra8unorm-storage","clip-distances","core-features-and-limits","depth-clip-control","depth32float-stencil8","dual-source-blending","float32-blendable","float32-filterable","indirect-first-instance","primitive-index","rg11b10ufloat-renderable","shader-f16","subgroup-size-control","subgroups","texture-component-swizzle","texture-compression-astc","texture-compression-astc-sliced-3d","texture-compression-bc","texture-compression-bc-sliced-3d","texture-compression-etc2","texture-compression-unaligned","texture-formats-tier1","texture-formats-tier2","timestamp-query"],"limits":{"maxTextureDimension1D":16384,"maxTextureDimension2D":16384,"maxTextureDimension3D":2048,"maxTextureArrayLayers":2048,"maxBindGroups":4,"maxBindGroupsPlusVertexBuffers":24,"maxBindingsPerBindGroup":1000,"maxDynamicUniformBuffersPerPipelineLayout":10,"maxDynamicStorageBuffersPerPipelineLayout":8,"maxSampledTexturesPerShaderStage":48,"maxSamplersPerShaderStage":16,"maxStorageBuffersPerShaderStage":10,"maxStorageTexturesPerShaderStage":8,"maxUniformBuffersPerShaderStage":12,"maxUniformBufferBindingSize":65536,"maxStorageBufferBindingSize":4294967292,"minUniformBufferOffsetAlignment":256,"minStorageBufferOffsetAlignment":256,"maxVertexBuffers":8,"maxBufferSize":4294967292,"maxVertexAttributes":30,"maxVertexBufferArrayStride":2048,"maxInterStageShaderVariables":28,"maxColorAttachments":8,"maxColorAttachmentBytesPerSample":128,"maxComputeWorkgroupStorageSize":32768,"maxComputeInvocationsPerWorkgroup":1024,"maxComputeWorkgroupSizeX":1024,"maxComputeWorkgroupSizeY":1024,"maxComputeWorkgroupSizeZ":64,"maxComputeWorkgroupsPerDimension":65535,"maxImmediateSize":64,"maxStorageBuffersInFragmentStage":10,"maxStorageTexturesInFragmentStage":8,"maxStorageBuffersInVertexStage":10,"maxStorageTexturesInVertexStage":8},"wgslLanguageFeatures":["buffer_view","immediate_address_space","linear_indexing","packed_4x8_integer_dot_product","pointer_composite_access","readonly_and_readwrite_storage_textures","subgroup_id","subgroup_uniformity","swizzle_assignment","texture_and_sampler_let","texture_formats_tier1","uniform_buffer_standard_layout","unrestricted_pointer_parameters"]}
+{"page":"c0b374d5","t":52,"subject":"wasm","stage":"step","event":"ok","mb":64}
+{"page":"c0b374d5","t":1,"subject":"wasm","stage":"ramp","event":"start","stepMb":64,"maxMb":8192}
+{"page":"c0b374d5","t":96,"subject":"wasm","stage":"step","event":"ok","mb":128}
+{"page":"c0b374d5","t":138,"subject":"wasm","stage":"step","event":"ok","mb":192}
+{"page":"c0b374d5","t":178,"subject":"wasm","stage":"step","event":"ok","mb":256}
+{"page":"c0b374d5","t":221,"subject":"wasm","stage":"step","event":"ok","mb":320}
+{"page":"c0b374d5","t":268,"subject":"wasm","stage":"step","event":"ok","mb":384}
+{"page":"c0b374d5","t":308,"subject":"wasm","stage":"step","event":"ok","mb":448}
+{"page":"c0b374d5","t":352,"subject":"wasm","stage":"step","event":"ok","mb":512}
+{"page":"c0b374d5","t":395,"subject":"wasm","stage":"step","event":"ok","mb":576}
+{"page":"c0b374d5","t":438,"subject":"wasm","stage":"step","event":"ok","mb":640}
+{"page":"c0b374d5","t":482,"subject":"wasm","stage":"step","event":"ok","mb":704}
+{"page":"c0b374d5","t":568,"subject":"wasm","stage":"step","event":"ok","mb":832}
+{"page":"c0b374d5","t":525,"subject":"wasm","stage":"step","event":"ok","mb":768}
+{"page":"c0b374d5","t":655,"subject":"wasm","stage":"step","event":"ok","mb":960}
+{"page":"c0b374d5","t":611,"subject":"wasm","stage":"step","event":"ok","mb":896}
+{"page":"c0b374d5","t":698,"subject":"wasm","stage":"step","event":"ok","mb":1024}
+{"page":"c0b374d5","t":741,"subject":"wasm","stage":"step","event":"ok","mb":1088}
+{"page":"c0b374d5","t":783,"subject":"wasm","stage":"step","event":"ok","mb":1152}
+{"page":"c0b374d5","t":826,"subject":"wasm","stage":"step","event":"ok","mb":1216}
+{"page":"c0b374d5","t":869,"subject":"wasm","stage":"step","event":"ok","mb":1280}
+{"page":"c0b374d5","t":911,"subject":"wasm","stage":"step","event":"ok","mb":1344}
+{"page":"c0b374d5","t":954,"subject":"wasm","stage":"step","event":"ok","mb":1408}
+{"page":"c0b374d5","t":995,"subject":"wasm","stage":"step","event":"ok","mb":1472}
+{"page":"c0b374d5","t":1081,"subject":"wasm","stage":"step","event":"ok","mb":1600}
+{"page":"c0b374d5","t":1038,"subject":"wasm","stage":"step","event":"ok","mb":1536}
+{"page":"c0b374d5","t":1123,"subject":"wasm","stage":"step","event":"ok","mb":1664}
+{"page":"c0b374d5","t":1165,"subject":"wasm","stage":"step","event":"ok","mb":1728}
+{"page":"c0b374d5","t":1207,"subject":"wasm","stage":"step","event":"ok","mb":1792}
+{"page":"c0b374d5","t":1250,"subject":"wasm","stage":"step","event":"ok","mb":1856}
+{"page":"c0b374d5","t":1293,"subject":"wasm","stage":"step","event":"ok","mb":1920}
+{"page":"c0b374d5","t":1335,"subject":"wasm","stage":"step","event":"ok","mb":1984}
+{"page":"c0b374d5","t":1377,"subject":"wasm","stage":"step","event":"ok","mb":2048}
+{"page":"c0b374d5","t":1420,"subject":"wasm","stage":"step","event":"ok","mb":2112}
+{"page":"c0b374d5","t":1462,"subject":"wasm","stage":"step","event":"ok","mb":2176}
+{"page":"c0b374d5","t":1505,"subject":"wasm","stage":"step","event":"ok","mb":2240}
+{"page":"c0b374d5","t":1590,"subject":"wasm","stage":"step","event":"ok","mb":2368}
+{"page":"c0b374d5","t":1548,"subject":"wasm","stage":"step","event":"ok","mb":2304}
+{"page":"c0b374d5","t":1675,"subject":"wasm","stage":"step","event":"ok","mb":2496}
+{"page":"c0b374d5","t":1633,"subject":"wasm","stage":"step","event":"ok","mb":2432}
+{"page":"c0b374d5","t":1719,"subject":"wasm","stage":"step","event":"ok","mb":2560}
+{"page":"c0b374d5","t":1762,"subject":"wasm","stage":"step","event":"ok","mb":2624}
+{"page":"c0b374d5","t":1805,"subject":"wasm","stage":"step","event":"ok","mb":2688}
+{"page":"c0b374d5","t":1848,"subject":"wasm","stage":"step","event":"ok","mb":2752}
+{"page":"c0b374d5","t":1892,"subject":"wasm","stage":"step","event":"ok","mb":2816}
+{"page":"c0b374d5","t":1936,"subject":"wasm","stage":"step","event":"ok","mb":2880}
+{"page":"c0b374d5","t":1980,"subject":"wasm","stage":"step","event":"ok","mb":2944}
+{"page":"c0b374d5","t":2023,"subject":"wasm","stage":"step","event":"ok","mb":3008}
+{"page":"c0b374d5","t":2066,"subject":"wasm","stage":"step","event":"ok","mb":3072}
+{"page":"c0b374d5","t":2109,"subject":"wasm","stage":"step","event":"ok","mb":3136}
+{"page":"c0b374d5","t":2196,"subject":"wasm","stage":"step","event":"ok","mb":3264}
+{"page":"c0b374d5","t":2152,"subject":"wasm","stage":"step","event":"ok","mb":3200}
+{"page":"c0b374d5","t":2238,"subject":"wasm","stage":"step","event":"ok","mb":3328}
+{"page":"c0b374d5","t":2281,"subject":"wasm","stage":"step","event":"ok","mb":3392}
+{"page":"c0b374d5","t":2324,"subject":"wasm","stage":"step","event":"ok","mb":3456}
+{"page":"c0b374d5","t":2367,"subject":"wasm","stage":"step","event":"ok","mb":3520}
+{"page":"c0b374d5","t":2409,"subject":"wasm","stage":"step","event":"ok","mb":3584}
+{"page":"c0b374d5","t":2453,"subject":"wasm","stage":"step","event":"ok","mb":3648}
+{"page":"c0b374d5","t":2496,"subject":"wasm","stage":"step","event":"ok","mb":3712}
+{"page":"c0b374d5","t":2540,"subject":"wasm","stage":"step","event":"ok","mb":3776}
+{"page":"c0b374d5","t":2626,"subject":"wasm","stage":"step","event":"ok","mb":3904}
+{"page":"c0b374d5","t":2583,"subject":"wasm","stage":"step","event":"ok","mb":3840}
+{"page":"c0b374d5","t":2670,"subject":"wasm","stage":"step","event":"ok","mb":3968}
+{"page":"c0b374d5","t":2757,"subject":"wasm","stage":"step","event":"ok","mb":4096}
+{"page":"c0b374d5","t":2714,"subject":"wasm","stage":"step","event":"ok","mb":4032}
+{"page":"c0b374d5","t":2762,"subject":"wasm","stage":"ramp","event":"end","outcome":"refused","error":"WebAssembly.Memory.grow(): Unable to grow instance memory","mb":4096}
+{"page":"1113dd86","t":0,"subject":"js","stage":"ramp","event":"start","stepMb":64,"maxMb":8192}
+{"page":"1113dd86","t":43,"subject":"js","stage":"step","event":"ok","mb":64}
+{"page":"1113dd86","t":83,"subject":"js","stage":"step","event":"ok","mb":128}
+{"page":"1113dd86","t":128,"subject":"js","stage":"step","event":"ok","mb":192}
+{"page":"1113dd86","t":168,"subject":"js","stage":"step","event":"ok","mb":256}
+{"page":"1113dd86","t":208,"subject":"js","stage":"step","event":"ok","mb":320}
+{"page":"1113dd86","t":252,"subject":"js","stage":"step","event":"ok","mb":384}
+{"page":"1113dd86","t":420,"subject":"js","stage":"step","event":"ok","mb":448}
+{"page":"1113dd86","t":462,"subject":"js","stage":"step","event":"ok","mb":512}
+{"page":"1113dd86","t":504,"subject":"js","stage":"step","event":"ok","mb":576}
+{"page":"1113dd86","t":546,"subject":"js","stage":"step","event":"ok","mb":640}
+{"page":"1113dd86","t":588,"subject":"js","stage":"step","event":"ok","mb":704}
+{"page":"1113dd86","t":630,"subject":"js","stage":"step","event":"ok","mb":768}
+{"page":"1113dd86","t":672,"subject":"js","stage":"step","event":"ok","mb":832}
+{"page":"1113dd86","t":713,"subject":"js","stage":"step","event":"ok","mb":896}
+{"page":"1113dd86","t":839,"subject":"js","stage":"step","event":"ok","mb":1088}
+{"page":"1113dd86","t":755,"subject":"js","stage":"step","event":"ok","mb":960}
+{"page":"1113dd86","t":796,"subject":"js","stage":"step","event":"ok","mb":1024}
+{"page":"1113dd86","t":923,"subject":"js","stage":"step","event":"ok","mb":1216}
+{"page":"1113dd86","t":882,"subject":"js","stage":"step","event":"ok","mb":1152}
+{"page":"1113dd86","t":964,"subject":"js","stage":"step","event":"ok","mb":1280}
+{"page":"1113dd86","t":1005,"subject":"js","stage":"step","event":"ok","mb":1344}
+{"page":"1113dd86","t":1046,"subject":"js","stage":"step","event":"ok","mb":1408}
+{"page":"1113dd86","t":1087,"subject":"js","stage":"step","event":"ok","mb":1472}
+{"page":"1113dd86","t":1128,"subject":"js","stage":"step","event":"ok","mb":1536}
+{"page":"1113dd86","t":1170,"subject":"js","stage":"step","event":"ok","mb":1600}
+{"page":"1113dd86","t":1213,"subject":"js","stage":"step","event":"ok","mb":1664}
+{"page":"1113dd86","t":1254,"subject":"js","stage":"step","event":"ok","mb":1728}
+{"page":"1113dd86","t":1296,"subject":"js","stage":"step","event":"ok","mb":1792}
+{"page":"1113dd86","t":1338,"subject":"js","stage":"step","event":"ok","mb":1856}
+{"page":"1113dd86","t":1381,"subject":"js","stage":"step","event":"ok","mb":1920}
+{"page":"1113dd86","t":1423,"subject":"js","stage":"step","event":"ok","mb":1984}
+{"page":"1113dd86","t":1465,"subject":"js","stage":"step","event":"ok","mb":2048}
+{"page":"1113dd86","t":1506,"subject":"js","stage":"step","event":"ok","mb":2112}
+{"page":"1113dd86","t":1548,"subject":"js","stage":"step","event":"ok","mb":2176}
+{"page":"1113dd86","t":1591,"subject":"js","stage":"step","event":"ok","mb":2240}
+{"page":"1113dd86","t":1632,"subject":"js","stage":"step","event":"ok","mb":2304}
+{"page":"1113dd86","t":1674,"subject":"js","stage":"step","event":"ok","mb":2368}
+{"page":"1113dd86","t":1716,"subject":"js","stage":"step","event":"ok","mb":2432}
+{"page":"1113dd86","t":1758,"subject":"js","stage":"step","event":"ok","mb":2496}
+{"page":"1113dd86","t":1884,"subject":"js","stage":"step","event":"ok","mb":2688}
+{"page":"1113dd86","t":1799,"subject":"js","stage":"step","event":"ok","mb":2560}
+{"page":"1113dd86","t":1842,"subject":"js","stage":"step","event":"ok","mb":2624}
+{"page":"1113dd86","t":1926,"subject":"js","stage":"step","event":"ok","mb":2752}
+{"page":"1113dd86","t":1968,"subject":"js","stage":"step","event":"ok","mb":2816}
+{"page":"1113dd86","t":2010,"subject":"js","stage":"step","event":"ok","mb":2880}
+{"page":"1113dd86","t":2053,"subject":"js","stage":"step","event":"ok","mb":2944}
+{"page":"1113dd86","t":2095,"subject":"js","stage":"step","event":"ok","mb":3008}
+{"page":"1113dd86","t":2137,"subject":"js","stage":"step","event":"ok","mb":3072}
+{"page":"1113dd86","t":2179,"subject":"js","stage":"step","event":"ok","mb":3136}
+{"page":"1113dd86","t":2222,"subject":"js","stage":"step","event":"ok","mb":3200}
+{"page":"1113dd86","t":2263,"subject":"js","stage":"step","event":"ok","mb":3264}
+{"page":"1113dd86","t":2305,"subject":"js","stage":"step","event":"ok","mb":3328}
+{"page":"1113dd86","t":2346,"subject":"js","stage":"step","event":"ok","mb":3392}
+{"page":"1113dd86","t":2388,"subject":"js","stage":"step","event":"ok","mb":3456}
+{"page":"1113dd86","t":2429,"subject":"js","stage":"step","event":"ok","mb":3520}
+{"page":"1113dd86","t":2472,"subject":"js","stage":"step","event":"ok","mb":3584}
+{"page":"1113dd86","t":2513,"subject":"js","stage":"step","event":"ok","mb":3648}
+{"page":"1113dd86","t":2556,"subject":"js","stage":"step","event":"ok","mb":3712}
+{"page":"1113dd86","t":2599,"subject":"js","stage":"step","event":"ok","mb":3776}
+{"page":"1113dd86","t":2641,"subject":"js","stage":"step","event":"ok","mb":3840}
+{"page":"1113dd86","t":2684,"subject":"js","stage":"step","event":"ok","mb":3904}
+{"page":"1113dd86","t":2726,"subject":"js","stage":"step","event":"ok","mb":3968}
+{"page":"1113dd86","t":2768,"subject":"js","stage":"step","event":"ok","mb":4032}
+{"page":"1113dd86","t":2809,"subject":"js","stage":"step","event":"ok","mb":4096}
+{"page":"1113dd86","t":2894,"subject":"js","stage":"step","event":"ok","mb":4224}
+{"page":"1113dd86","t":2852,"subject":"js","stage":"step","event":"ok","mb":4160}
+{"page":"1113dd86","t":2936,"subject":"js","stage":"step","event":"ok","mb":4288}
+{"page":"1113dd86","t":2979,"subject":"js","stage":"step","event":"ok","mb":4352}
+{"page":"1113dd86","t":3021,"subject":"js","stage":"step","event":"ok","mb":4416}
+{"page":"1113dd86","t":3064,"subject":"js","stage":"step","event":"ok","mb":4480}
+{"page":"1113dd86","t":3105,"subject":"js","stage":"step","event":"ok","mb":4544}
+{"page":"1113dd86","t":3146,"subject":"js","stage":"step","event":"ok","mb":4608}
+{"page":"1113dd86","t":3189,"subject":"js","stage":"step","event":"ok","mb":4672}
+{"page":"1113dd86","t":3232,"subject":"js","stage":"step","event":"ok","mb":4736}
+{"page":"1113dd86","t":3276,"subject":"js","stage":"step","event":"ok","mb":4800}
+{"page":"1113dd86","t":3319,"subject":"js","stage":"step","event":"ok","mb":4864}
+{"page":"1113dd86","t":3362,"subject":"js","stage":"step","event":"ok","mb":4928}
+{"page":"1113dd86","t":3404,"subject":"js","stage":"step","event":"ok","mb":4992}
+{"page":"1113dd86","t":3448,"subject":"js","stage":"step","event":"ok","mb":5056}
+{"page":"1113dd86","t":3533,"subject":"js","stage":"step","event":"ok","mb":5184}
+{"page":"1113dd86","t":3490,"subject":"js","stage":"step","event":"ok","mb":5120}
+{"page":"1113dd86","t":3576,"subject":"js","stage":"step","event":"ok","mb":5248}
+{"page":"1113dd86","t":3619,"subject":"js","stage":"step","event":"ok","mb":5312}
+{"page":"1113dd86","t":3662,"subject":"js","stage":"step","event":"ok","mb":5376}
+{"page":"1113dd86","t":3705,"subject":"js","stage":"step","event":"ok","mb":5440}
+{"page":"1113dd86","t":3748,"subject":"js","stage":"step","event":"ok","mb":5504}
+{"page":"1113dd86","t":3792,"subject":"js","stage":"step","event":"ok","mb":5568}
+{"page":"1113dd86","t":3835,"subject":"js","stage":"step","event":"ok","mb":5632}
+{"page":"1113dd86","t":3879,"subject":"js","stage":"step","event":"ok","mb":5696}
+{"page":"1113dd86","t":3923,"subject":"js","stage":"step","event":"ok","mb":5760}
+{"page":"1113dd86","t":3967,"subject":"js","stage":"step","event":"ok","mb":5824}
+{"page":"1113dd86","t":4054,"subject":"js","stage":"step","event":"ok","mb":5952}
+{"page":"1113dd86","t":4011,"subject":"js","stage":"step","event":"ok","mb":5888}
+{"page":"1113dd86","t":4098,"subject":"js","stage":"step","event":"ok","mb":6016}
+{"page":"1113dd86","t":4143,"subject":"js","stage":"step","event":"ok","mb":6080}
+{"page":"1113dd86","t":4186,"subject":"js","stage":"step","event":"ok","mb":6144}
+{"page":"1113dd86","t":4230,"subject":"js","stage":"step","event":"ok","mb":6208}
+{"page":"1113dd86","t":4274,"subject":"js","stage":"step","event":"ok","mb":6272}
+{"page":"1113dd86","t":4318,"subject":"js","stage":"step","event":"ok","mb":6336}
+{"page":"1113dd86","t":4362,"subject":"js","stage":"step","event":"ok","mb":6400}
+{"page":"1113dd86","t":4406,"subject":"js","stage":"step","event":"ok","mb":6464}
+{"page":"1113dd86","t":4449,"subject":"js","stage":"step","event":"ok","mb":6528}
+{"page":"1113dd86","t":4494,"subject":"js","stage":"step","event":"ok","mb":6592}
+{"page":"1113dd86","t":4582,"subject":"js","stage":"step","event":"ok","mb":6720}
+{"page":"1113dd86","t":4539,"subject":"js","stage":"step","event":"ok","mb":6656}
+{"page":"1113dd86","t":4625,"subject":"js","stage":"step","event":"ok","mb":6784}
+{"page":"1113dd86","t":4669,"subject":"js","stage":"step","event":"ok","mb":6848}
+{"page":"1113dd86","t":4714,"subject":"js","stage":"step","event":"ok","mb":6912}
+{"page":"1113dd86","t":4760,"subject":"js","stage":"step","event":"ok","mb":6976}
+{"page":"1113dd86","t":4804,"subject":"js","stage":"step","event":"ok","mb":7040}
+{"page":"1113dd86","t":4847,"subject":"js","stage":"step","event":"ok","mb":7104}
+{"page":"1113dd86","t":4891,"subject":"js","stage":"step","event":"ok","mb":7168}
+{"page":"1113dd86","t":4935,"subject":"js","stage":"step","event":"ok","mb":7232}
+{"page":"1113dd86","t":4980,"subject":"js","stage":"step","event":"ok","mb":7296}
+{"page":"1113dd86","t":5023,"subject":"js","stage":"step","event":"ok","mb":7360}
+{"page":"1113dd86","t":5066,"subject":"js","stage":"step","event":"ok","mb":7424}
+{"page":"1113dd86","t":5110,"subject":"js","stage":"step","event":"ok","mb":7488}
+{"page":"1113dd86","t":5160,"subject":"js","stage":"step","event":"ok","mb":7552}
+{"page":"1113dd86","t":5871,"subject":"js","stage":"step","event":"ok","mb":7616}
+{"page":"1113dd86","t":5978,"subject":"js","stage":"step","event":"ok","mb":7680}
+{"page":"1113dd86","t":6169,"subject":"js","stage":"step","event":"ok","mb":7744}
+{"page":"1113dd86","t":6216,"subject":"js","stage":"step","event":"ok","mb":7808}
+{"page":"1113dd86","t":6264,"subject":"js","stage":"step","event":"ok","mb":7872}
+{"page":"1113dd86","t":6309,"subject":"js","stage":"step","event":"ok","mb":7936}
+{"page":"1113dd86","t":6354,"subject":"js","stage":"step","event":"ok","mb":8000}
+{"page":"1113dd86","t":6398,"subject":"js","stage":"step","event":"ok","mb":8064}
+{"page":"1113dd86","t":6442,"subject":"js","stage":"step","event":"ok","mb":8128}
+{"page":"1113dd86","t":6494,"subject":"js","stage":"step","event":"ok","mb":8192}
+{"page":"1113dd86","t":6499,"subject":"js","stage":"ramp","event":"end","outcome":"cap","mb":8192}
+{"page":"cd46cff1","t":0,"subject":"gpu","stage":"ramp","event":"start","stepMb":64,"maxMb":8192}
+{"page":"cd46cff1","t":47,"subject":"gpu","stage":"step","event":"ok","mb":64}
+{"page":"cd46cff1","t":78,"subject":"gpu","stage":"step","event":"ok","mb":192}
+{"page":"cd46cff1","t":92,"subject":"gpu","stage":"step","event":"ok","mb":256}
+{"page":"cd46cff1","t":65,"subject":"gpu","stage":"step","event":"ok","mb":128}
+{"page":"cd46cff1","t":117,"subject":"gpu","stage":"step","event":"ok","mb":384}
+{"page":"cd46cff1","t":103,"subject":"gpu","stage":"step","event":"ok","mb":320}
+{"page":"cd46cff1","t":141,"subject":"gpu","stage":"step","event":"ok","mb":512}
+{"page":"cd46cff1","t":153,"subject":"gpu","stage":"step","event":"ok","mb":576}
+{"page":"cd46cff1","t":193,"subject":"gpu","stage":"step","event":"ok","mb":768}
+{"page":"cd46cff1","t":170,"subject":"gpu","stage":"step","event":"ok","mb":640}
+{"page":"cd46cff1","t":128,"subject":"gpu","stage":"step","event":"ok","mb":448}
+{"page":"cd46cff1","t":182,"subject":"gpu","stage":"step","event":"ok","mb":704}
+{"page":"cd46cff1","t":205,"subject":"gpu","stage":"step","event":"ok","mb":832}
+{"page":"cd46cff1","t":219,"subject":"gpu","stage":"step","event":"ok","mb":896}
+{"page":"cd46cff1","t":232,"subject":"gpu","stage":"step","event":"ok","mb":960}
+{"page":"cd46cff1","t":257,"subject":"gpu","stage":"step","event":"ok","mb":1088}
+{"page":"cd46cff1","t":268,"subject":"gpu","stage":"step","event":"ok","mb":1152}
+{"page":"cd46cff1","t":245,"subject":"gpu","stage":"step","event":"ok","mb":1024}
+{"page":"cd46cff1","t":279,"subject":"gpu","stage":"step","event":"ok","mb":1216}
+{"page":"cd46cff1","t":290,"subject":"gpu","stage":"step","event":"ok","mb":1280}
+{"page":"cd46cff1","t":302,"subject":"gpu","stage":"step","event":"ok","mb":1344}
+{"page":"cd46cff1","t":312,"subject":"gpu","stage":"step","event":"ok","mb":1408}
+{"page":"cd46cff1","t":327,"subject":"gpu","stage":"step","event":"ok","mb":1472}
+{"page":"cd46cff1","t":338,"subject":"gpu","stage":"step","event":"ok","mb":1536}
+{"page":"cd46cff1","t":349,"subject":"gpu","stage":"step","event":"ok","mb":1600}
+{"page":"cd46cff1","t":361,"subject":"gpu","stage":"step","event":"ok","mb":1664}
+{"page":"cd46cff1","t":371,"subject":"gpu","stage":"step","event":"ok","mb":1728}
+{"page":"cd46cff1","t":383,"subject":"gpu","stage":"step","event":"ok","mb":1792}
+{"page":"cd46cff1","t":394,"subject":"gpu","stage":"step","event":"ok","mb":1856}
+{"page":"cd46cff1","t":405,"subject":"gpu","stage":"step","event":"ok","mb":1920}
+{"page":"cd46cff1","t":416,"subject":"gpu","stage":"step","event":"ok","mb":1984}
+{"page":"cd46cff1","t":427,"subject":"gpu","stage":"step","event":"ok","mb":2048}
+{"page":"cd46cff1","t":438,"subject":"gpu","stage":"step","event":"ok","mb":2112}
+{"page":"cd46cff1","t":450,"subject":"gpu","stage":"step","event":"ok","mb":2176}
+{"page":"cd46cff1","t":462,"subject":"gpu","stage":"step","event":"ok","mb":2240}
+{"page":"cd46cff1","t":474,"subject":"gpu","stage":"step","event":"ok","mb":2304}
+{"page":"cd46cff1","t":486,"subject":"gpu","stage":"step","event":"ok","mb":2368}
+{"page":"cd46cff1","t":498,"subject":"gpu","stage":"step","event":"ok","mb":2432}
+{"page":"cd46cff1","t":510,"subject":"gpu","stage":"step","event":"ok","mb":2496}
+{"page":"cd46cff1","t":521,"subject":"gpu","stage":"step","event":"ok","mb":2560}
+{"page":"cd46cff1","t":609,"subject":"gpu","stage":"step","event":"ok","mb":3072}
+{"page":"cd46cff1","t":543,"subject":"gpu","stage":"step","event":"ok","mb":2688}
+{"page":"cd46cff1","t":597,"subject":"gpu","stage":"step","event":"ok","mb":3008}
+{"page":"cd46cff1","t":554,"subject":"gpu","stage":"step","event":"ok","mb":2752}
+{"page":"cd46cff1","t":565,"subject":"gpu","stage":"step","event":"ok","mb":2816}
+{"page":"cd46cff1","t":576,"subject":"gpu","stage":"step","event":"ok","mb":2880}
+{"page":"cd46cff1","t":587,"subject":"gpu","stage":"step","event":"ok","mb":2944}
+{"page":"cd46cff1","t":532,"subject":"gpu","stage":"step","event":"ok","mb":2624}
+{"page":"cd46cff1","t":620,"subject":"gpu","stage":"step","event":"ok","mb":3136}
+{"page":"cd46cff1","t":696,"subject":"gpu","stage":"step","event":"ok","mb":3584}
+{"page":"cd46cff1","t":718,"subject":"gpu","stage":"step","event":"ok","mb":3712}
+{"page":"cd46cff1","t":675,"subject":"gpu","stage":"step","event":"ok","mb":3456}
+{"page":"cd46cff1","t":706,"subject":"gpu","stage":"step","event":"ok","mb":3648}
+{"page":"cd46cff1","t":685,"subject":"gpu","stage":"step","event":"ok","mb":3520}
+{"page":"cd46cff1","t":642,"subject":"gpu","stage":"step","event":"ok","mb":3264}
+{"page":"cd46cff1","t":631,"subject":"gpu","stage":"step","event":"ok","mb":3200}
+{"page":"cd46cff1","t":653,"subject":"gpu","stage":"step","event":"ok","mb":3328}
+{"page":"cd46cff1","t":664,"subject":"gpu","stage":"step","event":"ok","mb":3392}
+{"page":"cd46cff1","t":728,"subject":"gpu","stage":"step","event":"ok","mb":3776}
+{"page":"cd46cff1","t":739,"subject":"gpu","stage":"step","event":"ok","mb":3840}
+{"page":"cd46cff1","t":749,"subject":"gpu","stage":"step","event":"ok","mb":3904}
+{"page":"cd46cff1","t":759,"subject":"gpu","stage":"step","event":"ok","mb":3968}
+{"page":"cd46cff1","t":774,"subject":"gpu","stage":"step","event":"ok","mb":4032}
+{"page":"cd46cff1","t":796,"subject":"gpu","stage":"step","event":"ok","mb":4160}
+{"page":"cd46cff1","t":785,"subject":"gpu","stage":"step","event":"ok","mb":4096}
+{"page":"cd46cff1","t":807,"subject":"gpu","stage":"step","event":"ok","mb":4224}
+{"page":"cd46cff1","t":818,"subject":"gpu","stage":"step","event":"ok","mb":4288}
+{"page":"cd46cff1","t":830,"subject":"gpu","stage":"step","event":"ok","mb":4352}
+{"page":"cd46cff1","t":842,"subject":"gpu","stage":"step","event":"ok","mb":4416}
+{"page":"cd46cff1","t":854,"subject":"gpu","stage":"step","event":"ok","mb":4480}
+{"page":"cd46cff1","t":865,"subject":"gpu","stage":"step","event":"ok","mb":4544}
+{"page":"cd46cff1","t":877,"subject":"gpu","stage":"step","event":"ok","mb":4608}
+{"page":"cd46cff1","t":889,"subject":"gpu","stage":"step","event":"ok","mb":4672}
+{"page":"cd46cff1","t":901,"subject":"gpu","stage":"step","event":"ok","mb":4736}
+{"page":"cd46cff1","t":912,"subject":"gpu","stage":"step","event":"ok","mb":4800}
+{"page":"cd46cff1","t":923,"subject":"gpu","stage":"step","event":"ok","mb":4864}
+{"page":"cd46cff1","t":933,"subject":"gpu","stage":"step","event":"ok","mb":4928}
+{"page":"cd46cff1","t":945,"subject":"gpu","stage":"step","event":"ok","mb":4992}
+{"page":"cd46cff1","t":957,"subject":"gpu","stage":"step","event":"ok","mb":5056}
+{"page":"cd46cff1","t":969,"subject":"gpu","stage":"step","event":"ok","mb":5120}
+{"page":"cd46cff1","t":981,"subject":"gpu","stage":"step","event":"ok","mb":5184}
+{"page":"cd46cff1","t":991,"subject":"gpu","stage":"step","event":"ok","mb":5248}
+{"page":"cd46cff1","t":1005,"subject":"gpu","stage":"step","event":"ok","mb":5312}
+{"page":"cd46cff1","t":1015,"subject":"gpu","stage":"step","event":"ok","mb":5376}
+{"page":"cd46cff1","t":1028,"subject":"gpu","stage":"step","event":"ok","mb":5440}
+{"page":"cd46cff1","t":1039,"subject":"gpu","stage":"step","event":"ok","mb":5504}
+{"page":"cd46cff1","t":1063,"subject":"gpu","stage":"step","event":"ok","mb":5632}
+{"page":"cd46cff1","t":1119,"subject":"gpu","stage":"step","event":"ok","mb":5952}
+{"page":"cd46cff1","t":1051,"subject":"gpu","stage":"step","event":"ok","mb":5568}
+{"page":"cd46cff1","t":1129,"subject":"gpu","stage":"step","event":"ok","mb":6016}
+{"page":"cd46cff1","t":1085,"subject":"gpu","stage":"step","event":"ok","mb":5760}
+{"page":"cd46cff1","t":1074,"subject":"gpu","stage":"step","event":"ok","mb":5696}
+{"page":"cd46cff1","t":1096,"subject":"gpu","stage":"step","event":"ok","mb":5824}
+{"page":"cd46cff1","t":1108,"subject":"gpu","stage":"step","event":"ok","mb":5888}
+{"page":"cd46cff1","t":1140,"subject":"gpu","stage":"step","event":"ok","mb":6080}
+{"page":"cd46cff1","t":1208,"subject":"gpu","stage":"step","event":"ok","mb":6464}
+{"page":"cd46cff1","t":1242,"subject":"gpu","stage":"step","event":"ok","mb":6656}
+{"page":"cd46cff1","t":1174,"subject":"gpu","stage":"step","event":"ok","mb":6272}
+{"page":"cd46cff1","t":1219,"subject":"gpu","stage":"step","event":"ok","mb":6528}
+{"page":"cd46cff1","t":1230,"subject":"gpu","stage":"step","event":"ok","mb":6592}
+{"page":"cd46cff1","t":1186,"subject":"gpu","stage":"step","event":"ok","mb":6336}
+{"page":"cd46cff1","t":1197,"subject":"gpu","stage":"step","event":"ok","mb":6400}
+{"page":"cd46cff1","t":1151,"subject":"gpu","stage":"step","event":"ok","mb":6144}
+{"page":"cd46cff1","t":1162,"subject":"gpu","stage":"step","event":"ok","mb":6208}
+{"page":"cd46cff1","t":1253,"subject":"gpu","stage":"step","event":"ok","mb":6720}
+{"page":"cd46cff1","t":1264,"subject":"gpu","stage":"step","event":"ok","mb":6784}
+{"page":"cd46cff1","t":1275,"subject":"gpu","stage":"step","event":"ok","mb":6848}
+{"page":"cd46cff1","t":1286,"subject":"gpu","stage":"step","event":"ok","mb":6912}
+{"page":"cd46cff1","t":1298,"subject":"gpu","stage":"step","event":"ok","mb":6976}
+{"page":"cd46cff1","t":1321,"subject":"gpu","stage":"step","event":"ok","mb":7040}
+{"page":"cd46cff1","t":1333,"subject":"gpu","stage":"step","event":"ok","mb":7104}
+{"page":"cd46cff1","t":1344,"subject":"gpu","stage":"step","event":"ok","mb":7168}
+{"page":"cd46cff1","t":1356,"subject":"gpu","stage":"step","event":"ok","mb":7232}
+{"page":"cd46cff1","t":1369,"subject":"gpu","stage":"step","event":"ok","mb":7296}
+{"page":"cd46cff1","t":1380,"subject":"gpu","stage":"step","event":"ok","mb":7360}
+{"page":"cd46cff1","t":1391,"subject":"gpu","stage":"step","event":"ok","mb":7424}
+{"page":"cd46cff1","t":1404,"subject":"gpu","stage":"step","event":"ok","mb":7488}
+{"page":"cd46cff1","t":1415,"subject":"gpu","stage":"step","event":"ok","mb":7552}
+{"page":"cd46cff1","t":1428,"subject":"gpu","stage":"step","event":"ok","mb":7616}
+{"page":"cd46cff1","t":1450,"subject":"gpu","stage":"step","event":"ok","mb":7680}
+{"page":"cd46cff1","t":1475,"subject":"gpu","stage":"step","event":"ok","mb":7744}
+{"page":"cd46cff1","t":1498,"subject":"gpu","stage":"step","event":"ok","mb":7808}
+{"page":"cd46cff1","t":1518,"subject":"gpu","stage":"step","event":"ok","mb":7872}
+{"page":"cd46cff1","t":1547,"subject":"gpu","stage":"step","event":"ok","mb":7936}
+{"page":"cd46cff1","t":1606,"subject":"gpu","stage":"step","event":"ok","mb":8064}
+{"page":"cd46cff1","t":1585,"subject":"gpu","stage":"step","event":"ok","mb":8000}
+{"page":"cd46cff1","t":1628,"subject":"gpu","stage":"step","event":"ok","mb":8128}
+{"page":"cd46cff1","t":1649,"subject":"gpu","stage":"step","event":"ok","mb":8192}
+{"page":"cd46cff1","t":1649,"subject":"gpu","stage":"ramp","event":"end","outcome":"cap","mb":8192}
+{"page":"1df10781","t":0,"subject":"mixed","stage":"ramp","event":"start","stepMb":64,"maxMb":8192}
+{"page":"1df10781","t":144,"subject":"mixed","stage":"step","event":"ok","mb":192}
+{"page":"1df10781","t":238,"subject":"mixed","stage":"step","event":"ok","mb":384}
+{"page":"1df10781","t":324,"subject":"mixed","stage":"step","event":"ok","mb":576}
+{"page":"1df10781","t":411,"subject":"mixed","stage":"step","event":"ok","mb":768}
+{"page":"1df10781","t":497,"subject":"mixed","stage":"step","event":"ok","mb":960}
+{"page":"1df10781","t":583,"subject":"mixed","stage":"step","event":"ok","mb":1152}
+{"page":"1df10781","t":668,"subject":"mixed","stage":"step","event":"ok","mb":1344}
+{"page":"1df10781","t":752,"subject":"mixed","stage":"step","event":"ok","mb":1536}
+{"page":"1df10781","t":835,"subject":"mixed","stage":"step","event":"ok","mb":1728}
+{"page":"1df10781","t":918,"subject":"mixed","stage":"step","event":"ok","mb":1920}
+{"page":"1df10781","t":1002,"subject":"mixed","stage":"step","event":"ok","mb":2112}
+{"page":"1df10781","t":1086,"subject":"mixed","stage":"step","event":"ok","mb":2304}
+{"page":"1df10781","t":1171,"subject":"mixed","stage":"step","event":"ok","mb":2496}
+{"page":"1df10781","t":1255,"subject":"mixed","stage":"step","event":"ok","mb":2688}
+{"page":"1df10781","t":1341,"subject":"mixed","stage":"step","event":"ok","mb":2880}
+{"page":"1df10781","t":1427,"subject":"mixed","stage":"step","event":"ok","mb":3072}
+{"page":"1df10781","t":1513,"subject":"mixed","stage":"step","event":"ok","mb":3264}
+{"page":"1df10781","t":1598,"subject":"mixed","stage":"step","event":"ok","mb":3456}
+{"page":"1df10781","t":1683,"subject":"mixed","stage":"step","event":"ok","mb":3648}
+{"page":"1df10781","t":1768,"subject":"mixed","stage":"step","event":"ok","mb":3840}
+{"page":"1df10781","t":1855,"subject":"mixed","stage":"step","event":"ok","mb":4032}
+{"page":"1df10781","t":1939,"subject":"mixed","stage":"step","event":"ok","mb":4224}
+{"page":"1df10781","t":2023,"subject":"mixed","stage":"step","event":"ok","mb":4416}
+{"page":"1df10781","t":2108,"subject":"mixed","stage":"step","event":"ok","mb":4608}
+{"page":"1df10781","t":2193,"subject":"mixed","stage":"step","event":"ok","mb":4800}
+{"page":"1df10781","t":2279,"subject":"mixed","stage":"step","event":"ok","mb":4992}
+{"page":"1df10781","t":2365,"subject":"mixed","stage":"step","event":"ok","mb":5184}
+{"page":"1df10781","t":2450,"subject":"mixed","stage":"step","event":"ok","mb":5376}
+{"page":"1df10781","t":2539,"subject":"mixed","stage":"step","event":"ok","mb":5568}
+{"page":"1df10781","t":2625,"subject":"mixed","stage":"step","event":"ok","mb":5760}
+{"page":"1df10781","t":2710,"subject":"mixed","stage":"step","event":"ok","mb":5952}
+{"page":"1df10781","t":2795,"subject":"mixed","stage":"step","event":"ok","mb":6144}
+{"page":"1df10781","t":2881,"subject":"mixed","stage":"step","event":"ok","mb":6336}
+{"page":"1df10781","t":2967,"subject":"mixed","stage":"step","event":"ok","mb":6528}
+{"page":"1df10781","t":3053,"subject":"mixed","stage":"step","event":"ok","mb":6720}
+{"page":"1df10781","t":3138,"subject":"mixed","stage":"step","event":"ok","mb":6912}
+{"page":"1df10781","t":3222,"subject":"mixed","stage":"step","event":"ok","mb":7104}
+{"page":"1df10781","t":3308,"subject":"mixed","stage":"step","event":"ok","mb":7296}
+{"page":"1df10781","t":3394,"subject":"mixed","stage":"step","event":"ok","mb":7488}
+{"page":"1df10781","t":3480,"subject":"mixed","stage":"step","event":"ok","mb":7680}
+{"page":"1df10781","t":3567,"subject":"mixed","stage":"step","event":"ok","mb":7872}
+{"page":"1df10781","t":3669,"subject":"mixed","stage":"step","event":"ok","mb":8064}
+{"page":"1df10781","t":3770,"subject":"mixed","stage":"step","event":"ok","mb":8256}
+{"page":"1df10781","t":3771,"subject":"mixed","stage":"ramp","event":"end","outcome":"cap","mb":8256}
+{"page":"0cda1f7e","t":52,"subject":"gpu","stage":"capabilities","event":"report","userAgent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36","secureContext":true,"webgpu":true,"adapterInfo":{"vendor":"apple","architecture":"metal-3","device":"","description":"","subgroupMinSize":32,"subgroupMaxSize":32,"isFallbackAdapter":false},"features":{"shader-f16":true,"subgroups":true,"timestamp-query":true},"allFeatures":["bgra8unorm-storage","clip-distances","core-features-and-limits","depth-clip-control","depth32float-stencil8","dual-source-blending","float32-blendable","float32-filterable","indirect-first-instance","primitive-index","rg11b10ufloat-renderable","shader-f16","subgroup-size-control","subgroups","texture-component-swizzle","texture-compression-astc","texture-compression-astc-sliced-3d","texture-compression-bc","texture-compression-bc-sliced-3d","texture-compression-etc2","texture-compression-unaligned","texture-formats-tier1","texture-formats-tier2","timestamp-query"],"limits":{"maxTextureDimension1D":16384,"maxTextureDimension2D":16384,"maxTextureDimension3D":2048,"maxTextureArrayLayers":2048,"maxBindGroups":4,"maxBindGroupsPlusVertexBuffers":24,"maxBindingsPerBindGroup":1000,"maxDynamicUniformBuffersPerPipelineLayout":10,"maxDynamicStorageBuffersPerPipelineLayout":8,"maxSampledTexturesPerShaderStage":48,"maxSamplersPerShaderStage":16,"maxStorageBuffersPerShaderStage":10,"maxStorageTexturesPerShaderStage":8,"maxUniformBuffersPerShaderStage":12,"maxUniformBufferBindingSize":65536,"maxStorageBufferBindingSize":4294967292,"minUniformBufferOffsetAlignment":256,"minStorageBufferOffsetAlignment":256,"maxVertexBuffers":8,"maxBufferSize":4294967292,"maxVertexAttributes":30,"maxVertexBufferArrayStride":2048,"maxInterStageShaderVariables":28,"maxColorAttachments":8,"maxColorAttachmentBytesPerSample":128,"maxComputeWorkgroupStorageSize":32768,"maxComputeInvocationsPerWorkgroup":1024,"maxComputeWorkgroupSizeX":1024,"maxComputeWorkgroupSizeY":1024,"maxComputeWorkgroupSizeZ":64,"maxComputeWorkgroupsPerDimension":65535,"maxImmediateSize":64,"maxStorageBuffersInFragmentStage":10,"maxStorageTexturesInFragmentStage":8,"maxStorageBuffersInVertexStage":10,"maxStorageTexturesInVertexStage":8},"wgslLanguageFeatures":["buffer_view","immediate_address_space","linear_indexing","packed_4x8_integer_dot_product","pointer_composite_access","readonly_and_readwrite_storage_textures","subgroup_id","subgroup_uniformity","swizzle_assignment","texture_and_sampler_let","texture_formats_tier1","uniform_buffer_standard_layout","unrestricted_pointer_parameters"]}
+{"page":"531da5ba","t":16,"subject":"gpu","stage":"capabilities","event":"report","userAgent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36","secureContext":true,"webgpu":true,"adapterInfo":{"vendor":"apple","architecture":"metal-3","device":"","description":"","subgroupMinSize":32,"subgroupMaxSize":32,"isFallbackAdapter":false},"features":{"shader-f16":true,"subgroups":true,"timestamp-query":true},"allFeatures":["bgra8unorm-storage","clip-distances","core-features-and-limits","depth-clip-control","depth32float-stencil8","dual-source-blending","float32-blendable","float32-filterable","indirect-first-instance","primitive-index","rg11b10ufloat-renderable","shader-f16","subgroup-size-control","subgroups","texture-component-swizzle","texture-compression-astc","texture-compression-astc-sliced-3d","texture-compression-bc","texture-compression-bc-sliced-3d","texture-compression-etc2","texture-compression-unaligned","texture-formats-tier1","texture-formats-tier2","timestamp-query"],"limits":{"maxTextureDimension1D":16384,"maxTextureDimension2D":16384,"maxTextureDimension3D":2048,"maxTextureArrayLayers":2048,"maxBindGroups":4,"maxBindGroupsPlusVertexBuffers":24,"maxBindingsPerBindGroup":1000,"maxDynamicUniformBuffersPerPipelineLayout":10,"maxDynamicStorageBuffersPerPipelineLayout":8,"maxSampledTexturesPerShaderStage":48,"maxSamplersPerShaderStage":16,"maxStorageBuffersPerShaderStage":10,"maxStorageTexturesPerShaderStage":8,"maxUniformBuffersPerShaderStage":12,"maxUniformBufferBindingSize":65536,"maxStorageBufferBindingSize":4294967292,"minUniformBufferOffsetAlignment":256,"minStorageBufferOffsetAlignment":256,"maxVertexBuffers":8,"maxBufferSize":4294967292,"maxVertexAttributes":30,"maxVertexBufferArrayStride":2048,"maxInterStageShaderVariables":28,"maxColorAttachments":8,"maxColorAttachmentBytesPerSample":128,"maxComputeWorkgroupStorageSize":32768,"maxComputeInvocationsPerWorkgroup":1024,"maxComputeWorkgroupSizeX":1024,"maxComputeWorkgroupSizeY":1024,"maxComputeWorkgroupSizeZ":64,"maxComputeWorkgroupsPerDimension":65535,"maxImmediateSize":64,"maxStorageBuffersInFragmentStage":10,"maxStorageTexturesInFragmentStage":8,"maxStorageBuffersInVertexStage":10,"maxStorageTexturesInVertexStage":8},"wgslLanguageFeatures":["buffer_view","immediate_address_space","linear_indexing","packed_4x8_integer_dot_product","pointer_composite_access","readonly_and_readwrite_storage_textures","subgroup_id","subgroup_uniformity","swizzle_assignment","texture_and_sampler_let","texture_formats_tier1","uniform_buffer_standard_layout","unrestricted_pointer_parameters"]}
+{"page":"df459f8d","t":1,"subject":"wasm","stage":"ramp","event":"start","stepMb":64,"maxMb":8192}
+{"page":"df459f8d","t":45,"subject":"wasm","stage":"step","event":"ok","mb":64}
+{"page":"df459f8d","t":83,"subject":"wasm","stage":"step","event":"ok","mb":128}
+{"page":"df459f8d","t":126,"subject":"wasm","stage":"step","event":"ok","mb":192}
+{"page":"df459f8d","t":164,"subject":"wasm","stage":"step","event":"ok","mb":256}
+{"page":"df459f8d","t":205,"subject":"wasm","stage":"step","event":"ok","mb":320}
+{"page":"df459f8d","t":243,"subject":"wasm","stage":"step","event":"ok","mb":384}
+{"page":"df459f8d","t":280,"subject":"wasm","stage":"step","event":"ok","mb":448}
+{"page":"df459f8d","t":323,"subject":"wasm","stage":"step","event":"ok","mb":512}
+{"page":"df459f8d","t":364,"subject":"wasm","stage":"step","event":"ok","mb":576}
+{"page":"df459f8d","t":406,"subject":"wasm","stage":"step","event":"ok","mb":640}
+{"page":"df459f8d","t":446,"subject":"wasm","stage":"step","event":"ok","mb":704}
+{"page":"df459f8d","t":488,"subject":"wasm","stage":"step","event":"ok","mb":768}
+{"page":"df459f8d","t":529,"subject":"wasm","stage":"step","event":"ok","mb":832}
+{"page":"df459f8d","t":611,"subject":"wasm","stage":"step","event":"ok","mb":960}
+{"page":"df459f8d","t":569,"subject":"wasm","stage":"step","event":"ok","mb":896}
+{"page":"df459f8d","t":652,"subject":"wasm","stage":"step","event":"ok","mb":1024}
+{"page":"df459f8d","t":693,"subject":"wasm","stage":"step","event":"ok","mb":1088}
+{"page":"df459f8d","t":733,"subject":"wasm","stage":"step","event":"ok","mb":1152}
+{"page":"df459f8d","t":774,"subject":"wasm","stage":"step","event":"ok","mb":1216}
+{"page":"df459f8d","t":814,"subject":"wasm","stage":"step","event":"ok","mb":1280}
+{"page":"df459f8d","t":856,"subject":"wasm","stage":"step","event":"ok","mb":1344}
+{"page":"df459f8d","t":896,"subject":"wasm","stage":"step","event":"ok","mb":1408}
+{"page":"df459f8d","t":937,"subject":"wasm","stage":"step","event":"ok","mb":1472}
+{"page":"df459f8d","t":977,"subject":"wasm","stage":"step","event":"ok","mb":1536}
+{"page":"df459f8d","t":1018,"subject":"wasm","stage":"step","event":"ok","mb":1600}
+{"page":"df459f8d","t":1058,"subject":"wasm","stage":"step","event":"ok","mb":1664}
+{"page":"df459f8d","t":1099,"subject":"wasm","stage":"step","event":"ok","mb":1728}
+{"page":"df459f8d","t":1139,"subject":"wasm","stage":"step","event":"ok","mb":1792}
+{"page":"df459f8d","t":1221,"subject":"wasm","stage":"step","event":"ok","mb":1920}
+{"page":"df459f8d","t":1180,"subject":"wasm","stage":"step","event":"ok","mb":1856}
+{"page":"df459f8d","t":1263,"subject":"wasm","stage":"step","event":"ok","mb":1984}
+{"page":"df459f8d","t":1303,"subject":"wasm","stage":"step","event":"ok","mb":2048}
+{"page":"df459f8d","t":1345,"subject":"wasm","stage":"step","event":"ok","mb":2112}
+{"page":"df459f8d","t":1386,"subject":"wasm","stage":"step","event":"ok","mb":2176}
+{"page":"df459f8d","t":1427,"subject":"wasm","stage":"step","event":"ok","mb":2240}
+{"page":"df459f8d","t":1467,"subject":"wasm","stage":"step","event":"ok","mb":2304}
+{"page":"df459f8d","t":1508,"subject":"wasm","stage":"step","event":"ok","mb":2368}
+{"page":"df459f8d","t":1549,"subject":"wasm","stage":"step","event":"ok","mb":2432}
+{"page":"df459f8d","t":1589,"subject":"wasm","stage":"step","event":"ok","mb":2496}
+{"page":"df459f8d","t":1630,"subject":"wasm","stage":"step","event":"ok","mb":2560}
+{"page":"df459f8d","t":1671,"subject":"wasm","stage":"step","event":"ok","mb":2624}
+{"page":"df459f8d","t":1755,"subject":"wasm","stage":"step","event":"ok","mb":2752}
+{"page":"df459f8d","t":1713,"subject":"wasm","stage":"step","event":"ok","mb":2688}
+{"page":"df459f8d","t":1797,"subject":"wasm","stage":"step","event":"ok","mb":2816}
+{"page":"df459f8d","t":1839,"subject":"wasm","stage":"step","event":"ok","mb":2880}
+{"page":"df459f8d","t":1881,"subject":"wasm","stage":"step","event":"ok","mb":2944}
+{"page":"df459f8d","t":1922,"subject":"wasm","stage":"step","event":"ok","mb":3008}
+{"page":"df459f8d","t":1963,"subject":"wasm","stage":"step","event":"ok","mb":3072}
+{"page":"df459f8d","t":2004,"subject":"wasm","stage":"step","event":"ok","mb":3136}
+{"page":"df459f8d","t":2045,"subject":"wasm","stage":"step","event":"ok","mb":3200}
+{"page":"df459f8d","t":2086,"subject":"wasm","stage":"step","event":"ok","mb":3264}
+{"page":"df459f8d","t":2167,"subject":"wasm","stage":"step","event":"ok","mb":3392}
+{"page":"df459f8d","t":2127,"subject":"wasm","stage":"step","event":"ok","mb":3328}
+{"page":"df459f8d","t":2209,"subject":"wasm","stage":"step","event":"ok","mb":3456}
+{"page":"df459f8d","t":2289,"subject":"wasm","stage":"step","event":"ok","mb":3584}
+{"page":"df459f8d","t":2249,"subject":"wasm","stage":"step","event":"ok","mb":3520}
+{"page":"df459f8d","t":2330,"subject":"wasm","stage":"step","event":"ok","mb":3648}
+{"page":"df459f8d","t":2371,"subject":"wasm","stage":"step","event":"ok","mb":3712}
+{"page":"df459f8d","t":2412,"subject":"wasm","stage":"step","event":"ok","mb":3776}
+{"page":"df459f8d","t":2454,"subject":"wasm","stage":"step","event":"ok","mb":3840}
+{"page":"df459f8d","t":2495,"subject":"wasm","stage":"step","event":"ok","mb":3904}
+{"page":"df459f8d","t":2535,"subject":"wasm","stage":"step","event":"ok","mb":3968}
+{"page":"df459f8d","t":2576,"subject":"wasm","stage":"step","event":"ok","mb":4032}
+{"page":"df459f8d","t":2617,"subject":"wasm","stage":"step","event":"ok","mb":4096}
+{"page":"df459f8d","t":2623,"subject":"wasm","stage":"ramp","event":"end","outcome":"refused","error":"WebAssembly.Memory.grow(): Unable to grow instance memory","mb":4096}
+{"page":"14489f32","t":1,"subject":"js","stage":"ramp","event":"start","stepMb":64,"maxMb":8192}
+{"page":"14489f32","t":57,"subject":"js","stage":"step","event":"ok","mb":64}
+{"page":"14489f32","t":96,"subject":"js","stage":"step","event":"ok","mb":128}
+{"page":"14489f32","t":135,"subject":"js","stage":"step","event":"ok","mb":192}
+{"page":"14489f32","t":172,"subject":"js","stage":"step","event":"ok","mb":256}
+{"page":"14489f32","t":211,"subject":"js","stage":"step","event":"ok","mb":320}
+{"page":"14489f32","t":250,"subject":"js","stage":"step","event":"ok","mb":384}
+{"page":"14489f32","t":287,"subject":"js","stage":"step","event":"ok","mb":448}
+{"page":"14489f32","t":330,"subject":"js","stage":"step","event":"ok","mb":512}
+{"page":"14489f32","t":371,"subject":"js","stage":"step","event":"ok","mb":576}
+{"page":"14489f32","t":412,"subject":"js","stage":"step","event":"ok","mb":640}
+{"page":"14489f32","t":533,"subject":"js","stage":"step","event":"ok","mb":768}
+{"page":"14489f32","t":492,"subject":"js","stage":"step","event":"ok","mb":704}
+{"page":"14489f32","t":615,"subject":"js","stage":"step","event":"ok","mb":896}
+{"page":"14489f32","t":574,"subject":"js","stage":"step","event":"ok","mb":832}
+{"page":"14489f32","t":656,"subject":"js","stage":"step","event":"ok","mb":960}
+{"page":"14489f32","t":697,"subject":"js","stage":"step","event":"ok","mb":1024}
+{"page":"14489f32","t":737,"subject":"js","stage":"step","event":"ok","mb":1088}
+{"page":"14489f32","t":778,"subject":"js","stage":"step","event":"ok","mb":1152}
+{"page":"14489f32","t":818,"subject":"js","stage":"step","event":"ok","mb":1216}
+{"page":"14489f32","t":859,"subject":"js","stage":"step","event":"ok","mb":1280}
+{"page":"14489f32","t":900,"subject":"js","stage":"step","event":"ok","mb":1344}
+{"page":"14489f32","t":941,"subject":"js","stage":"step","event":"ok","mb":1408}
+{"page":"14489f32","t":1023,"subject":"js","stage":"step","event":"ok","mb":1536}
+{"page":"14489f32","t":982,"subject":"js","stage":"step","event":"ok","mb":1472}
+{"page":"14489f32","t":1064,"subject":"js","stage":"step","event":"ok","mb":1600}
+{"page":"14489f32","t":1103,"subject":"js","stage":"step","event":"ok","mb":1664}
+{"page":"14489f32","t":1143,"subject":"js","stage":"step","event":"ok","mb":1728}
+{"page":"14489f32","t":1184,"subject":"js","stage":"step","event":"ok","mb":1792}
+{"page":"14489f32","t":1225,"subject":"js","stage":"step","event":"ok","mb":1856}
+{"page":"14489f32","t":1267,"subject":"js","stage":"step","event":"ok","mb":1920}
+{"page":"14489f32","t":1308,"subject":"js","stage":"step","event":"ok","mb":1984}
+{"page":"14489f32","t":1350,"subject":"js","stage":"step","event":"ok","mb":2048}
+{"page":"14489f32","t":1391,"subject":"js","stage":"step","event":"ok","mb":2112}
+{"page":"14489f32","t":1432,"subject":"js","stage":"step","event":"ok","mb":2176}
+{"page":"14489f32","t":1474,"subject":"js","stage":"step","event":"ok","mb":2240}
+{"page":"14489f32","t":1515,"subject":"js","stage":"step","event":"ok","mb":2304}
+{"page":"14489f32","t":1557,"subject":"js","stage":"step","event":"ok","mb":2368}
+{"page":"14489f32","t":1639,"subject":"js","stage":"step","event":"ok","mb":2496}
+{"page":"14489f32","t":1598,"subject":"js","stage":"step","event":"ok","mb":2432}
+{"page":"14489f32","t":1680,"subject":"js","stage":"step","event":"ok","mb":2560}
+{"page":"14489f32","t":1720,"subject":"js","stage":"step","event":"ok","mb":2624}
+{"page":"14489f32","t":1760,"subject":"js","stage":"step","event":"ok","mb":2688}
+{"page":"14489f32","t":1800,"subject":"js","stage":"step","event":"ok","mb":2752}
+{"page":"14489f32","t":1841,"subject":"js","stage":"step","event":"ok","mb":2816}
+{"page":"14489f32","t":1882,"subject":"js","stage":"step","event":"ok","mb":2880}
+{"page":"14489f32","t":1922,"subject":"js","stage":"step","event":"ok","mb":2944}
+{"page":"14489f32","t":1963,"subject":"js","stage":"step","event":"ok","mb":3008}
+{"page":"14489f32","t":2004,"subject":"js","stage":"step","event":"ok","mb":3072}
+{"page":"14489f32","t":2084,"subject":"js","stage":"step","event":"ok","mb":3200}
+{"page":"14489f32","t":2044,"subject":"js","stage":"step","event":"ok","mb":3136}
+{"page":"14489f32","t":2124,"subject":"js","stage":"step","event":"ok","mb":3264}
+{"page":"14489f32","t":2165,"subject":"js","stage":"step","event":"ok","mb":3328}
+{"page":"14489f32","t":2206,"subject":"js","stage":"step","event":"ok","mb":3392}
+{"page":"14489f32","t":2247,"subject":"js","stage":"step","event":"ok","mb":3456}
+{"page":"14489f32","t":2287,"subject":"js","stage":"step","event":"ok","mb":3520}
+{"page":"14489f32","t":2328,"subject":"js","stage":"step","event":"ok","mb":3584}
+{"page":"14489f32","t":2368,"subject":"js","stage":"step","event":"ok","mb":3648}
+{"page":"14489f32","t":2408,"subject":"js","stage":"step","event":"ok","mb":3712}
+{"page":"14489f32","t":2449,"subject":"js","stage":"step","event":"ok","mb":3776}
+{"page":"14489f32","t":2490,"subject":"js","stage":"step","event":"ok","mb":3840}
+{"page":"14489f32","t":2531,"subject":"js","stage":"step","event":"ok","mb":3904}
+{"page":"14489f32","t":2613,"subject":"js","stage":"step","event":"ok","mb":4032}
+{"page":"14489f32","t":2572,"subject":"js","stage":"step","event":"ok","mb":3968}
+{"page":"14489f32","t":2654,"subject":"js","stage":"step","event":"ok","mb":4096}
+{"page":"14489f32","t":2695,"subject":"js","stage":"step","event":"ok","mb":4160}
+{"page":"14489f32","t":2734,"subject":"js","stage":"step","event":"ok","mb":4224}
+{"page":"14489f32","t":2775,"subject":"js","stage":"step","event":"ok","mb":4288}
+{"page":"14489f32","t":2816,"subject":"js","stage":"step","event":"ok","mb":4352}
+{"page":"14489f32","t":2857,"subject":"js","stage":"step","event":"ok","mb":4416}
+{"page":"14489f32","t":2898,"subject":"js","stage":"step","event":"ok","mb":4480}
+{"page":"14489f32","t":2940,"subject":"js","stage":"step","event":"ok","mb":4544}
+{"page":"14489f32","t":2980,"subject":"js","stage":"step","event":"ok","mb":4608}
+{"page":"14489f32","t":3020,"subject":"js","stage":"step","event":"ok","mb":4672}
+{"page":"14489f32","t":3060,"subject":"js","stage":"step","event":"ok","mb":4736}
+{"page":"14489f32","t":3103,"subject":"js","stage":"step","event":"ok","mb":4800}
+{"page":"14489f32","t":3144,"subject":"js","stage":"step","event":"ok","mb":4864}
+{"page":"14489f32","t":3185,"subject":"js","stage":"step","event":"ok","mb":4928}
+{"page":"14489f32","t":3227,"subject":"js","stage":"step","event":"ok","mb":4992}
+{"page":"14489f32","t":3269,"subject":"js","stage":"step","event":"ok","mb":5056}
+{"page":"14489f32","t":3309,"subject":"js","stage":"step","event":"ok","mb":5120}
+{"page":"14489f32","t":3350,"subject":"js","stage":"step","event":"ok","mb":5184}
+{"page":"14489f32","t":3391,"subject":"js","stage":"step","event":"ok","mb":5248}
+{"page":"14489f32","t":3431,"subject":"js","stage":"step","event":"ok","mb":5312}
+{"page":"14489f32","t":3474,"subject":"js","stage":"step","event":"ok","mb":5376}
+{"page":"14489f32","t":3517,"subject":"js","stage":"step","event":"ok","mb":5440}
+{"page":"14489f32","t":3560,"subject":"js","stage":"step","event":"ok","mb":5504}
+{"page":"14489f32","t":3646,"subject":"js","stage":"step","event":"ok","mb":5632}
+{"page":"14489f32","t":3604,"subject":"js","stage":"step","event":"ok","mb":5568}
+{"page":"14489f32","t":3733,"subject":"js","stage":"step","event":"ok","mb":5760}
+{"page":"14489f32","t":3690,"subject":"js","stage":"step","event":"ok","mb":5696}
+{"page":"14489f32","t":3775,"subject":"js","stage":"step","event":"ok","mb":5824}
+{"page":"14489f32","t":3818,"subject":"js","stage":"step","event":"ok","mb":5888}
+{"page":"14489f32","t":3861,"subject":"js","stage":"step","event":"ok","mb":5952}
+{"page":"14489f32","t":3904,"subject":"js","stage":"step","event":"ok","mb":6016}
+{"page":"14489f32","t":3946,"subject":"js","stage":"step","event":"ok","mb":6080}
+{"page":"14489f32","t":3989,"subject":"js","stage":"step","event":"ok","mb":6144}
+{"page":"14489f32","t":4032,"subject":"js","stage":"step","event":"ok","mb":6208}
+{"page":"14489f32","t":4076,"subject":"js","stage":"step","event":"ok","mb":6272}
+{"page":"14489f32","t":4119,"subject":"js","stage":"step","event":"ok","mb":6336}
+{"page":"14489f32","t":4205,"subject":"js","stage":"step","event":"ok","mb":6464}
+{"page":"14489f32","t":4161,"subject":"js","stage":"step","event":"ok","mb":6400}
+{"page":"14489f32","t":4248,"subject":"js","stage":"step","event":"ok","mb":6528}
+{"page":"14489f32","t":4291,"subject":"js","stage":"step","event":"ok","mb":6592}
+{"page":"14489f32","t":4335,"subject":"js","stage":"step","event":"ok","mb":6656}
+{"page":"14489f32","t":4379,"subject":"js","stage":"step","event":"ok","mb":6720}
+{"page":"14489f32","t":4422,"subject":"js","stage":"step","event":"ok","mb":6784}
+{"page":"14489f32","t":4464,"subject":"js","stage":"step","event":"ok","mb":6848}
+{"page":"14489f32","t":4506,"subject":"js","stage":"step","event":"ok","mb":6912}
+{"page":"14489f32","t":4547,"subject":"js","stage":"step","event":"ok","mb":6976}
+{"page":"14489f32","t":4589,"subject":"js","stage":"step","event":"ok","mb":7040}
+{"page":"14489f32","t":4630,"subject":"js","stage":"step","event":"ok","mb":7104}
+{"page":"14489f32","t":4672,"subject":"js","stage":"step","event":"ok","mb":7168}
+{"page":"14489f32","t":4713,"subject":"js","stage":"step","event":"ok","mb":7232}
+{"page":"14489f32","t":4755,"subject":"js","stage":"step","event":"ok","mb":7296}
+{"page":"14489f32","t":4796,"subject":"js","stage":"step","event":"ok","mb":7360}
+{"page":"14489f32","t":4839,"subject":"js","stage":"step","event":"ok","mb":7424}
+{"page":"14489f32","t":4881,"subject":"js","stage":"step","event":"ok","mb":7488}
+{"page":"14489f32","t":4924,"subject":"js","stage":"step","event":"ok","mb":7552}
+{"page":"14489f32","t":4966,"subject":"js","stage":"step","event":"ok","mb":7616}
+{"page":"14489f32","t":5008,"subject":"js","stage":"step","event":"ok","mb":7680}
+{"page":"14489f32","t":5050,"subject":"js","stage":"step","event":"ok","mb":7744}
+{"page":"14489f32","t":5093,"subject":"js","stage":"step","event":"ok","mb":7808}
+{"page":"14489f32","t":5135,"subject":"js","stage":"step","event":"ok","mb":7872}
+{"page":"14489f32","t":5176,"subject":"js","stage":"step","event":"ok","mb":7936}
+{"page":"14489f32","t":5220,"subject":"js","stage":"step","event":"ok","mb":8000}
+{"page":"14489f32","t":5368,"subject":"js","stage":"step","event":"ok","mb":8064}
+{"page":"14489f32","t":5663,"subject":"js","stage":"step","event":"ok","mb":8128}
+{"page":"14489f32","t":5960,"subject":"js","stage":"step","event":"ok","mb":8192}
+{"page":"14489f32","t":5964,"subject":"js","stage":"ramp","event":"end","outcome":"cap","mb":8192}
+{"page":"87afaeaa","t":0,"subject":"gpu","stage":"ramp","event":"start","stepMb":64,"maxMb":8192}
+{"page":"87afaeaa","t":32,"subject":"gpu","stage":"step","event":"ok","mb":64}
+{"page":"87afaeaa","t":54,"subject":"gpu","stage":"step","event":"ok","mb":192}
+{"page":"87afaeaa","t":44,"subject":"gpu","stage":"step","event":"ok","mb":128}
+{"page":"87afaeaa","t":64,"subject":"gpu","stage":"step","event":"ok","mb":256}
+{"page":"87afaeaa","t":74,"subject":"gpu","stage":"step","event":"ok","mb":320}
+{"page":"87afaeaa","t":86,"subject":"gpu","stage":"step","event":"ok","mb":384}
+{"page":"87afaeaa","t":96,"subject":"gpu","stage":"step","event":"ok","mb":448}
+{"page":"87afaeaa","t":107,"subject":"gpu","stage":"step","event":"ok","mb":512}
+{"page":"87afaeaa","t":118,"subject":"gpu","stage":"step","event":"ok","mb":576}
+{"page":"87afaeaa","t":128,"subject":"gpu","stage":"step","event":"ok","mb":640}
+{"page":"87afaeaa","t":139,"subject":"gpu","stage":"step","event":"ok","mb":704}
+{"page":"87afaeaa","t":170,"subject":"gpu","stage":"step","event":"ok","mb":896}
+{"page":"87afaeaa","t":149,"subject":"gpu","stage":"step","event":"ok","mb":768}
+{"page":"87afaeaa","t":160,"subject":"gpu","stage":"step","event":"ok","mb":832}
+{"page":"87afaeaa","t":181,"subject":"gpu","stage":"step","event":"ok","mb":960}
+{"page":"87afaeaa","t":192,"subject":"gpu","stage":"step","event":"ok","mb":1024}
+{"page":"87afaeaa","t":202,"subject":"gpu","stage":"step","event":"ok","mb":1088}
+{"page":"87afaeaa","t":213,"subject":"gpu","stage":"step","event":"ok","mb":1152}
+{"page":"87afaeaa","t":236,"subject":"gpu","stage":"step","event":"ok","mb":1280}
+{"page":"87afaeaa","t":225,"subject":"gpu","stage":"step","event":"ok","mb":1216}
+{"page":"87afaeaa","t":247,"subject":"gpu","stage":"step","event":"ok","mb":1344}
+{"page":"87afaeaa","t":257,"subject":"gpu","stage":"step","event":"ok","mb":1408}
+{"page":"87afaeaa","t":268,"subject":"gpu","stage":"step","event":"ok","mb":1472}
+{"page":"87afaeaa","t":278,"subject":"gpu","stage":"step","event":"ok","mb":1536}
+{"page":"87afaeaa","t":289,"subject":"gpu","stage":"step","event":"ok","mb":1600}
+{"page":"87afaeaa","t":299,"subject":"gpu","stage":"step","event":"ok","mb":1664}
+{"page":"87afaeaa","t":311,"subject":"gpu","stage":"step","event":"ok","mb":1728}
+{"page":"87afaeaa","t":322,"subject":"gpu","stage":"step","event":"ok","mb":1792}
+{"page":"87afaeaa","t":343,"subject":"gpu","stage":"step","event":"ok","mb":1920}
+{"page":"87afaeaa","t":352,"subject":"gpu","stage":"step","event":"ok","mb":1984}
+{"page":"87afaeaa","t":362,"subject":"gpu","stage":"step","event":"ok","mb":2048}
+{"page":"87afaeaa","t":382,"subject":"gpu","stage":"step","event":"ok","mb":2176}
+{"page":"87afaeaa","t":372,"subject":"gpu","stage":"step","event":"ok","mb":2112}
+{"page":"87afaeaa","t":333,"subject":"gpu","stage":"step","event":"ok","mb":1856}
+{"page":"87afaeaa","t":412,"subject":"gpu","stage":"step","event":"ok","mb":2368}
+{"page":"87afaeaa","t":402,"subject":"gpu","stage":"step","event":"ok","mb":2304}
+{"page":"87afaeaa","t":392,"subject":"gpu","stage":"step","event":"ok","mb":2240}
+{"page":"87afaeaa","t":422,"subject":"gpu","stage":"step","event":"ok","mb":2432}
+{"page":"87afaeaa","t":432,"subject":"gpu","stage":"step","event":"ok","mb":2496}
+{"page":"87afaeaa","t":443,"subject":"gpu","stage":"step","event":"ok","mb":2560}
+{"page":"87afaeaa","t":483,"subject":"gpu","stage":"step","event":"ok","mb":2816}
+{"page":"87afaeaa","t":503,"subject":"gpu","stage":"step","event":"ok","mb":2944}
+{"page":"87afaeaa","t":492,"subject":"gpu","stage":"step","event":"ok","mb":2880}
+{"page":"87afaeaa","t":453,"subject":"gpu","stage":"step","event":"ok","mb":2624}
+{"page":"87afaeaa","t":512,"subject":"gpu","stage":"step","event":"ok","mb":3008}
+{"page":"87afaeaa","t":462,"subject":"gpu","stage":"step","event":"ok","mb":2688}
+{"page":"87afaeaa","t":523,"subject":"gpu","stage":"step","event":"ok","mb":3072}
+{"page":"87afaeaa","t":473,"subject":"gpu","stage":"step","event":"ok","mb":2752}
+{"page":"87afaeaa","t":533,"subject":"gpu","stage":"step","event":"ok","mb":3136}
+{"page":"87afaeaa","t":542,"subject":"gpu","stage":"step","event":"ok","mb":3200}
+{"page":"87afaeaa","t":552,"subject":"gpu","stage":"step","event":"ok","mb":3264}
+{"page":"87afaeaa","t":562,"subject":"gpu","stage":"step","event":"ok","mb":3328}
+{"page":"87afaeaa","t":572,"subject":"gpu","stage":"step","event":"ok","mb":3392}
+{"page":"87afaeaa","t":594,"subject":"gpu","stage":"step","event":"ok","mb":3520}
+{"page":"87afaeaa","t":583,"subject":"gpu","stage":"step","event":"ok","mb":3456}
+{"page":"87afaeaa","t":604,"subject":"gpu","stage":"step","event":"ok","mb":3584}
+{"page":"87afaeaa","t":614,"subject":"gpu","stage":"step","event":"ok","mb":3648}
+{"page":"87afaeaa","t":624,"subject":"gpu","stage":"step","event":"ok","mb":3712}
+{"page":"87afaeaa","t":635,"subject":"gpu","stage":"step","event":"ok","mb":3776}
+{"page":"87afaeaa","t":646,"subject":"gpu","stage":"step","event":"ok","mb":3840}
+{"page":"87afaeaa","t":656,"subject":"gpu","stage":"step","event":"ok","mb":3904}
+{"page":"87afaeaa","t":667,"subject":"gpu","stage":"step","event":"ok","mb":3968}
+{"page":"87afaeaa","t":678,"subject":"gpu","stage":"step","event":"ok","mb":4032}
+{"page":"87afaeaa","t":688,"subject":"gpu","stage":"step","event":"ok","mb":4096}
+{"page":"87afaeaa","t":709,"subject":"gpu","stage":"step","event":"ok","mb":4224}
+{"page":"87afaeaa","t":699,"subject":"gpu","stage":"step","event":"ok","mb":4160}
+{"page":"87afaeaa","t":719,"subject":"gpu","stage":"step","event":"ok","mb":4288}
+{"page":"87afaeaa","t":729,"subject":"gpu","stage":"step","event":"ok","mb":4352}
+{"page":"87afaeaa","t":740,"subject":"gpu","stage":"step","event":"ok","mb":4416}
+{"page":"87afaeaa","t":750,"subject":"gpu","stage":"step","event":"ok","mb":4480}
+{"page":"87afaeaa","t":761,"subject":"gpu","stage":"step","event":"ok","mb":4544}
+{"page":"87afaeaa","t":771,"subject":"gpu","stage":"step","event":"ok","mb":4608}
+{"page":"87afaeaa","t":781,"subject":"gpu","stage":"step","event":"ok","mb":4672}
+{"page":"87afaeaa","t":791,"subject":"gpu","stage":"step","event":"ok","mb":4736}
+{"page":"87afaeaa","t":801,"subject":"gpu","stage":"step","event":"ok","mb":4800}
+{"page":"87afaeaa","t":812,"subject":"gpu","stage":"step","event":"ok","mb":4864}
+{"page":"87afaeaa","t":832,"subject":"gpu","stage":"step","event":"ok","mb":4992}
+{"page":"87afaeaa","t":822,"subject":"gpu","stage":"step","event":"ok","mb":4928}
+{"page":"87afaeaa","t":842,"subject":"gpu","stage":"step","event":"ok","mb":5056}
+{"page":"87afaeaa","t":852,"subject":"gpu","stage":"step","event":"ok","mb":5120}
+{"page":"87afaeaa","t":873,"subject":"gpu","stage":"step","event":"ok","mb":5248}
+{"page":"87afaeaa","t":863,"subject":"gpu","stage":"step","event":"ok","mb":5184}
+{"page":"87afaeaa","t":883,"subject":"gpu","stage":"step","event":"ok","mb":5312}
+{"page":"87afaeaa","t":914,"subject":"gpu","stage":"step","event":"ok","mb":5504}
+{"page":"87afaeaa","t":935,"subject":"gpu","stage":"step","event":"ok","mb":5632}
+{"page":"87afaeaa","t":893,"subject":"gpu","stage":"step","event":"ok","mb":5376}
+{"page":"87afaeaa","t":904,"subject":"gpu","stage":"step","event":"ok","mb":5440}
+{"page":"87afaeaa","t":924,"subject":"gpu","stage":"step","event":"ok","mb":5568}
+{"page":"87afaeaa","t":966,"subject":"gpu","stage":"step","event":"ok","mb":5824}
+{"page":"87afaeaa","t":945,"subject":"gpu","stage":"step","event":"ok","mb":5696}
+{"page":"87afaeaa","t":976,"subject":"gpu","stage":"step","event":"ok","mb":5888}
+{"page":"87afaeaa","t":1017,"subject":"gpu","stage":"step","event":"ok","mb":6144}
+{"page":"87afaeaa","t":987,"subject":"gpu","stage":"step","event":"ok","mb":5952}
+{"page":"87afaeaa","t":1027,"subject":"gpu","stage":"step","event":"ok","mb":6208}
+{"page":"87afaeaa","t":1040,"subject":"gpu","stage":"step","event":"ok","mb":6272}
+{"page":"87afaeaa","t":955,"subject":"gpu","stage":"step","event":"ok","mb":5760}
+{"page":"87afaeaa","t":997,"subject":"gpu","stage":"step","event":"ok","mb":6016}
+{"page":"87afaeaa","t":1007,"subject":"gpu","stage":"step","event":"ok","mb":6080}
+{"page":"87afaeaa","t":1050,"subject":"gpu","stage":"step","event":"ok","mb":6336}
+{"page":"87afaeaa","t":1061,"subject":"gpu","stage":"step","event":"ok","mb":6400}
+{"page":"87afaeaa","t":1072,"subject":"gpu","stage":"step","event":"ok","mb":6464}
+{"page":"87afaeaa","t":1082,"subject":"gpu","stage":"step","event":"ok","mb":6528}
+{"page":"87afaeaa","t":1092,"subject":"gpu","stage":"step","event":"ok","mb":6592}
+{"page":"87afaeaa","t":1102,"subject":"gpu","stage":"step","event":"ok","mb":6656}
+{"page":"87afaeaa","t":1113,"subject":"gpu","stage":"step","event":"ok","mb":6720}
+{"page":"87afaeaa","t":1125,"subject":"gpu","stage":"step","event":"ok","mb":6784}
+{"page":"87afaeaa","t":1136,"subject":"gpu","stage":"step","event":"ok","mb":6848}
+{"page":"87afaeaa","t":1147,"subject":"gpu","stage":"step","event":"ok","mb":6912}
+{"page":"87afaeaa","t":1158,"subject":"gpu","stage":"step","event":"ok","mb":6976}
+{"page":"87afaeaa","t":1168,"subject":"gpu","stage":"step","event":"ok","mb":7040}
+{"page":"87afaeaa","t":1178,"subject":"gpu","stage":"step","event":"ok","mb":7104}
+{"page":"87afaeaa","t":1188,"subject":"gpu","stage":"step","event":"ok","mb":7168}
+{"page":"87afaeaa","t":1198,"subject":"gpu","stage":"step","event":"ok","mb":7232}
+{"page":"87afaeaa","t":1209,"subject":"gpu","stage":"step","event":"ok","mb":7296}
+{"page":"87afaeaa","t":1219,"subject":"gpu","stage":"step","event":"ok","mb":7360}
+{"page":"87afaeaa","t":1229,"subject":"gpu","stage":"step","event":"ok","mb":7424}
+{"page":"87afaeaa","t":1240,"subject":"gpu","stage":"step","event":"ok","mb":7488}
+{"page":"87afaeaa","t":1251,"subject":"gpu","stage":"step","event":"ok","mb":7552}
+{"page":"87afaeaa","t":1261,"subject":"gpu","stage":"step","event":"ok","mb":7616}
+{"page":"87afaeaa","t":1282,"subject":"gpu","stage":"step","event":"ok","mb":7744}
+{"page":"87afaeaa","t":1271,"subject":"gpu","stage":"step","event":"ok","mb":7680}
+{"page":"87afaeaa","t":1297,"subject":"gpu","stage":"step","event":"ok","mb":7808}
+{"page":"87afaeaa","t":1311,"subject":"gpu","stage":"step","event":"ok","mb":7872}
+{"page":"87afaeaa","t":1323,"subject":"gpu","stage":"step","event":"ok","mb":7936}
+{"page":"87afaeaa","t":1335,"subject":"gpu","stage":"step","event":"ok","mb":8000}
+{"page":"87afaeaa","t":1360,"subject":"gpu","stage":"step","event":"ok","mb":8128}
+{"page":"87afaeaa","t":1347,"subject":"gpu","stage":"step","event":"ok","mb":8064}
+{"page":"87afaeaa","t":1373,"subject":"gpu","stage":"step","event":"ok","mb":8192}
+{"page":"87afaeaa","t":1374,"subject":"gpu","stage":"ramp","event":"end","outcome":"cap","mb":8192}
+{"page":"1c286a62","t":1,"subject":"mixed","stage":"ramp","event":"start","stepMb":64,"maxMb":8192}
+{"page":"1c286a62","t":121,"subject":"mixed","stage":"step","event":"ok","mb":192}
+{"page":"1c286a62","t":208,"subject":"mixed","stage":"step","event":"ok","mb":384}
+{"page":"1c286a62","t":293,"subject":"mixed","stage":"step","event":"ok","mb":576}
+{"page":"1c286a62","t":374,"subject":"mixed","stage":"step","event":"ok","mb":768}
+{"page":"1c286a62","t":455,"subject":"mixed","stage":"step","event":"ok","mb":960}
+{"page":"1c286a62","t":537,"subject":"mixed","stage":"step","event":"ok","mb":1152}
+{"page":"1c286a62","t":619,"subject":"mixed","stage":"step","event":"ok","mb":1344}
+{"page":"1c286a62","t":702,"subject":"mixed","stage":"step","event":"ok","mb":1536}
+{"page":"1c286a62","t":784,"subject":"mixed","stage":"step","event":"ok","mb":1728}
+{"page":"1c286a62","t":947,"subject":"mixed","stage":"step","event":"ok","mb":2112}
+{"page":"1c286a62","t":865,"subject":"mixed","stage":"step","event":"ok","mb":1920}
+{"page":"1c286a62","t":1030,"subject":"mixed","stage":"step","event":"ok","mb":2304}
+{"page":"1c286a62","t":1112,"subject":"mixed","stage":"step","event":"ok","mb":2496}
+{"page":"1c286a62","t":1193,"subject":"mixed","stage":"step","event":"ok","mb":2688}
+{"page":"1c286a62","t":1275,"subject":"mixed","stage":"step","event":"ok","mb":2880}
+{"page":"1c286a62","t":1356,"subject":"mixed","stage":"step","event":"ok","mb":3072}
+{"page":"1c286a62","t":1437,"subject":"mixed","stage":"step","event":"ok","mb":3264}
+{"page":"1c286a62","t":1517,"subject":"mixed","stage":"step","event":"ok","mb":3456}
+{"page":"1c286a62","t":1599,"subject":"mixed","stage":"step","event":"ok","mb":3648}
+{"page":"1c286a62","t":1681,"subject":"mixed","stage":"step","event":"ok","mb":3840}
+{"page":"1c286a62","t":1762,"subject":"mixed","stage":"step","event":"ok","mb":4032}
+{"page":"1c286a62","t":1843,"subject":"mixed","stage":"step","event":"ok","mb":4224}
+{"page":"1c286a62","t":1925,"subject":"mixed","stage":"step","event":"ok","mb":4416}
+{"page":"1c286a62","t":2008,"subject":"mixed","stage":"step","event":"ok","mb":4608}
+{"page":"1c286a62","t":2091,"subject":"mixed","stage":"step","event":"ok","mb":4800}
+{"page":"1c286a62","t":2171,"subject":"mixed","stage":"step","event":"ok","mb":4992}
+{"page":"1c286a62","t":2253,"subject":"mixed","stage":"step","event":"ok","mb":5184}
+{"page":"1c286a62","t":2334,"subject":"mixed","stage":"step","event":"ok","mb":5376}
+{"page":"1c286a62","t":2415,"subject":"mixed","stage":"step","event":"ok","mb":5568}
+{"page":"1c286a62","t":2497,"subject":"mixed","stage":"step","event":"ok","mb":5760}
+{"page":"1c286a62","t":2580,"subject":"mixed","stage":"step","event":"ok","mb":5952}
+{"page":"1c286a62","t":2662,"subject":"mixed","stage":"step","event":"ok","mb":6144}
+{"page":"1c286a62","t":2745,"subject":"mixed","stage":"step","event":"ok","mb":6336}
+{"page":"1c286a62","t":2828,"subject":"mixed","stage":"step","event":"ok","mb":6528}
+{"page":"1c286a62","t":2910,"subject":"mixed","stage":"step","event":"ok","mb":6720}
+{"page":"1c286a62","t":2991,"subject":"mixed","stage":"step","event":"ok","mb":6912}
+{"page":"1c286a62","t":3072,"subject":"mixed","stage":"step","event":"ok","mb":7104}
+{"page":"1c286a62","t":3153,"subject":"mixed","stage":"step","event":"ok","mb":7296}
+{"page":"1c286a62","t":3235,"subject":"mixed","stage":"step","event":"ok","mb":7488}
+{"page":"1c286a62","t":3318,"subject":"mixed","stage":"step","event":"ok","mb":7680}
+{"page":"1c286a62","t":3400,"subject":"mixed","stage":"step","event":"ok","mb":7872}
+{"page":"1c286a62","t":3481,"subject":"mixed","stage":"step","event":"ok","mb":8064}
+{"page":"1c286a62","t":3482,"subject":"mixed","stage":"ramp","event":"end","outcome":"cap","mb":8064}
+{"page":"255a69a3","t":1,"subject":"wasm","stage":"ramp","event":"start","stepMb":64,"maxMb":8192}
+{"page":"255a69a3","t":63,"subject":"wasm","stage":"step","event":"ok","mb":64}
+{"page":"255a69a3","t":129,"subject":"wasm","stage":"step","event":"ok","mb":192}
+{"page":"255a69a3","t":98,"subject":"wasm","stage":"step","event":"ok","mb":128}
+{"page":"255a69a3","t":160,"subject":"wasm","stage":"step","event":"ok","mb":256}
+{"page":"255a69a3","t":228,"subject":"wasm","stage":"step","event":"ok","mb":384}
+{"page":"255a69a3","t":198,"subject":"wasm","stage":"step","event":"ok","mb":320}
+{"page":"255a69a3","t":271,"subject":"wasm","stage":"step","event":"ok","mb":448}
+{"page":"255a69a3","t":314,"subject":"wasm","stage":"step","event":"ok","mb":512}
+{"page":"255a69a3","t":357,"subject":"wasm","stage":"step","event":"ok","mb":576}
+{"page":"255a69a3","t":399,"subject":"wasm","stage":"step","event":"ok","mb":640}
+{"page":"255a69a3","t":443,"subject":"wasm","stage":"step","event":"ok","mb":704}
+{"page":"255a69a3","t":489,"subject":"wasm","stage":"step","event":"ok","mb":768}
+{"page":"255a69a3","t":538,"subject":"wasm","stage":"step","event":"ok","mb":832}
+{"page":"255a69a3","t":586,"subject":"wasm","stage":"step","event":"ok","mb":896}
+{"page":"255a69a3","t":634,"subject":"wasm","stage":"step","event":"ok","mb":960}
+{"page":"255a69a3","t":682,"subject":"wasm","stage":"step","event":"ok","mb":1024}
+{"page":"255a69a3","t":729,"subject":"wasm","stage":"step","event":"ok","mb":1088}
+{"page":"255a69a3","t":790,"subject":"wasm","stage":"step","event":"ok","mb":1152}
+{"page":"255a69a3","t":841,"subject":"wasm","stage":"step","event":"ok","mb":1216}
+{"page":"255a69a3","t":898,"subject":"wasm","stage":"step","event":"ok","mb":1280}
+{"page":"255a69a3","t":947,"subject":"wasm","stage":"step","event":"ok","mb":1344}
+{"page":"255a69a3","t":993,"subject":"wasm","stage":"step","event":"ok","mb":1408}
+{"page":"255a69a3","t":1041,"subject":"wasm","stage":"step","event":"ok","mb":1472}
+{"page":"255a69a3","t":1091,"subject":"wasm","stage":"step","event":"ok","mb":1536}
+{"page":"255a69a3","t":1139,"subject":"wasm","stage":"step","event":"ok","mb":1600}
+{"page":"255a69a3","t":1203,"subject":"wasm","stage":"step","event":"ok","mb":1664}
+{"page":"255a69a3","t":1250,"subject":"wasm","stage":"step","event":"ok","mb":1728}
+{"page":"255a69a3","t":1304,"subject":"wasm","stage":"step","event":"ok","mb":1792}
+{"page":"255a69a3","t":1355,"subject":"wasm","stage":"step","event":"ok","mb":1856}
+{"page":"255a69a3","t":1432,"subject":"wasm","stage":"step","event":"ok","mb":1920}
+{"page":"a34047d6","t":1,"subject":"wasm","stage":"ramp","event":"end","outcome":"dead-tab","mb":1920}
+{"page":"a34047d6","t":1,"subject":"js","stage":"ramp","event":"start","stepMb":64,"maxMb":8192}
+{"page":"a34047d6","t":31,"subject":"js","stage":"step","event":"ok","mb":64}
+{"page":"a34047d6","t":61,"subject":"js","stage":"step","event":"ok","mb":128}
+{"page":"a34047d6","t":96,"subject":"js","stage":"step","event":"ok","mb":192}
+{"page":"a34047d6","t":128,"subject":"js","stage":"step","event":"ok","mb":256}
+{"page":"a34047d6","t":158,"subject":"js","stage":"step","event":"ok","mb":320}
+{"page":"a34047d6","t":190,"subject":"js","stage":"step","event":"ok","mb":384}
+{"page":"a34047d6","t":220,"subject":"js","stage":"step","event":"ok","mb":448}
+{"page":"a34047d6","t":251,"subject":"js","stage":"step","event":"ok","mb":512}
+{"page":"a34047d6","t":289,"subject":"js","stage":"step","event":"ok","mb":576}
+{"page":"a34047d6","t":320,"subject":"js","stage":"step","event":"ok","mb":640}
+{"page":"a34047d6","t":364,"subject":"js","stage":"step","event":"ok","mb":704}
+{"page":"a34047d6","t":410,"subject":"js","stage":"step","event":"ok","mb":768}
+{"page":"a34047d6","t":459,"subject":"js","stage":"step","event":"ok","mb":832}
+{"page":"a34047d6","t":507,"subject":"js","stage":"step","event":"ok","mb":896}
+{"page":"a34047d6","t":556,"subject":"js","stage":"step","event":"ok","mb":960}
+{"page":"a34047d6","t":602,"subject":"js","stage":"step","event":"ok","mb":1024}
+{"page":"a34047d6","t":651,"subject":"js","stage":"step","event":"ok","mb":1088}
+{"page":"a34047d6","t":698,"subject":"js","stage":"step","event":"ok","mb":1152}
+{"page":"a34047d6","t":747,"subject":"js","stage":"step","event":"ok","mb":1216}
+{"page":"a34047d6","t":794,"subject":"js","stage":"step","event":"ok","mb":1280}
+{"page":"a34047d6","t":843,"subject":"js","stage":"step","event":"ok","mb":1344}
+{"page":"a34047d6","t":899,"subject":"js","stage":"step","event":"ok","mb":1408}
+{"page":"a34047d6","t":968,"subject":"js","stage":"step","event":"ok","mb":1472}
+{"page":"a34047d6","t":1023,"subject":"js","stage":"step","event":"ok","mb":1536}
+{"page":"a34047d6","t":1074,"subject":"js","stage":"step","event":"ok","mb":1600}
+{"page":"a34047d6","t":1146,"subject":"js","stage":"step","event":"ok","mb":1664}
+{"page":"a34047d6","t":1207,"subject":"js","stage":"step","event":"ok","mb":1728}
+{"page":"a34047d6","t":1258,"subject":"js","stage":"step","event":"ok","mb":1792}
+{"page":"a34047d6","t":1334,"subject":"js","stage":"step","event":"ok","mb":1856}
+{"page":"a34047d6","t":1397,"subject":"js","stage":"step","event":"ok","mb":1920}
+{"page":"a34047d6","t":1493,"subject":"js","stage":"step","event":"ok","mb":1984}
+{"page":"6e305986","t":11,"subject":"gpu","stage":"ramp","event":"start","stepMb":64,"maxMb":8192}
+{"page":"6e305986","t":5,"subject":"js","stage":"ramp","event":"end","outcome":"dead-tab","mb":1984}
+{"page":"6e305986","t":70,"subject":"gpu","stage":"step","event":"ok","mb":64}
+{"page":"6e305986","t":90,"subject":"gpu","stage":"step","event":"ok","mb":128}
+{"page":"6e305986","t":104,"subject":"gpu","stage":"step","event":"ok","mb":192}
+{"page":"6e305986","t":119,"subject":"gpu","stage":"step","event":"ok","mb":256}
+{"page":"6e305986","t":134,"subject":"gpu","stage":"step","event":"ok","mb":320}
+{"page":"6e305986","t":164,"subject":"gpu","stage":"step","event":"ok","mb":448}
+{"page":"6e305986","t":149,"subject":"gpu","stage":"step","event":"ok","mb":384}
+{"page":"6e305986","t":178,"subject":"gpu","stage":"step","event":"ok","mb":512}
+{"page":"6e305986","t":193,"subject":"gpu","stage":"step","event":"ok","mb":576}
+{"page":"6e305986","t":207,"subject":"gpu","stage":"step","event":"ok","mb":640}
+{"page":"6e305986","t":222,"subject":"gpu","stage":"step","event":"ok","mb":704}
+{"page":"6e305986","t":265,"subject":"gpu","stage":"step","event":"ok","mb":896}
+{"page":"6e305986","t":236,"subject":"gpu","stage":"step","event":"ok","mb":768}
+{"page":"6e305986","t":250,"subject":"gpu","stage":"step","event":"ok","mb":832}
+{"page":"6e305986","t":310,"subject":"gpu","stage":"step","event":"ok","mb":1088}
+{"page":"6e305986","t":279,"subject":"gpu","stage":"step","event":"ok","mb":960}
+{"page":"6e305986","t":293,"subject":"gpu","stage":"step","event":"ok","mb":1024}
+{"page":"6e305986","t":325,"subject":"gpu","stage":"step","event":"ok","mb":1152}
+{"page":"6e305986","t":340,"subject":"gpu","stage":"step","event":"ok","mb":1216}
+{"page":"6e305986","t":355,"subject":"gpu","stage":"step","event":"ok","mb":1280}
+{"page":"6e305986","t":371,"subject":"gpu","stage":"step","event":"ok","mb":1344}
+{"page":"6e305986","t":385,"subject":"gpu","stage":"step","event":"ok","mb":1408}
+{"page":"6e305986","t":400,"subject":"gpu","stage":"step","event":"ok","mb":1472}
+{"page":"6e305986","t":414,"subject":"gpu","stage":"step","event":"ok","mb":1536}
+{"page":"6e305986","t":429,"subject":"gpu","stage":"step","event":"ok","mb":1600}
+{"page":"6e305986","t":444,"subject":"gpu","stage":"step","event":"ok","mb":1664}
+{"page":"6e305986","t":458,"subject":"gpu","stage":"step","event":"ok","mb":1728}
+{"page":"6e305986","t":471,"subject":"gpu","stage":"step","event":"ok","mb":1792}
+{"page":"6e305986","t":484,"subject":"gpu","stage":"step","event":"ok","mb":1856}
+{"page":"6e305986","t":498,"subject":"gpu","stage":"step","event":"ok","mb":1920}
+{"page":"7b42844c","t":0,"subject":"gpu","stage":"ramp","event":"end","outcome":"dead-tab","mb":1920}
+{"page":"7b42844c","t":1,"subject":"mixed","stage":"ramp","event":"start","stepMb":64,"maxMb":8192}
+{"page":"7b42844c","t":82,"subject":"mixed","stage":"step","event":"ok","mb":192}
+{"page":"7b42844c","t":163,"subject":"mixed","stage":"step","event":"ok","mb":384}
+{"page":"7b42844c","t":245,"subject":"mixed","stage":"step","event":"ok","mb":576}
+{"page":"7b42844c","t":351,"subject":"mixed","stage":"step","event":"ok","mb":768}
+{"page":"7b42844c","t":446,"subject":"mixed","stage":"step","event":"ok","mb":960}
+{"page":"7b42844c","t":557,"subject":"mixed","stage":"step","event":"ok","mb":1152}
+{"page":"7b42844c","t":869,"subject":"mixed","stage":"step","event":"ok","mb":1344}
+{"page":"7b42844c","t":1099,"subject":"mixed","stage":"step","event":"ok","mb":1536}
+{"page":"7b42844c","t":1218,"subject":"mixed","stage":"step","event":"ok","mb":1728}
+{"page":"7b42844c","t":1325,"subject":"mixed","stage":"step","event":"ok","mb":1920}
+{"page":"fc199ad4","t":1,"subject":"mixed","stage":"ramp","event":"end","outcome":"dead-tab","mb":1920}
+{"page":"31e51d7c","t":10,"subject":"gpu","stage":"capabilities","event":"report","userAgent":"Mozilla/5.0 (iPhone; CPU iPhone OS 18_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.6.2 Mobile/15E148 Safari/604.1","secureContext":true,"webgpu":true,"adapterInfo":{"vendor":"apple","architecture":"apple","device":"apple","description":"apple","isFallbackAdapter":false},"features":{"shader-f16":true,"subgroups":false,"timestamp-query":true},"allFeatures":["bgra8unorm-storage","core-features-and-limits","depth-clip-control","depth32float-stencil8","float16-renderable","float32-blendable","float32-filterable","float32-renderable","indirect-first-instance","rg11b10ufloat-renderable","shader-f16","texture-compression-astc","texture-compression-astc-sliced-3d","texture-compression-bc","texture-compression-bc-sliced-3d","texture-compression-etc2","texture-formats-tier1","timestamp-query"],"limits":{"maxTextureDimension1D":16384,"maxTextureDimension2D":16384,"maxTextureDimension3D":2048,"maxTextureArrayLayers":2048,"maxBindGroups":11,"maxBindGroupsPlusVertexBuffers":30,"maxBindingsPerBindGroup":65535,"maxDynamicUniformBuffersPerPipelineLayout":65535,"maxDynamicStorageBuffersPerPipelineLayout":65535,"maxSampledTexturesPerShaderStage":44,"maxSamplersPerShaderStage":22,"maxStorageBuffersPerShaderStage":44,"maxStorageTexturesPerShaderStage":44,"maxUniformBuffersPerShaderStage":44,"maxUniformBufferBindingSize":1073741824,"maxStorageBufferBindingSize":1073741824,"minUniformBufferOffsetAlignment":32,"minStorageBufferOffsetAlignment":32,"maxVertexBuffers":12,"maxBufferSize":1073741824,"maxVertexAttributes":30,"maxVertexBufferArrayStride":65532,"maxInterStageShaderComponents":124,"maxInterStageShaderVariables":124,"maxColorAttachments":8,"maxColorAttachmentBytesPerSample":64,"maxComputeWorkgroupStorageSize":32768,"maxComputeInvocationsPerWorkgroup":1024,"maxComputeWorkgroupSizeX":1024,"maxComputeWorkgroupSizeY":1024,"maxComputeWorkgroupSizeZ":1024,"maxComputeWorkgroupsPerDimension":65535},"wgslLanguageFeatures":["packed_4x8_integer_dot_product","pointer_composite_access","readonly_and_readwrite_storage_textures","unrestricted_pointer_parameters"]}
+{"page":"d4653d1f","t":7343,"subject":"watchdog","stage":"gpu","event":"device","timestamps":true}
+{"page":"d4653d1f","t":7452,"subject":"watchdog","stage":"calibrate","event":"ok","mode":"calibrate","iterations":1,"outcome":"ok","wallMs":102.7,"gpuMs":0.1}
+{"page":"d4653d1f","t":7455,"subject":"watchdog","stage":"calibrate","event":"ok","mode":"calibrate","iterations":2,"outcome":"ok","wallMs":1,"gpuMs":0.1}
+{"page":"d4653d1f","t":7457,"subject":"watchdog","stage":"calibrate","event":"ok","mode":"calibrate","iterations":4,"outcome":"ok","wallMs":0.8,"gpuMs":0.1}
+{"page":"d4653d1f","t":7460,"subject":"watchdog","stage":"calibrate","event":"ok","mode":"calibrate","iterations":8,"outcome":"ok","wallMs":0.9,"gpuMs":0.3}
+{"page":"d4653d1f","t":7470,"subject":"watchdog","stage":"calibrate","event":"ok","mode":"calibrate","iterations":64,"outcome":"ok","wallMs":3.1,"gpuMs":2.4}
+{"page":"d4653d1f","t":7462,"subject":"watchdog","stage":"calibrate","event":"ok","mode":"calibrate","iterations":16,"outcome":"ok","wallMs":1.7,"gpuMs":0.7}
+{"page":"d4653d1f","t":7465,"subject":"watchdog","stage":"calibrate","event":"ok","mode":"calibrate","iterations":32,"outcome":"ok","wallMs":1.6,"gpuMs":1.2}
+{"page":"d4653d1f","t":7476,"subject":"watchdog","stage":"calibrate","event":"ok","mode":"calibrate","iterations":128,"outcome":"ok","wallMs":5.5,"gpuMs":4.8}
+{"page":"d4653d1f","t":7487,"subject":"watchdog","stage":"calibrate","event":"ok","mode":"calibrate","iterations":256,"outcome":"ok","wallMs":10.2,"gpuMs":9.2}
+{"page":"d4653d1f","t":7504,"subject":"watchdog","stage":"calibrate","event":"ok","mode":"calibrate","iterations":512,"outcome":"ok","wallMs":15.2,"gpuMs":14.2}
+{"page":"d4653d1f","t":7547,"subject":"watchdog","stage":"calibrate","event":"ok","mode":"calibrate","iterations":2048,"outcome":"ok","wallMs":24.4,"gpuMs":23.5}
+{"page":"d4653d1f","t":7520,"subject":"watchdog","stage":"calibrate","event":"ok","mode":"calibrate","iterations":1024,"outcome":"ok","wallMs":15.6,"gpuMs":15}
+{"page":"d4653d1f","t":7596,"subject":"watchdog","stage":"calibrate","event":"ok","mode":"calibrate","iterations":4096,"outcome":"ok","wallMs":46.7,"gpuMs":45.6}
+{"page":"d4653d1f","t":7689,"subject":"watchdog","stage":"calibrate","event":"ok","mode":"calibrate","iterations":8192,"outcome":"ok","wallMs":92,"gpuMs":91.2}
+{"page":"d4653d1f","t":8172,"subject":"watchdog","stage":"single","event":"ok","mode":"single","iterations":44912,"estimatedMs":500,"outcome":"ok","wallMs":481,"gpuMs":480.2}
+{"page":"6e27967f","t":5652,"subject":"watchdog","stage":"gpu","event":"device","timestamps":true}
+{"page":"6e27967f","t":5667,"subject":"watchdog","stage":"calibrate","event":"ok","mode":"calibrate","iterations":1,"outcome":"ok","wallMs":11,"gpuMs":0.5}
+{"page":"6e27967f","t":5681,"subject":"watchdog","stage":"calibrate","event":"ok","mode":"calibrate","iterations":16,"outcome":"ok","wallMs":1.6,"gpuMs":0.3}
+{"page":"6e27967f","t":5689,"subject":"watchdog","stage":"calibrate","event":"ok","mode":"calibrate","iterations":32,"outcome":"ok","wallMs":3.7,"gpuMs":0.7}
+{"page":"6e27967f","t":5671,"subject":"watchdog","stage":"calibrate","event":"ok","mode":"calibrate","iterations":4,"outcome":"ok","wallMs":0.8,"gpuMs":0.1}
+{"page":"6e27967f","t":5673,"subject":"watchdog","stage":"calibrate","event":"ok","mode":"calibrate","iterations":8,"outcome":"ok","wallMs":0.9,"gpuMs":0.2}
+{"page":"6e27967f","t":5695,"subject":"watchdog","stage":"calibrate","event":"ok","mode":"calibrate","iterations":64,"outcome":"ok","wallMs":3.5,"gpuMs":1.9}
+{"page":"6e27967f","t":5669,"subject":"watchdog","stage":"calibrate","event":"ok","mode":"calibrate","iterations":2,"outcome":"ok","wallMs":0.7,"gpuMs":0.1}
+{"page":"6e27967f","t":5709,"subject":"watchdog","stage":"calibrate","event":"ok","mode":"calibrate","iterations":256,"outcome":"ok","wallMs":6.1,"gpuMs":5.4}
+{"page":"6e27967f","t":5701,"subject":"watchdog","stage":"calibrate","event":"ok","mode":"calibrate","iterations":128,"outcome":"ok","wallMs":5,"gpuMs":2.8}
+{"page":"6e27967f","t":5722,"subject":"watchdog","stage":"calibrate","event":"ok","mode":"calibrate","iterations":512,"outcome":"ok","wallMs":12.5,"gpuMs":11.9}
+{"page":"6e27967f","t":5738,"subject":"watchdog","stage":"calibrate","event":"ok","mode":"calibrate","iterations":1024,"outcome":"ok","wallMs":14.3,"gpuMs":13.4}
+{"page":"6e27967f","t":5823,"subject":"watchdog","stage":"calibrate","event":"ok","mode":"calibrate","iterations":4096,"outcome":"ok","wallMs":49.8,"gpuMs":47.4}
+{"page":"6e27967f","t":5772,"subject":"watchdog","stage":"calibrate","event":"ok","mode":"calibrate","iterations":2048,"outcome":"ok","wallMs":29.7,"gpuMs":22.9}
+{"page":"6e27967f","t":6025,"subject":"watchdog","stage":"single","event":"ok","mode":"single","iterations":8669,"estimatedMs":100,"outcome":"ok","wallMs":101.7,"gpuMs":98.9}
+{"page":"6e27967f","t":5921,"subject":"watchdog","stage":"calibrate","event":"ok","mode":"calibrate","iterations":8192,"outcome":"ok","wallMs":96.3,"gpuMs":94.5}
+{"page":"6e27967f","t":6223,"subject":"watchdog","stage":"single","event":"ok","mode":"single","iterations":17338,"estimatedMs":200,"outcome":"ok","wallMs":196.2,"gpuMs":194.3}
+{"page":"6e27967f","t":6622,"subject":"watchdog","stage":"single","event":"ok","mode":"single","iterations":34676,"estimatedMs":400,"outcome":"ok","wallMs":396.4,"gpuMs":395.2}
+{"page":"6e27967f","t":7429,"subject":"watchdog","stage":"single","event":"ok","mode":"single","iterations":69352,"estimatedMs":800,"outcome":"ok","wallMs":804.9,"gpuMs":801.3}
+{"page":"6e27967f","t":9031,"subject":"watchdog","stage":"single","event":"ok","mode":"single","iterations":138704,"estimatedMs":1600,"outcome":"ok","wallMs":1599.7,"gpuMs":1597.5}
+{"page":"6e27967f","t":12218,"subject":"watchdog","stage":"single","event":"ok","mode":"single","iterations":277408,"estimatedMs":3200,"outcome":"ok","wallMs":3185.5,"gpuMs":3184.3}
+{"page":"6e27967f","t":18849,"subject":"watchdog","stage":"single","event":"ok","mode":"single","iterations":554816,"estimatedMs":6400,"outcome":"ok","wallMs":6629.5,"gpuMs":6628.5}
+{"page":"6e27967f","t":18853,"subject":"watchdog","stage":"gpu","event":"device","timestamps":true}
+{"page":"6e27967f","t":25699,"subject":"watchdog","stage":"split","event":"ok","mode":"split","iterations":554816,"estimatedMs":6400,"chunkIterations":4334,"submits":129,"outcome":"ok","gpuMs":6510,"maxSubmitMs":55.4,"wallMs":6845}
+{"page":"6e27967f","t":40807,"subject":"watchdog","stage":"single","event":"ok","mode":"single","iterations":26006,"estimatedMs":300,"outcome":"ok","wallMs":300.5,"gpuMs":297.9}
+{"page":"6e27967f","t":42321,"subject":"watchdog","stage":"single","event":"ok","mode":"single","iterations":26006,"estimatedMs":300,"outcome":"ok","wallMs":1014.6,"gpuMs":300.5}
+{"page":"ffffa8b8","t":357,"subject":"watchdog","stage":"gpu","event":"device","timestamps":true}
+{"page":"ffffa8b8","t":693,"subject":"watchdog","stage":"single","event":"ok","mode":"single","iterations":26006,"estimatedMs":300,"outcome":"ok","wallMs":335.8,"gpuMs":332}
+{"page":"ffffa8b8","t":1842,"subject":"watchdog","stage":"gpu","event":"device","timestamps":true}
+{"page":"ffffa8b8","t":2147,"subject":"watchdog","stage":"single","event":"ok","mode":"single","iterations":26006,"estimatedMs":300,"outcome":"ok","wallMs":304.7,"gpuMs":302.9}
+{"page":"63179048","t":98739,"subject":"watchdog","stage":"gpu","event":"device","timestamps":true}
+{"page":"63179048","t":99041,"subject":"watchdog","stage":"calibrate","event":"ok","mode":"calibrate","iterations":1,"outcome":"ok","wallMs":299,"gpuMs":0.3}
+{"page":"63179048","t":99043,"subject":"watchdog","stage":"calibrate","event":"ok","mode":"calibrate","iterations":2,"outcome":"ok","wallMs":2,"gpuMs":0.5}
+{"page":"63179048","t":99122,"subject":"watchdog","stage":"calibrate","event":"ok","mode":"calibrate","iterations":512,"outcome":"ok","wallMs":29,"gpuMs":28.7}
+{"page":"63179048","t":99062,"subject":"watchdog","stage":"calibrate","event":"ok","mode":"calibrate","iterations":32,"outcome":"ok","wallMs":9,"gpuMs":8}
+{"page":"63179048","t":99078,"subject":"watchdog","stage":"calibrate","event":"ok","mode":"calibrate","iterations":128,"outcome":"ok","wallMs":7,"gpuMs":7.5}
+{"page":"63179048","t":99069,"subject":"watchdog","stage":"calibrate","event":"ok","mode":"calibrate","iterations":64,"outcome":"ok","wallMs":7,"gpuMs":6.9}
+{"page":"63179048","t":99046,"subject":"watchdog","stage":"calibrate","event":"ok","mode":"calibrate","iterations":4,"outcome":"ok","wallMs":3,"gpuMs":1}
+{"page":"63179048","t":99048,"subject":"watchdog","stage":"calibrate","event":"ok","mode":"calibrate","iterations":8,"outcome":"ok","wallMs":2,"gpuMs":2}
+{"page":"63179048","t":99053,"subject":"watchdog","stage":"calibrate","event":"ok","mode":"calibrate","iterations":16,"outcome":"ok","wallMs":4,"gpuMs":4.1}
+{"page":"63179048","t":99093,"subject":"watchdog","stage":"calibrate","event":"ok","mode":"calibrate","iterations":256,"outcome":"ok","wallMs":15,"gpuMs":14.4}
+{"page":"63179048","t":99181,"subject":"watchdog","stage":"calibrate","event":"ok","mode":"calibrate","iterations":1024,"outcome":"ok","wallMs":59,"gpuMs":57.4}
+{"page":"63179048","t":99286,"subject":"watchdog","stage":"single","event":"ok","mode":"single","iterations":1784,"estimatedMs":100,"outcome":"ok","wallMs":105,"gpuMs":103.8}
+{"page":"63179048","t":99493,"subject":"watchdog","stage":"single","event":"ok","mode":"single","iterations":3568,"estimatedMs":200,"outcome":"ok","wallMs":205,"gpuMs":202.6}
+{"page":"63179048","t":99902,"subject":"watchdog","stage":"single","event":"ok","mode":"single","iterations":7136,"estimatedMs":400,"outcome":"ok","wallMs":408,"gpuMs":405.8}
+{"page":"63179048","t":100557,"subject":"watchdog","stage":"gpu","event":"device","timestamps":true}
+{"page":"63179048","t":100555,"subject":"watchdog","stage":"single","event":"lost","mode":"single","iterations":14272,"estimatedMs":800,"outcome":"lost","wallMs":0,"error":"unknown: "}
+{"page":"63179048","t":101069,"subject":"watchdog","stage":"single","event":"lost","mode":"single","iterations":10092,"estimatedMs":566,"outcome":"lost","wallMs":511,"error":"unknown: "}
+{"page":"63179048","t":101072,"subject":"watchdog","stage":"gpu","event":"device","timestamps":true}
+{"page":"63179048","t":101565,"subject":"watchdog","stage":"single","event":"ok","mode":"single","iterations":8486,"estimatedMs":476,"outcome":"ok","wallMs":492,"gpuMs":484.9}
+{"page":"63179048","t":102074,"subject":"watchdog","stage":"single","event":"lost","mode":"single","iterations":9254,"estimatedMs":519,"outcome":"lost","wallMs":0,"error":"unknown: "}
+{"page":"63179048","t":102078,"subject":"watchdog","stage":"gpu","event":"device","timestamps":true}
+{"page":"63179048","t":102631,"subject":"watchdog","stage":"split","event":"ok","mode":"split","iterations":9254,"estimatedMs":519,"chunkIterations":892,"submits":11,"outcome":"ok","gpuMs":529,"maxSubmitMs":52.4,"wallMs":552}
+{"at":"2026-11-15T17:17:18.273Z","page":"96c14170","t":0,"subject":"page","stage":"boot","event":"info","ua":"Mozilla/5.0 (iPhone; CPU iPhone OS 18_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.6.2 Mobile/15E148 Safari/604.1","ort":"1.31.1"}
+{"at":"2026-11-15T17:17:18.275Z","page":"96c14170","t":8,"subject":"gpu","stage":"adapter","event":"info","vendor":"apple","architecture":"apple","description":"apple","f16":true,"maxBufferSize":1073741824,"maxStorageBufferBindingSize":1073741824}
+{"at":"2026-11-15T17:17:18.349Z","page":"96c14170","t":22,"subject":"unet","stage":"fetch","event":"start"}
+{"at":"2026-11-15T17:17:19.872Z","page":"96c14170","t":1551,"subject":"tokenizer","stage":"fetch","event":"start"}
+{"at":"2026-11-15T17:17:21.553Z","page":"96c14170","t":3289,"subject":"tokenizer","stage":"fetch","event":"ok","ms":1738}
+{"at":"2026-11-15T17:20:44.253Z","page":"3372a41a","t":0,"subject":"page","stage":"boot","event":"info","ua":"Mozilla/5.0 (iPhone; CPU iPhone OS 18_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.6.2 Mobile/15E148 Safari/604.1","ort":"1.31.1"}
+{"at":"2026-11-15T17:20:44.360Z","page":"3372a41a","t":4,"subject":"unet","stage":"fetch","event":"start"}
+{"at":"2026-11-15T17:20:44.363Z","page":"3372a41a","t":1,"subject":"gpu","stage":"adapter","event":"info","vendor":"apple","architecture":"apple","description":"apple","f16":true,"maxBufferSize":1073741824,"maxStorageBufferBindingSize":1073741824}
+{"at":"2026-11-15T17:30:14.181Z","page":"3372a41a","t":225088,"subject":"unet/model.onnx","stage":"fetch","event":"cache-fallback","error":"Load failed"}
+{"at":"2026-11-17T10:58:10.404Z","page":"219fca06","t":0,"subject":"page","stage":"boot","event":"info","ua":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36","ort":"1.31.1"}
+{"at":"2026-11-17T10:58:10.499Z","page":"219fca06","t":187,"subject":"gpu","stage":"adapter","event":"info","vendor":"apple","architecture":"metal-3","description":"","f16":true,"maxBufferSize":4294967292,"maxStorageBufferBindingSize":4294967292}
+{"at":"2026-11-17T10:58:10.956Z","page":"f37f99b9","t":0,"subject":"page","stage":"boot","event":"info","ua":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36","ort":"1.31.1"}
+{"at":"2026-11-17T10:58:10.963Z","page":"f37f99b9","t":5,"subject":"gpu","stage":"adapter","event":"info","vendor":"apple","architecture":"metal-3","description":"","f16":true,"maxBufferSize":4294967292,"maxStorageBufferBindingSize":4294967292}
+{"at":"2026-11-17T10:58:10.964Z","page":"f37f99b9","t":11,"subject":"unet","stage":"fetch","event":"start"}
+{"at":"2026-11-17T10:58:11.078Z","page":"f37f99b9","t":124,"subject":"unet/model.onnx","stage":"fetch","event":"cache-fallback","error":"Failed to fetch"}
+{"at":"2026-11-17T10:58:11.199Z","page":"6a3e231c","t":0,"subject":"page","stage":"boot","event":"info","ua":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36","ort":"1.31.1"}
+{"at":"2026-11-17T10:58:11.204Z","page":"6a3e231c","t":14,"subject":"gpu","stage":"adapter","event":"info","vendor":"apple","architecture":"metal-3","description":"","f16":true,"maxBufferSize":4294967292,"maxStorageBufferBindingSize":4294967292}
+{"at":"2026-11-17T10:58:11.205Z","page":"6a3e231c","t":17,"subject":"unet","stage":"fetch","event":"start"}
+{"at":"2026-11-17T10:58:11.234Z","page":"6a3e231c","t":58,"subject":"unet/model.onnx","stage":"fetch","event":"cache-fallback","error":"Failed to fetch"}
+{"at":"2026-11-17T10:58:11.338Z","page":"788990d7","t":0,"subject":"page","stage":"boot","event":"info","ua":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36","ort":"1.31.1"}
+{"at":"2026-11-17T10:58:11.354Z","page":"788990d7","t":15,"subject":"gpu","stage":"adapter","event":"info","vendor":"apple","architecture":"metal-3","description":"","f16":true,"maxBufferSize":4294967292,"maxStorageBufferBindingSize":4294967292}
+{"at":"2026-11-17T10:58:11.358Z","page":"788990d7","t":20,"subject":"unet","stage":"fetch","event":"start"}
+{"at":"2026-11-17T10:58:11.384Z","page":"788990d7","t":46,"subject":"unet/model.onnx","stage":"fetch","event":"cache-fallback","error":"Failed to fetch"}
+{"at":"2026-11-17T10:58:11.494Z","page":"3bf74f70","t":0,"subject":"page","stage":"boot","event":"info","ua":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36","ort":"1.31.1"}
+{"at":"2026-11-17T10:58:11.501Z","page":"3bf74f70","t":7,"subject":"gpu","stage":"adapter","event":"info","vendor":"apple","architecture":"metal-3","description":"","f16":true,"maxBufferSize":4294967292,"maxStorageBufferBindingSize":4294967292}
+{"at":"2026-11-17T10:58:11.507Z","page":"3bf74f70","t":10,"subject":"unet","stage":"fetch","event":"start"}
+{"at":"2026-11-17T10:58:11.578Z","page":"3bf74f70","t":77,"subject":"unet/model.onnx","stage":"fetch","event":"cache-fallback","error":"Failed to fetch"}
+{"at":"2026-11-17T10:58:11.683Z","page":"b7812b53","t":0,"subject":"page","stage":"boot","event":"info","ua":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36","ort":"1.31.1"}
+{"at":"2026-11-17T10:58:11.691Z","page":"b7812b53","t":6,"subject":"gpu","stage":"adapter","event":"info","vendor":"apple","architecture":"metal-3","description":"","f16":true,"maxBufferSize":4294967292,"maxStorageBufferBindingSize":4294967292}
+{"at":"2026-11-17T10:58:11.695Z","page":"b7812b53","t":11,"subject":"unet","stage":"fetch","event":"start"}
+{"at":"2026-11-17T10:58:11.736Z","page":"b7812b53","t":53,"subject":"unet/model.onnx","stage":"fetch","event":"cache-fallback","error":"Failed to fetch"}
+{"at":"2026-11-17T10:58:11.838Z","page":"112ce407","t":0,"subject":"page","stage":"boot","event":"info","ua":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36","ort":"1.31.1"}
+{"at":"2026-11-17T10:58:11.854Z","page":"112ce407","t":13,"subject":"gpu","stage":"adapter","event":"info","vendor":"apple","architecture":"metal-3","description":"","f16":true,"maxBufferSize":4294967292,"maxStorageBufferBindingSize":4294967292}
+{"at":"2026-11-17T10:58:11.858Z","page":"112ce407","t":20,"subject":"unet","stage":"fetch","event":"start"}
+{"at":"2026-11-17T10:58:11.889Z","page":"112ce407","t":50,"subject":"unet/model.onnx","stage":"fetch","event":"cache-fallback","error":"Failed to fetch"}
+{"at":"2026-11-17T10:58:11.992Z","page":"8cf92e47","t":0,"subject":"page","stage":"boot","event":"info","ua":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36","ort":"1.31.1"}
+{"at":"2026-11-17T10:58:12.007Z","page":"8cf92e47","t":13,"subject":"gpu","stage":"adapter","event":"info","vendor":"apple","architecture":"metal-3","description":"","f16":true,"maxBufferSize":4294967292,"maxStorageBufferBindingSize":4294967292}
+{"at":"2026-11-17T10:58:12.010Z","page":"8cf92e47","t":17,"subject":"unet","stage":"fetch","event":"start"}
+{"at":"2026-11-17T10:58:12.039Z","page":"8cf92e47","t":46,"subject":"unet/model.onnx","stage":"fetch","event":"cache-fallback","error":"Failed to fetch"}
+{"at":"2026-11-17T10:58:12.146Z","page":"2f5796d6","t":0,"subject":"page","stage":"boot","event":"info","ua":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36","ort":"1.31.1"}
+{"at":"2026-11-17T10:58:12.159Z","page":"2f5796d6","t":12,"subject":"gpu","stage":"adapter","event":"info","vendor":"apple","architecture":"metal-3","description":"","f16":true,"maxBufferSize":4294967292,"maxStorageBufferBindingSize":4294967292}
+{"at":"2026-11-17T10:58:12.165Z","page":"2f5796d6","t":17,"subject":"unet","stage":"fetch","event":"start"}
+{"at":"2026-11-17T10:58:12.209Z","page":"2f5796d6","t":61,"subject":"unet/model.onnx","stage":"fetch","event":"cache-fallback","error":"Failed to fetch"}
+{"at":"2026-11-17T10:58:12.313Z","page":"3768ed0f","t":0,"subject":"page","stage":"boot","event":"info","ua":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36","ort":"1.31.1"}
+{"at":"2026-11-17T10:58:12.327Z","page":"3768ed0f","t":12,"subject":"gpu","stage":"adapter","event":"info","vendor":"apple","architecture":"metal-3","description":"","f16":true,"maxBufferSize":4294967292,"maxStorageBufferBindingSize":4294967292}
+{"at":"2026-11-17T10:58:12.332Z","page":"3768ed0f","t":18,"subject":"unet","stage":"fetch","event":"start"}
+{"at":"2026-11-17T10:58:12.350Z","page":"3768ed0f","t":30,"subject":"unet/model.onnx","stage":"fetch","event":"cache-fallback","error":"Failed to fetch"}
+{"at":"2026-11-17T10:58:12.455Z","page":"7ed2c74d","t":0,"subject":"page","stage":"boot","event":"info","ua":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36","ort":"1.31.1"}
+{"at":"2026-11-17T10:58:12.463Z","page":"7ed2c74d","t":6,"subject":"gpu","stage":"adapter","event":"info","vendor":"apple","architecture":"metal-3","description":"","f16":true,"maxBufferSize":4294967292,"maxStorageBufferBindingSize":4294967292}
+{"at":"2026-11-17T10:58:12.467Z","page":"7ed2c74d","t":11,"subject":"unet","stage":"fetch","event":"start"}
+{"at":"2026-11-17T10:58:12.501Z","page":"7ed2c74d","t":46,"subject":"unet/model.onnx","stage":"fetch","event":"cache-fallback","error":"Failed to fetch"}
+{"at":"2026-11-17T10:58:12.612Z","page":"ba5ab838","t":0,"subject":"page","stage":"boot","event":"info","ua":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36","ort":"1.31.1"}
+{"at":"2026-11-17T10:58:12.620Z","page":"ba5ab838","t":6,"subject":"gpu","stage":"adapter","event":"info","vendor":"apple","architecture":"metal-3","description":"","f16":true,"maxBufferSize":4294967292,"maxStorageBufferBindingSize":4294967292}
+{"at":"2026-11-17T10:58:12.623Z","page":"ba5ab838","t":11,"subject":"unet","stage":"fetch","event":"start"}
+{"at":"2026-11-17T10:58:12.655Z","page":"ba5ab838","t":36,"subject":"unet/model.onnx","stage":"fetch","event":"cache-fallback","error":"Failed to fetch"}
+{"at":"2026-11-17T10:58:12.752Z","page":"92cdaa5c","t":0,"subject":"page","stage":"boot","event":"info","ua":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36","ort":"1.31.1"}
+{"at":"2026-11-17T10:58:12.766Z","page":"92cdaa5c","t":12,"subject":"gpu","stage":"adapter","event":"info","vendor":"apple","architecture":"metal-3","description":"","f16":true,"maxBufferSize":4294967292,"maxStorageBufferBindingSize":4294967292}
+{"at":"2026-11-17T10:58:12.774Z","page":"92cdaa5c","t":19,"subject":"unet","stage":"fetch","event":"start"}
+{"at":"2026-11-17T10:58:12.809Z","page":"92cdaa5c","t":56,"subject":"unet/model.onnx","stage":"fetch","event":"cache-fallback","error":"Failed to fetch"}
+{"at":"2026-11-17T10:58:12.920Z","page":"b50043cc","t":0,"subject":"page","stage":"boot","event":"info","ua":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36","ort":"1.31.1"}
+{"at":"2026-11-17T10:58:12.929Z","page":"b50043cc","t":6,"subject":"gpu","stage":"adapter","event":"info","vendor":"apple","architecture":"metal-3","description":"","f16":true,"maxBufferSize":4294967292,"maxStorageBufferBindingSize":4294967292}
+{"at":"2026-11-17T10:58:12.936Z","page":"b50043cc","t":12,"subject":"unet","stage":"fetch","event":"start"}
+{"at":"2026-11-17T10:58:12.957Z","page":"b50043cc","t":30,"subject":"unet/model.onnx","stage":"fetch","event":"cache-fallback","error":"Failed to fetch"}
+{"at":"2026-11-17T10:58:13.062Z","page":"fdf4b2a1","t":0,"subject":"page","stage":"boot","event":"info","ua":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36","ort":"1.31.1"}
+{"at":"2026-11-17T10:58:13.070Z","page":"fdf4b2a1","t":6,"subject":"gpu","stage":"adapter","event":"info","vendor":"apple","architecture":"metal-3","description":"","f16":true,"maxBufferSize":4294967292,"maxStorageBufferBindingSize":4294967292}
+{"at":"2026-11-17T10:58:13.076Z","page":"fdf4b2a1","t":11,"subject":"unet","stage":"fetch","event":"start"}
+{"at":"2026-11-17T10:58:13.101Z","page":"fdf4b2a1","t":40,"subject":"unet/model.onnx","stage":"fetch","event":"cache-fallback","error":"Failed to fetch"}
+{"at":"2026-11-17T10:58:13.211Z","page":"eee1b59c","t":0,"subject":"page","stage":"boot","event":"info","ua":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36","ort":"1.31.1"}
+{"at":"2026-11-17T10:58:13.226Z","page":"eee1b59c","t":14,"subject":"gpu","stage":"adapter","event":"info","vendor":"apple","architecture":"metal-3","description":"","f16":true,"maxBufferSize":4294967292,"maxStorageBufferBindingSize":4294967292}
+{"at":"2026-11-17T10:58:13.230Z","page":"eee1b59c","t":19,"subject":"unet","stage":"fetch","event":"start"}
+{"at":"2026-11-17T10:58:13.259Z","page":"eee1b59c","t":49,"subject":"unet/model.onnx","stage":"fetch","event":"cache-fallback","error":"Failed to fetch"}
+{"at":"2026-11-17T10:58:13.377Z","page":"9709a0c6","t":0,"subject":"page","stage":"boot","event":"info","ua":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36","ort":"1.31.1"}
+{"at":"2026-11-17T10:58:13.384Z","page":"9709a0c6","t":6,"subject":"gpu","stage":"adapter","event":"info","vendor":"apple","architecture":"metal-3","description":"","f16":true,"maxBufferSize":4294967292,"maxStorageBufferBindingSize":4294967292}
+{"at":"2026-11-17T10:58:13.387Z","page":"9709a0c6","t":9,"subject":"unet","stage":"fetch","event":"start"}
+{"at":"2026-11-17T10:58:13.408Z","page":"9709a0c6","t":30,"subject":"unet/model.onnx","stage":"fetch","event":"cache-fallback","error":"Failed to fetch"}
+{"at":"2026-11-17T10:58:13.519Z","page":"698a8159","t":0,"subject":"page","stage":"boot","event":"info","ua":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36","ort":"1.31.1"}
+{"at":"2026-11-17T10:58:13.531Z","page":"698a8159","t":14,"subject":"gpu","stage":"adapter","event":"info","vendor":"apple","architecture":"metal-3","description":"","f16":true,"maxBufferSize":4294967292,"maxStorageBufferBindingSize":4294967292}
+{"at":"2026-11-17T10:58:13.540Z","page":"698a8159","t":20,"subject":"unet","stage":"fetch","event":"start"}
+{"at":"2026-11-17T10:58:13.559Z","page":"698a8159","t":44,"subject":"unet/model.onnx","stage":"fetch","event":"cache-fallback","error":"Failed to fetch"}
+{"at":"2026-11-17T10:58:13.664Z","page":"691ffc3c","t":0,"subject":"page","stage":"boot","event":"info","ua":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36","ort":"1.31.1"}
+{"at":"2026-11-17T10:58:13.677Z","page":"691ffc3c","t":13,"subject":"gpu","stage":"adapter","event":"info","vendor":"apple","architecture":"metal-3","description":"","f16":true,"maxBufferSize":4294967292,"maxStorageBufferBindingSize":4294967292}
+{"at":"2026-11-17T10:58:13.684Z","page":"691ffc3c","t":20,"subject":"unet","stage":"fetch","event":"start"}
+{"at":"2026-11-17T10:58:13.722Z","page":"691ffc3c","t":48,"subject":"unet/model.onnx","stage":"fetch","event":"cache-fallback","error":"Failed to fetch"}
+{"at":"2026-11-17T10:58:13.820Z","page":"05e59c42","t":0,"subject":"page","stage":"boot","event":"info","ua":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36","ort":"1.31.1"}
+{"at":"2026-11-17T10:58:13.837Z","page":"05e59c42","t":13,"subject":"gpu","stage":"adapter","event":"info","vendor":"apple","architecture":"metal-3","description":"","f16":true,"maxBufferSize":4294967292,"maxStorageBufferBindingSize":4294967292}
+{"at":"2026-11-17T10:58:13.839Z","page":"05e59c42","t":18,"subject":"unet","stage":"fetch","event":"start"}
+{"at":"2026-11-17T10:58:13.866Z","page":"05e59c42","t":45,"subject":"unet/model.onnx","stage":"fetch","event":"cache-fallback","error":"Failed to fetch"}
+{"at":"2026-11-17T10:58:13.973Z","page":"b6fda799","t":0,"subject":"page","stage":"boot","event":"info","ua":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36","ort":"1.31.1"}
+{"at":"2026-11-17T10:58:13.989Z","page":"b6fda799","t":13,"subject":"gpu","stage":"adapter","event":"info","vendor":"apple","architecture":"metal-3","description":"","f16":true,"maxBufferSize":4294967292,"maxStorageBufferBindingSize":4294967292}
+{"at":"2026-11-17T10:58:13.993Z","page":"b6fda799","t":19,"subject":"unet","stage":"fetch","event":"start"}
+{"at":"2026-11-17T10:58:14.025Z","page":"b6fda799","t":50,"subject":"unet/model.onnx","stage":"fetch","event":"cache-fallback","error":"Failed to fetch"}
+{"at":"2026-11-17T10:58:14.131Z","page":"9062e888","t":0,"subject":"page","stage":"boot","event":"info","ua":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36","ort":"1.31.1"}
+{"at":"2026-11-17T10:58:14.148Z","page":"9062e888","t":13,"subject":"gpu","stage":"adapter","event":"info","vendor":"apple","architecture":"metal-3","description":"","f16":true,"maxBufferSize":4294967292,"maxStorageBufferBindingSize":4294967292}
+{"at":"2026-11-17T10:58:14.150Z","page":"9062e888","t":18,"subject":"unet","stage":"fetch","event":"start"}
+{"at":"2026-11-17T10:58:14.174Z","page":"9062e888","t":41,"subject":"unet/model.onnx","stage":"fetch","event":"cache-fallback","error":"Failed to fetch"}
+{"at":"2026-11-17T10:58:14.283Z","page":"4b8a5ef8","t":0,"subject":"page","stage":"boot","event":"info","ua":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36","ort":"1.31.1"}
+{"at":"2026-11-17T10:58:14.299Z","page":"4b8a5ef8","t":12,"subject":"gpu","stage":"adapter","event":"info","vendor":"apple","architecture":"metal-3","description":"","f16":true,"maxBufferSize":4294967292,"maxStorageBufferBindingSize":4294967292}
+{"at":"2026-11-17T10:58:14.306Z","page":"4b8a5ef8","t":18,"subject":"unet","stage":"fetch","event":"start"}
+{"at":"2026-11-17T10:58:14.336Z","page":"4b8a5ef8","t":48,"subject":"unet/model.onnx","stage":"fetch","event":"cache-fallback","error":"Failed to fetch"}
+{"at":"2026-11-17T10:58:14.441Z","page":"794cd388","t":0,"subject":"page","stage":"boot","event":"info","ua":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36","ort":"1.31.1"}
+{"at":"2026-11-17T10:58:14.454Z","page":"794cd388","t":12,"subject":"gpu","stage":"adapter","event":"info","vendor":"apple","architecture":"metal-3","description":"","f16":true,"maxBufferSize":4294967292,"maxStorageBufferBindingSize":4294967292}
+{"at":"2026-11-17T10:58:14.459Z","page":"794cd388","t":15,"subject":"unet","stage":"fetch","event":"start"}
+{"at":"2026-11-17T10:58:14.523Z","page":"794cd388","t":83,"subject":"unet/model.onnx","stage":"fetch","event":"cache-fallback","error":"Failed to fetch"}
+{"at":"2026-11-17T10:58:14.630Z","page":"515c829d","t":0,"subject":"page","stage":"boot","event":"info","ua":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36","ort":"1.31.1"}
+{"at":"2026-11-17T10:58:14.647Z","page":"515c829d","t":13,"subject":"gpu","stage":"adapter","event":"info","vendor":"apple","architecture":"metal-3","description":"","f16":true,"maxBufferSize":4294967292,"maxStorageBufferBindingSize":4294967292}
+{"at":"2026-11-17T10:58:14.651Z","page":"515c829d","t":20,"subject":"unet","stage":"fetch","event":"start"}
+{"at":"2026-11-17T10:58:14.687Z","page":"515c829d","t":48,"subject":"unet/model.onnx","stage":"fetch","event":"cache-fallback","error":"Failed to fetch"}
+{"at":"2026-11-17T10:58:14.790Z","page":"a0a9644a","t":0,"subject":"page","stage":"boot","event":"info","ua":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36","ort":"1.31.1"}
+{"at":"2026-11-17T10:58:14.803Z","page":"a0a9644a","t":13,"subject":"gpu","stage":"adapter","event":"info","vendor":"apple","architecture":"metal-3","description":"","f16":true,"maxBufferSize":4294967292,"maxStorageBufferBindingSize":4294967292}
+{"at":"2026-11-17T10:58:14.807Z","page":"a0a9644a","t":18,"subject":"unet","stage":"fetch","event":"start"}
+{"at":"2026-11-17T10:58:14.828Z","page":"a0a9644a","t":39,"subject":"unet/model.onnx","stage":"fetch","event":"cache-fallback","error":"Failed to fetch"}
+{"at":"2026-11-17T10:58:14.939Z","page":"78fc2c53","t":0,"subject":"page","stage":"boot","event":"info","ua":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36","ort":"1.31.1"}
+{"at":"2026-11-17T10:58:14.954Z","page":"78fc2c53","t":13,"subject":"gpu","stage":"adapter","event":"info","vendor":"apple","architecture":"metal-3","description":"","f16":true,"maxBufferSize":4294967292,"maxStorageBufferBindingSize":4294967292}
+{"at":"2026-11-17T10:58:14.957Z","page":"78fc2c53","t":17,"subject":"unet","stage":"fetch","event":"start"}
+{"at":"2026-11-17T10:58:14.986Z","page":"78fc2c53","t":41,"subject":"unet/model.onnx","stage":"fetch","event":"cache-fallback","error":"Failed to fetch"}
+{"at":"2026-11-17T10:58:15.098Z","page":"e60af758","t":0,"subject":"page","stage":"boot","event":"info","ua":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36","ort":"1.31.1"}
+{"at":"2026-11-17T10:58:15.103Z","page":"e60af758","t":6,"subject":"gpu","stage":"adapter","event":"info","vendor":"apple","architecture":"metal-3","description":"","f16":true,"maxBufferSize":4294967292,"maxStorageBufferBindingSize":4294967292}
+{"at":"2026-11-17T10:58:15.110Z","page":"e60af758","t":9,"subject":"unet","stage":"fetch","event":"start"}
+{"at":"2026-11-17T10:58:15.133Z","page":"e60af758","t":36,"subject":"unet/model.onnx","stage":"fetch","event":"cache-fallback","error":"Failed to fetch"}
+{"at":"2026-11-17T10:58:15.243Z","page":"45ca4733","t":0,"subject":"page","stage":"boot","event":"info","ua":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36","ort":"1.31.1"}
+{"at":"2026-11-17T10:58:15.257Z","page":"45ca4733","t":12,"subject":"gpu","stage":"adapter","event":"info","vendor":"apple","architecture":"metal-3","description":"","f16":true,"maxBufferSize":4294967292,"maxStorageBufferBindingSize":4294967292}
+{"at":"2026-11-17T10:58:15.262Z","page":"45ca4733","t":18,"subject":"unet","stage":"fetch","event":"start"}
+{"at":"2026-11-17T10:58:15.286Z","page":"45ca4733","t":43,"subject":"unet/model.onnx","stage":"fetch","event":"cache-fallback","error":"Failed to fetch"}
+{"at":"2026-11-17T10:58:15.394Z","page":"4f2641ba","t":0,"subject":"page","stage":"boot","event":"info","ua":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36","ort":"1.31.1"}
+{"at":"2026-11-17T10:58:15.422Z","page":"4f2641ba","t":13,"subject":"gpu","stage":"adapter","event":"info","vendor":"apple","architecture":"metal-3","description":"","f16":true,"maxBufferSize":4294967292,"maxStorageBufferBindingSize":4294967292}
+{"at":"2026-11-17T10:58:15.423Z","page":"4f2641ba","t":19,"subject":"unet","stage":"fetch","event":"start"}
+{"at":"2026-11-17T10:58:15.446Z","page":"4f2641ba","t":48,"subject":"unet/model.onnx","stage":"fetch","event":"cache-fallback","error":"Failed to fetch"}
+{"at":"2026-11-17T10:58:15.555Z","page":"72923b35","t":0,"subject":"page","stage":"boot","event":"info","ua":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36","ort":"1.31.1"}
+{"at":"2026-11-17T10:58:15.575Z","page":"72923b35","t":15,"subject":"gpu","stage":"adapter","event":"info","vendor":"apple","architecture":"metal-3","description":"","f16":true,"maxBufferSize":4294967292,"maxStorageBufferBindingSize":4294967292}
+{"at":"2026-11-17T10:58:15.579Z","page":"72923b35","t":23,"subject":"unet","stage":"fetch","event":"start"}
+{"at":"2026-11-17T10:58:15.602Z","page":"72923b35","t":44,"subject":"unet/model.onnx","stage":"fetch","event":"cache-fallback","error":"Failed to fetch"}
+{"at":"2026-11-17T10:58:15.711Z","page":"7a27612f","t":0,"subject":"page","stage":"boot","event":"info","ua":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36","ort":"1.31.1"}
+{"at":"2026-11-17T10:58:15.727Z","page":"7a27612f","t":13,"subject":"gpu","stage":"adapter","event":"info","vendor":"apple","architecture":"metal-3","description":"","f16":true,"maxBufferSize":4294967292,"maxStorageBufferBindingSize":4294967292}
+{"at":"2026-11-17T10:58:15.729Z","page":"7a27612f","t":17,"subject":"unet","stage":"fetch","event":"start"}
+{"at":"2026-11-17T10:58:15.794Z","page":"7a27612f","t":83,"subject":"unet/model.onnx","stage":"fetch","event":"cache-fallback","error":"Failed to fetch"}
+{"at":"2026-11-17T10:58:15.910Z","page":"4ca8b9a2","t":0,"subject":"page","stage":"boot","event":"info","ua":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36","ort":"1.31.1"}
+{"at":"2026-11-17T10:58:15.925Z","page":"4ca8b9a2","t":15,"subject":"gpu","stage":"adapter","event":"info","vendor":"apple","architecture":"metal-3","description":"","f16":true,"maxBufferSize":4294967292,"maxStorageBufferBindingSize":4294967292}
+{"at":"2026-11-17T10:58:15.932Z","page":"4ca8b9a2","t":21,"subject":"unet","stage":"fetch","event":"start"}
+{"at":"2026-11-17T10:58:15.959Z","page":"4ca8b9a2","t":39,"subject":"unet/model.onnx","stage":"fetch","event":"cache-fallback","error":"Failed to fetch"}
+{"at":"2026-11-17T10:58:16.061Z","page":"665c92c3","t":0,"subject":"page","stage":"boot","event":"info","ua":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36","ort":"1.31.1"}
+{"at":"2026-11-17T10:58:16.081Z","page":"665c92c3","t":14,"subject":"gpu","stage":"adapter","event":"info","vendor":"apple","architecture":"metal-3","description":"","f16":true,"maxBufferSize":4294967292,"maxStorageBufferBindingSize":4294967292}
+{"at":"2026-11-17T10:58:16.085Z","page":"665c92c3","t":20,"subject":"unet","stage":"fetch","event":"start"}
+{"at":"2026-11-17T10:58:16.115Z","page":"665c92c3","t":40,"subject":"unet/model.onnx","stage":"fetch","event":"cache-fallback","error":"Failed to fetch"}
+{"at":"2026-11-17T10:58:16.228Z","page":"1309fee1","t":0,"subject":"page","stage":"boot","event":"info","ua":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36","ort":"1.31.1"}
+{"at":"2026-11-17T10:58:16.237Z","page":"1309fee1","t":18,"subject":"gpu","stage":"adapter","event":"info","vendor":"apple","architecture":"metal-3","description":"","f16":true,"maxBufferSize":4294967292,"maxStorageBufferBindingSize":4294967292}
+{"at":"2026-11-17T10:58:16.242Z","page":"1309fee1","t":22,"subject":"unet","stage":"fetch","event":"start"}
+{"at":"2026-11-17T10:58:16.307Z","page":"1309fee1","t":79,"subject":"unet/model.onnx","stage":"fetch","event":"cache-fallback","error":"Failed to fetch"}
+{"at":"2026-11-17T10:58:16.409Z","page":"f7f3a9ef","t":0,"subject":"page","stage":"boot","event":"info","ua":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36","ort":"1.31.1"}
+{"at":"2026-11-17T10:58:16.424Z","page":"f7f3a9ef","t":14,"subject":"gpu","stage":"adapter","event":"info","vendor":"apple","architecture":"metal-3","description":"","f16":true,"maxBufferSize":4294967292,"maxStorageBufferBindingSize":4294967292}
+{"at":"2026-11-17T10:58:16.430Z","page":"f7f3a9ef","t":18,"subject":"unet","stage":"fetch","event":"start"}
+{"at":"2026-11-17T10:58:16.456Z","page":"f7f3a9ef","t":44,"subject":"unet/model.onnx","stage":"fetch","event":"cache-fallback","error":"Failed to fetch"}
+{"at":"2026-11-17T10:58:16.577Z","page":"07d4a878","t":0,"subject":"page","stage":"boot","event":"info","ua":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36","ort":"1.31.1"}
+{"at":"2026-11-17T10:58:16.589Z","page":"07d4a878","t":7,"subject":"gpu","stage":"adapter","event":"info","vendor":"apple","architecture":"metal-3","description":"","f16":true,"maxBufferSize":4294967292,"maxStorageBufferBindingSize":4294967292}
+{"at":"2026-11-17T10:58:16.590Z","page":"07d4a878","t":11,"subject":"unet","stage":"fetch","event":"start"}
+{"at":"2026-11-17T10:58:16.654Z","page":"07d4a878","t":70,"subject":"unet/model.onnx","stage":"fetch","event":"cache-fallback","error":"Failed to fetch"}
+{"at":"2026-11-17T10:58:16.756Z","page":"b8be4799","t":0,"subject":"page","stage":"boot","event":"info","ua":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36","ort":"1.31.1"}
+{"at":"2026-11-17T10:58:16.972Z","page":"b8be4799","t":14,"subject":"gpu","stage":"adapter","event":"info","vendor":"apple","architecture":"metal-3","description":"","f16":true,"maxBufferSize":4294967292,"maxStorageBufferBindingSize":4294967292}
+{"at":"2026-11-17T10:58:16.975Z","page":"b8be4799","t":213,"subject":"unet","stage":"fetch","event":"start"}
+{"at":"2026-11-17T10:58:17.001Z","page":"b8be4799","t":224,"subject":"unet/model.onnx","stage":"fetch","event":"cache-fallback","error":"Failed to fetch"}
+{"at":"2026-11-17T10:58:17.093Z","page":"e4ba562d","t":0,"subject":"page","stage":"boot","event":"info","ua":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36","ort":"1.31.1"}
+{"at":"2026-11-17T10:58:17.114Z","page":"e4ba562d","t":16,"subject":"gpu","stage":"adapter","event":"info","vendor":"apple","architecture":"metal-3","description":"","f16":true,"maxBufferSize":4294967292,"maxStorageBufferBindingSize":4294967292}
+{"at":"2026-11-17T10:58:17.117Z","page":"e4ba562d","t":22,"subject":"unet","stage":"fetch","event":"start"}
+{"at":"2026-11-17T10:58:17.158Z","page":"e4ba562d","t":56,"subject":"unet/model.onnx","stage":"fetch","event":"cache-fallback","error":"Failed to fetch"}
+{"at":"2026-11-17T10:58:17.265Z","page":"32f393a2","t":0,"subject":"page","stage":"boot","event":"info","ua":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36","ort":"1.31.1"}
+{"at":"2026-11-17T10:58:17.281Z","page":"32f393a2","t":13,"subject":"gpu","stage":"adapter","event":"info","vendor":"apple","architecture":"metal-3","description":"","f16":true,"maxBufferSize":4294967292,"maxStorageBufferBindingSize":4294967292}
+{"at":"2026-11-17T10:58:17.289Z","page":"32f393a2","t":19,"subject":"unet","stage":"fetch","event":"start"}
+{"at":"2026-11-17T10:58:17.310Z","page":"32f393a2","t":44,"subject":"unet/model.onnx","stage":"fetch","event":"cache-fallback","error":"Failed to fetch"}
+{"at":"2026-11-17T10:58:17.424Z","page":"3ed95609","t":0,"subject":"page","stage":"boot","event":"info","ua":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36","ort":"1.31.1"}
+{"at":"2026-11-17T10:58:17.440Z","page":"3ed95609","t":14,"subject":"gpu","stage":"adapter","event":"info","vendor":"apple","architecture":"metal-3","description":"","f16":true,"maxBufferSize":4294967292,"maxStorageBufferBindingSize":4294967292}
+{"at":"2026-11-17T10:58:17.443Z","page":"3ed95609","t":21,"subject":"unet","stage":"fetch","event":"start"}
+{"at":"2026-11-17T10:58:17.471Z","page":"3ed95609","t":47,"subject":"unet/model.onnx","stage":"fetch","event":"cache-fallback","error":"Failed to fetch"}
+{"at":"2026-11-17T10:58:17.580Z","page":"be0f59cc","t":0,"subject":"page","stage":"boot","event":"info","ua":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36","ort":"1.31.1"}
+{"at":"2026-11-17T10:58:17.596Z","page":"be0f59cc","t":13,"subject":"gpu","stage":"adapter","event":"info","vendor":"apple","architecture":"metal-3","description":"","f16":true,"maxBufferSize":4294967292,"maxStorageBufferBindingSize":4294967292}
+{"at":"2026-11-17T10:58:17.606Z","page":"be0f59cc","t":18,"subject":"unet","stage":"fetch","event":"start"}
+{"at":"2026-11-17T10:58:17.618Z","page":"be0f59cc","t":38,"subject":"unet/model.onnx","stage":"fetch","event":"cache-fallback","error":"Failed to fetch"}
+{"at":"2026-11-17T10:58:17.729Z","page":"c85698b4","t":0,"subject":"page","stage":"boot","event":"info","ua":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36","ort":"1.31.1"}
+{"at":"2026-11-17T10:58:17.746Z","page":"c85698b4","t":14,"subject":"gpu","stage":"adapter","event":"info","vendor":"apple","architecture":"metal-3","description":"","f16":true,"maxBufferSize":4294967292,"maxStorageBufferBindingSize":4294967292}
+{"at":"2026-11-17T10:58:17.758Z","page":"c85698b4","t":20,"subject":"unet","stage":"fetch","event":"start"}
+{"at":"2026-11-17T10:58:17.773Z","page":"c85698b4","t":33,"subject":"unet/model.onnx","stage":"fetch","event":"cache-fallback","error":"Failed to fetch"}
+{"at":"2026-11-17T10:58:17.875Z","page":"defd36e4","t":0,"subject":"page","stage":"boot","event":"info","ua":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36","ort":"1.31.1"}
+{"at":"2026-11-17T10:58:17.891Z","page":"defd36e4","t":13,"subject":"gpu","stage":"adapter","event":"info","vendor":"apple","architecture":"metal-3","description":"","f16":true,"maxBufferSize":4294967292,"maxStorageBufferBindingSize":4294967292}
+{"at":"2026-11-17T10:58:17.904Z","page":"defd36e4","t":18,"subject":"unet","stage":"fetch","event":"start"}
+{"at":"2026-11-17T10:58:17.952Z","page":"defd36e4","t":71,"subject":"unet/model.onnx","stage":"fetch","event":"cache-fallback","error":"Failed to fetch"}
+{"at":"2026-11-17T10:58:18.064Z","page":"571bbe6f","t":0,"subject":"page","stage":"boot","event":"info","ua":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36","ort":"1.31.1"}
+{"at":"2026-11-17T10:58:18.080Z","page":"571bbe6f","t":13,"subject":"gpu","stage":"adapter","event":"info","vendor":"apple","architecture":"metal-3","description":"","f16":true,"maxBufferSize":4294967292,"maxStorageBufferBindingSize":4294967292}
+{"at":"2026-11-17T10:58:18.085Z","page":"571bbe6f","t":19,"subject":"unet","stage":"fetch","event":"start"}
+{"at":"2026-11-17T10:58:18.121Z","page":"571bbe6f","t":55,"subject":"unet/model.onnx","stage":"fetch","event":"cache-fallback","error":"Failed to fetch"}
+{"at":"2026-11-17T10:58:18.238Z","page":"dd9e624b","t":0,"subject":"page","stage":"boot","event":"info","ua":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36","ort":"1.31.1"}
+{"at":"2026-11-17T10:58:18.256Z","page":"dd9e624b","t":14,"subject":"gpu","stage":"adapter","event":"info","vendor":"apple","architecture":"metal-3","description":"","f16":true,"maxBufferSize":4294967292,"maxStorageBufferBindingSize":4294967292}
+{"at":"2026-11-17T10:58:18.258Z","page":"dd9e624b","t":20,"subject":"unet","stage":"fetch","event":"start"}
+{"at":"2026-11-17T10:58:18.298Z","page":"dd9e624b","t":52,"subject":"unet/model.onnx","stage":"fetch","event":"cache-fallback","error":"Failed to fetch"}
+{"at":"2026-11-17T10:58:18.419Z","page":"0367650a","t":0,"subject":"page","stage":"boot","event":"info","ua":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36","ort":"1.31.1"}
+{"at":"2026-11-17T10:58:18.436Z","page":"0367650a","t":20,"subject":"gpu","stage":"adapter","event":"info","vendor":"apple","architecture":"metal-3","description":"","f16":true,"maxBufferSize":4294967292,"maxStorageBufferBindingSize":4294967292}
+{"at":"2026-11-17T10:58:18.440Z","page":"0367650a","t":25,"subject":"unet","stage":"fetch","event":"start"}
+{"at":"2026-11-17T10:58:18.465Z","page":"0367650a","t":46,"subject":"unet/model.onnx","stage":"fetch","event":"cache-fallback","error":"Failed to fetch"}
+{"at":"2026-11-17T10:58:18.683Z","page":"775d7e41","t":0,"subject":"page","stage":"boot","event":"info","ua":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36","ort":"1.31.1"}
+{"at":"2026-11-17T10:58:18.700Z","page":"775d7e41","t":15,"subject":"gpu","stage":"adapter","event":"info","vendor":"apple","architecture":"metal-3","description":"","f16":true,"maxBufferSize":4294967292,"maxStorageBufferBindingSize":4294967292}
+{"at":"2026-11-17T10:58:18.707Z","page":"775d7e41","t":21,"subject":"unet","stage":"fetch","event":"start"}
+{"at":"2026-11-17T10:58:18.735Z","page":"775d7e41","t":50,"subject":"unet/model.onnx","stage":"fetch","event":"cache-fallback","error":"Failed to fetch"}
+{"at":"2026-11-17T10:58:18.851Z","page":"0d820d9c","t":0,"subject":"page","stage":"boot","event":"info","ua":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36","ort":"1.31.1"}
+{"at":"2026-11-17T10:58:18.873Z","page":"0d820d9c","t":14,"subject":"gpu","stage":"adapter","event":"info","vendor":"apple","architecture":"metal-3","description":"","f16":true,"maxBufferSize":4294967292,"maxStorageBufferBindingSize":4294967292}
+{"at":"2026-11-17T10:58:18.878Z","page":"0d820d9c","t":20,"subject":"unet","stage":"fetch","event":"start"}
+{"at":"2026-11-17T10:58:18.920Z","page":"0d820d9c","t":68,"subject":"unet/model.onnx","stage":"fetch","event":"cache-fallback","error":"Failed to fetch"}
+{"at":"2026-11-17T10:58:19.146Z","page":"f27f96fa","t":0,"subject":"page","stage":"boot","event":"info","ua":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36","ort":"1.31.1"}
+{"at":"2026-11-17T10:58:19.167Z","page":"f27f96fa","t":14,"subject":"gpu","stage":"adapter","event":"info","vendor":"apple","architecture":"metal-3","description":"","f16":true,"maxBufferSize":4294967292,"maxStorageBufferBindingSize":4294967292}
+{"at":"2026-11-17T10:58:19.173Z","page":"f27f96fa","t":20,"subject":"unet","stage":"fetch","event":"start"}
+{"at":"2026-11-17T10:58:19.207Z","page":"f27f96fa","t":47,"subject":"unet/model.onnx","stage":"fetch","event":"cache-fallback","error":"Failed to fetch"}
+{"at":"2026-11-17T10:58:19.351Z","page":"dd4ff634","t":0,"subject":"page","stage":"boot","event":"info","ua":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36","ort":"1.31.1"}
+{"at":"2026-11-17T10:58:19.352Z","page":"dd4ff634","t":13,"subject":"gpu","stage":"adapter","event":"info","vendor":"apple","architecture":"metal-3","description":"","f16":true,"maxBufferSize":4294967292,"maxStorageBufferBindingSize":4294967292}
+{"at":"2026-11-17T10:58:19.355Z","page":"dd4ff634","t":27,"subject":"unet","stage":"fetch","event":"start"}
+{"at":"2026-11-17T10:58:19.511Z","page":"dd4ff634","t":180,"subject":"unet/model.onnx","stage":"fetch","event":"cache-fallback","error":"Failed to fetch"}
+{"at":"2026-11-17T10:58:20.056Z","page":"3c9107b7","t":0,"subject":"page","stage":"boot","event":"info","ua":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36","ort":"1.31.1"}
+{"at":"2026-11-17T10:58:20.088Z","page":"3c9107b7","t":56,"subject":"gpu","stage":"adapter","event":"info","vendor":"apple","architecture":"metal-3","description":"","f16":true,"maxBufferSize":4294967292,"maxStorageBufferBindingSize":4294967292}
+{"at":"2026-11-17T10:58:20.198Z","page":"3c9107b7","t":100,"subject":"unet","stage":"fetch","event":"start"}
+{"at":"2026-11-17T10:58:20.218Z","page":"3c9107b7","t":208,"subject":"unet/model.onnx","stage":"fetch","event":"cache-fallback","error":"Failed to fetch"}
+{"at":"2026-11-17T10:58:20.419Z","page":"fd7c9920","t":0,"subject":"page","stage":"boot","event":"info","ua":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36","ort":"1.31.1"}
+{"at":"2026-11-17T10:58:20.467Z","page":"fd7c9920","t":79,"subject":"gpu","stage":"adapter","event":"info","vendor":"apple","architecture":"metal-3","description":"","f16":true,"maxBufferSize":4294967292,"maxStorageBufferBindingSize":4294967292}
+{"at":"2026-11-17T10:58:20.487Z","page":"fd7c9920","t":96,"subject":"unet","stage":"fetch","event":"start"}
+{"at":"2026-11-17T10:58:20.495Z","page":"fd7c9920","t":118,"subject":"unet/model.onnx","stage":"fetch","event":"cache-fallback","error":"Failed to fetch"}
+{"at":"2026-11-17T10:58:20.607Z","page":"5489523b","t":0,"subject":"page","stage":"boot","event":"info","ua":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36","ort":"1.31.1"}
+{"at":"2026-11-17T10:58:20.629Z","page":"5489523b","t":15,"subject":"gpu","stage":"adapter","event":"info","vendor":"apple","architecture":"metal-3","description":"","f16":true,"maxBufferSize":4294967292,"maxStorageBufferBindingSize":4294967292}
+{"at":"2026-11-17T10:58:20.636Z","page":"5489523b","t":22,"subject":"unet","stage":"fetch","event":"start"}
+{"at":"2026-11-17T10:58:20.661Z","page":"5489523b","t":50,"subject":"unet/model.onnx","stage":"fetch","event":"cache-fallback","error":"Failed to fetch"}
+{"at":"2026-11-17T10:58:21.165Z","page":"557edb7d","t":0,"subject":"page","stage":"boot","event":"info","ua":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36","ort":"1.31.1"}
+{"at":"2026-11-17T10:58:21.166Z","page":"557edb7d","t":351,"subject":"gpu","stage":"adapter","event":"info","vendor":"apple","architecture":"metal-3","description":"","f16":true,"maxBufferSize":4294967292,"maxStorageBufferBindingSize":4294967292}
+{"at":"2026-11-17T10:58:21.167Z","page":"557edb7d","t":379,"subject":"unet","stage":"fetch","event":"start"}
+{"at":"2026-11-17T10:58:21.209Z","page":"557edb7d","t":436,"subject":"unet/model.onnx","stage":"fetch","event":"cache-fallback","error":"Failed to fetch"}
+{"at":"2026-11-17T10:58:21.321Z","page":"360a610f","t":0,"subject":"page","stage":"boot","event":"info","ua":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36","ort":"1.31.1"}
+{"at":"2026-11-17T10:58:21.340Z","page":"360a610f","t":17,"subject":"gpu","stage":"adapter","event":"info","vendor":"apple","architecture":"metal-3","description":"","f16":true,"maxBufferSize":4294967292,"maxStorageBufferBindingSize":4294967292}
+{"at":"2026-11-17T10:58:21.346Z","page":"360a610f","t":23,"subject":"unet","stage":"fetch","event":"start"}
+{"at":"2026-11-17T10:58:21.373Z","page":"360a610f","t":41,"subject":"unet/model.onnx","stage":"fetch","event":"cache-fallback","error":"Failed to fetch"}
+{"at":"2026-11-17T10:58:21.482Z","page":"22b699bc","t":0,"subject":"page","stage":"boot","event":"info","ua":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36","ort":"1.31.1"}
+{"at":"2026-11-17T10:58:21.502Z","page":"22b699bc","t":15,"subject":"gpu","stage":"adapter","event":"info","vendor":"apple","architecture":"metal-3","description":"","f16":true,"maxBufferSize":4294967292,"maxStorageBufferBindingSize":4294967292}
+{"at":"2026-11-17T10:58:21.504Z","page":"22b699bc","t":23,"subject":"unet","stage":"fetch","event":"start"}
+{"at":"2026-11-17T10:58:21.525Z","page":"22b699bc","t":38,"subject":"unet/model.onnx","stage":"fetch","event":"cache-fallback","error":"Failed to fetch"}
+{"at":"2026-11-17T10:58:21.642Z","page":"0caaa98e","t":0,"subject":"page","stage":"boot","event":"info","ua":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36","ort":"1.31.1"}
+{"at":"2026-11-17T10:58:21.662Z","page":"0caaa98e","t":14,"subject":"gpu","stage":"adapter","event":"info","vendor":"apple","architecture":"metal-3","description":"","f16":true,"maxBufferSize":4294967292,"maxStorageBufferBindingSize":4294967292}
+{"at":"2026-11-17T10:58:21.667Z","page":"0caaa98e","t":18,"subject":"unet","stage":"fetch","event":"start"}
+{"at":"2026-11-17T10:58:21.763Z","page":"0caaa98e","t":107,"subject":"unet/model.onnx","stage":"fetch","event":"cache-fallback","error":"Failed to fetch"}
+{"at":"2026-11-17T10:58:21.860Z","page":"364a09f7","t":0,"subject":"page","stage":"boot","event":"info","ua":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36","ort":"1.31.1"}
+{"at":"2026-11-17T10:58:21.885Z","page":"364a09f7","t":15,"subject":"gpu","stage":"adapter","event":"info","vendor":"apple","architecture":"metal-3","description":"","f16":true,"maxBufferSize":4294967292,"maxStorageBufferBindingSize":4294967292}
+{"at":"2026-11-17T10:58:21.889Z","page":"364a09f7","t":27,"subject":"unet","stage":"fetch","event":"start"}
+{"at":"2026-11-17T10:58:21.922Z","page":"364a09f7","t":60,"subject":"unet/model.onnx","stage":"fetch","event":"cache-fallback","error":"Failed to fetch"}
+{"at":"2026-11-17T10:58:22.042Z","page":"084eafb7","t":0,"subject":"page","stage":"boot","event":"info","ua":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36","ort":"1.31.1"}
+{"at":"2026-11-17T10:58:22.061Z","page":"084eafb7","t":15,"subject":"gpu","stage":"adapter","event":"info","vendor":"apple","architecture":"metal-3","description":"","f16":true,"maxBufferSize":4294967292,"maxStorageBufferBindingSize":4294967292}
+{"at":"2026-11-17T10:58:22.078Z","page":"084eafb7","t":20,"subject":"unet","stage":"fetch","event":"start"}
+{"at":"2026-11-17T10:58:22.103Z","page":"084eafb7","t":47,"subject":"unet/model.onnx","stage":"fetch","event":"cache-fallback","error":"Failed to fetch"}
+{"at":"2026-11-17T10:58:22.210Z","page":"b6d34902","t":0,"subject":"page","stage":"boot","event":"info","ua":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36","ort":"1.31.1"}
+{"at":"2026-11-17T10:58:22.229Z","page":"b6d34902","t":15,"subject":"gpu","stage":"adapter","event":"info","vendor":"apple","architecture":"metal-3","description":"","f16":true,"maxBufferSize":4294967292,"maxStorageBufferBindingSize":4294967292}
+{"at":"2026-11-17T10:58:22.231Z","page":"b6d34902","t":21,"subject":"unet","stage":"fetch","event":"start"}
+{"at":"2026-11-17T10:58:22.291Z","page":"b6d34902","t":70,"subject":"unet/model.onnx","stage":"fetch","event":"cache-fallback","error":"Failed to fetch"}
+{"at":"2026-11-17T10:58:22.398Z","page":"99b091a0","t":0,"subject":"page","stage":"boot","event":"info","ua":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36","ort":"1.31.1"}
+{"at":"2026-11-17T10:58:22.415Z","page":"99b091a0","t":15,"subject":"gpu","stage":"adapter","event":"info","vendor":"apple","architecture":"metal-3","description":"","f16":true,"maxBufferSize":4294967292,"maxStorageBufferBindingSize":4294967292}
+{"at":"2026-11-17T10:58:22.420Z","page":"99b091a0","t":19,"subject":"unet","stage":"fetch","event":"start"}
+{"at":"2026-11-17T10:58:22.445Z","page":"99b091a0","t":47,"subject":"unet/model.onnx","stage":"fetch","event":"cache-fallback","error":"Failed to fetch"}
+{"at":"2026-11-17T10:58:22.560Z","page":"243d74e8","t":0,"subject":"page","stage":"boot","event":"info","ua":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36","ort":"1.31.1"}
+{"at":"2026-11-17T10:58:22.576Z","page":"243d74e8","t":13,"subject":"gpu","stage":"adapter","event":"info","vendor":"apple","architecture":"metal-3","description":"","f16":true,"maxBufferSize":4294967292,"maxStorageBufferBindingSize":4294967292}
+{"at":"2026-11-17T10:58:22.578Z","page":"243d74e8","t":18,"subject":"unet","stage":"fetch","event":"start"}
+{"at":"2026-11-17T10:58:22.623Z","page":"243d74e8","t":62,"subject":"unet/model.onnx","stage":"fetch","event":"cache-fallback","error":"Failed to fetch"}
+{"at":"2026-11-17T10:58:22.748Z","page":"9b974093","t":0,"subject":"page","stage":"boot","event":"info","ua":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36","ort":"1.31.1"}
+{"at":"2026-11-17T10:58:22.766Z","page":"9b974093","t":8,"subject":"gpu","stage":"adapter","event":"info","vendor":"apple","architecture":"metal-3","description":"","f16":true,"maxBufferSize":4294967292,"maxStorageBufferBindingSize":4294967292}
+{"at":"2026-11-17T10:58:22.772Z","page":"9b974093","t":17,"subject":"unet","stage":"fetch","event":"start"}
+{"at":"2026-11-17T10:58:22.825Z","page":"9b974093","t":60,"subject":"unet/model.onnx","stage":"fetch","event":"cache-fallback","error":"Failed to fetch"}
+{"at":"2026-11-17T10:58:22.957Z","page":"d174fb11","t":0,"subject":"page","stage":"boot","event":"info","ua":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36","ort":"1.31.1"}
+{"at":"2026-11-17T10:58:23.028Z","page":"d174fb11","t":6,"subject":"gpu","stage":"adapter","event":"info","vendor":"apple","architecture":"metal-3","description":"","f16":true,"maxBufferSize":4294967292,"maxStorageBufferBindingSize":4294967292}
+{"at":"2026-11-17T10:58:23.095Z","page":"d174fb11","t":20,"subject":"unet","stage":"fetch","event":"start"}
+{"at":"2026-11-17T11:53:50.865Z","page":"1f62189a","t":0,"subject":"page","stage":"boot","event":"info","ua":"Mozilla/5.0 (iPhone; CPU iPhone OS 18_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.7.1 Mobile/23H30 Safari/604.1","ort":"1.31.1"}
+{"at":"2026-11-17T11:53:51.096Z","page":"1f62189a","t":17,"subject":"unet","stage":"fetch","event":"start"}
+{"at":"2026-11-17T11:53:51.097Z","page":"1f62189a","t":6,"subject":"gpu","stage":"adapter","event":"info","vendor":"apple","architecture":"apple","description":"apple","f16":true,"maxBufferSize":1073741824,"maxStorageBufferBindingSize":1073741824}
+{"at":"2026-11-17T11:53:57.921Z","page":"1f62189a","t":6922,"subject":"unet/model.onnx","stage":"fetch","event":"cache-fallback","error":"Load failed"}
+{"at":"2026-11-17T11:53:58.146Z","page":"1f62189a","t":6922,"subject":"unet","stage":"fetch","event":"fail","ms":6905,"error":"Load failed"}
+{"at":"2026-11-17T11:53:58.738Z","page":"1f62189a","t":6923,"subject":"text_encoder","stage":"fetch","event":"start"}
+{"at":"2026-11-17T11:53:58.754Z","page":"1f62189a","t":6924,"subject":"text_encoder/model.onnx","stage":"fetch","event":"cache-fallback","error":"Load failed"}
+{"at":"2026-11-17T11:53:58.981Z","page":"1f62189a","t":6925,"subject":"vae_decoder","stage":"fetch","event":"start"}
+{"at":"2026-11-17T11:53:58.981Z","page":"1f62189a","t":6925,"subject":"vae_decoder/model.onnx","stage":"fetch","event":"cache-fallback","error":"Load failed"}
+{"at":"2026-11-17T11:53:58.981Z","page":"1f62189a","t":6925,"subject":"vae_decoder","stage":"fetch","event":"fail","ms":0,"error":"Load failed"}
+{"at":"2026-11-17T11:53:59.186Z","page":"1f62189a","t":6924,"subject":"text_encoder","stage":"fetch","event":"fail","ms":1,"error":"Load failed"}
+{"at":"2026-11-19T06:54:04.220Z","page":"deaf8297","t":0,"subject":"page","stage":"boot","event":"info","ua":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36","ort":"1.31.1"}
+{"at":"2026-11-19T06:54:04.225Z","page":"deaf8297","t":6,"subject":"gpu","stage":"adapter","event":"info","vendor":"apple","architecture":"metal-3","description":"","f16":true,"maxBufferSize":4294967292,"maxStorageBufferBindingSize":4294967292}
+{"at":"2026-11-19T06:54:04.228Z","page":"deaf8297","t":9,"subject":"unet","stage":"fetch","event":"start"}
+{"at":"2026-11-19T06:54:11.837Z","page":"d67864cd","t":3,"subject":"gpu","stage":"capabilities","event":"report","userAgent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36","secureContext":true,"webgpu":true,"adapterInfo":{"vendor":"apple","architecture":"metal-3","device":"","description":"","subgroupMinSize":32,"subgroupMaxSize":32,"isFallbackAdapter":false},"features":{"shader-f16":true,"subgroups":true,"timestamp-query":true},"allFeatures":["bgra8unorm-storage","clip-distances","core-features-and-limits","depth-clip-control","depth32float-stencil8","dual-source-blending","float32-blendable","float32-filterable","indirect-first-instance","primitive-index","rg11b10ufloat-renderable","shader-f16","subgroup-size-control","subgroups","texture-component-swizzle","texture-compression-astc","texture-compression-astc-sliced-3d","texture-compression-bc","texture-compression-bc-sliced-3d","texture-compression-etc2","texture-compression-unaligned","texture-formats-tier1","texture-formats-tier2","timestamp-query"],"limits":{"maxTextureDimension1D":16384,"maxTextureDimension2D":16384,"maxTextureDimension3D":2048,"maxTextureArrayLayers":2048,"maxBindGroups":4,"maxBindGroupsPlusVertexBuffers":24,"maxBindingsPerBindGroup":1000,"maxDynamicUniformBuffersPerPipelineLayout":10,"maxDynamicStorageBuffersPerPipelineLayout":8,"maxSampledTexturesPerShaderStage":48,"maxSamplersPerShaderStage":16,"maxStorageBuffersPerShaderStage":10,"maxStorageTexturesPerShaderStage":8,"maxUniformBuffersPerShaderStage":12,"maxUniformBufferBindingSize":65536,"maxStorageBufferBindingSize":4294967292,"minUniformBufferOffsetAlignment":256,"minStorageBufferOffsetAlignment":256,"maxVertexBuffers":8,"maxBufferSize":4294967292,"maxVertexAttributes":30,"maxVertexBufferArrayStride":2048,"maxInterStageShaderVariables":28,"maxColorAttachments":8,"maxColorAttachmentBytesPerSample":128,"maxComputeWorkgroupStorageSize":32768,"maxComputeInvocationsPerWorkgroup":1024,"maxComputeWorkgroupSizeX":1024,"maxComputeWorkgroupSizeY":1024,"maxComputeWorkgroupSizeZ":64,"maxComputeWorkgroupsPerDimension":65535,"maxImmediateSize":64,"maxStorageBuffersInFragmentStage":10,"maxStorageTexturesInFragmentStage":8,"maxStorageBuffersInVertexStage":10,"maxStorageTexturesInVertexStage":8},"wgslLanguageFeatures":["buffer_view","immediate_address_space","linear_indexing","packed_4x8_integer_dot_product","pointer_composite_access","readonly_and_readwrite_storage_textures","subgroup_id","subgroup_uniformity","swizzle_assignment","texture_and_sampler_let","texture_formats_tier1","uniform_buffer_standard_layout","unrestricted_pointer_parameters"]}
+{"at":"2026-11-19T06:54:25.842Z","page":"78a7922e","t":0,"subject":"page","stage":"boot","event":"info","ua":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36","ort":"1.31.1"}
+{"at":"2026-11-19T06:54:25.859Z","page":"78a7922e","t":16,"subject":"gpu","stage":"adapter","event":"info","vendor":"apple","architecture":"metal-3","description":"","f16":true,"maxBufferSize":4294967292,"maxStorageBufferBindingSize":4294967292}
+{"at":"2026-11-19T06:54:25.860Z","page":"78a7922e","t":19,"subject":"unet","stage":"fetch","event":"start"}
+{"at":"2026-11-19T06:54:33.407Z","page":"27321518","t":10,"subject":"gpu","stage":"capabilities","event":"report","userAgent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36","secureContext":true,"webgpu":true,"adapterInfo":{"vendor":"apple","architecture":"metal-3","device":"","description":"","subgroupMinSize":32,"subgroupMaxSize":32,"isFallbackAdapter":false},"features":{"shader-f16":true,"subgroups":true,"timestamp-query":true},"allFeatures":["bgra8unorm-storage","clip-distances","core-features-and-limits","depth-clip-control","depth32float-stencil8","dual-source-blending","float32-blendable","float32-filterable","indirect-first-instance","primitive-index","rg11b10ufloat-renderable","shader-f16","subgroup-size-control","subgroups","texture-component-swizzle","texture-compression-astc","texture-compression-astc-sliced-3d","texture-compression-bc","texture-compression-bc-sliced-3d","texture-compression-etc2","texture-compression-unaligned","texture-formats-tier1","texture-formats-tier2","timestamp-query"],"limits":{"maxTextureDimension1D":16384,"maxTextureDimension2D":16384,"maxTextureDimension3D":2048,"maxTextureArrayLayers":2048,"maxBindGroups":4,"maxBindGroupsPlusVertexBuffers":24,"maxBindingsPerBindGroup":1000,"maxDynamicUniformBuffersPerPipelineLayout":10,"maxDynamicStorageBuffersPerPipelineLayout":8,"maxSampledTexturesPerShaderStage":48,"maxSamplersPerShaderStage":16,"maxStorageBuffersPerShaderStage":10,"maxStorageTexturesPerShaderStage":8,"maxUniformBuffersPerShaderStage":12,"maxUniformBufferBindingSize":65536,"maxStorageBufferBindingSize":4294967292,"minUniformBufferOffsetAlignment":256,"minStorageBufferOffsetAlignment":256,"maxVertexBuffers":8,"maxBufferSize":4294967292,"maxVertexAttributes":30,"maxVertexBufferArrayStride":2048,"maxInterStageShaderVariables":28,"maxColorAttachments":8,"maxColorAttachmentBytesPerSample":128,"maxComputeWorkgroupStorageSize":32768,"maxComputeInvocationsPerWorkgroup":1024,"maxComputeWorkgroupSizeX":1024,"maxComputeWorkgroupSizeY":1024,"maxComputeWorkgroupSizeZ":64,"maxComputeWorkgroupsPerDimension":65535,"maxImmediateSize":64,"maxStorageBuffersInFragmentStage":10,"maxStorageTexturesInFragmentStage":8,"maxStorageBuffersInVertexStage":10,"maxStorageTexturesInVertexStage":8},"wgslLanguageFeatures":["buffer_view","immediate_address_space","linear_indexing","packed_4x8_integer_dot_product","pointer_composite_access","readonly_and_readwrite_storage_textures","subgroup_id","subgroup_uniformity","swizzle_assignment","texture_and_sampler_let","texture_formats_tier1","uniform_buffer_standard_layout","unrestricted_pointer_parameters"]}
+{"at":"2026-11-19T06:54:45.878Z","page":"db43de08","t":0,"subject":"page","stage":"boot","event":"info","ua":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36","ort":"1.31.1"}
+{"at":"2026-11-19T06:54:45.887Z","page":"db43de08","t":9,"subject":"gpu","stage":"adapter","event":"info","vendor":"apple","architecture":"metal-3","description":"","f16":true,"maxBufferSize":4294967292,"maxStorageBufferBindingSize":4294967292}
+{"at":"2026-11-19T06:54:45.890Z","page":"db43de08","t":11,"subject":"unet","stage":"fetch","event":"start"}
+{"at":"2026-11-19T06:54:53.453Z","page":"b6b72b3a","t":3,"subject":"gpu","stage":"capabilities","event":"report","userAgent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36","secureContext":true,"webgpu":true,"adapterInfo":{"vendor":"apple","architecture":"metal-3","device":"","description":"","subgroupMinSize":32,"subgroupMaxSize":32,"isFallbackAdapter":false},"features":{"shader-f16":true,"subgroups":true,"timestamp-query":true},"allFeatures":["bgra8unorm-storage","clip-distances","core-features-and-limits","depth-clip-control","depth32float-stencil8","dual-source-blending","float32-blendable","float32-filterable","indirect-first-instance","primitive-index","rg11b10ufloat-renderable","shader-f16","subgroup-size-control","subgroups","texture-component-swizzle","texture-compression-astc","texture-compression-astc-sliced-3d","texture-compression-bc","texture-compression-bc-sliced-3d","texture-compression-etc2","texture-compression-unaligned","texture-formats-tier1","texture-formats-tier2","timestamp-query"],"limits":{"maxTextureDimension1D":16384,"maxTextureDimension2D":16384,"maxTextureDimension3D":2048,"maxTextureArrayLayers":2048,"maxBindGroups":4,"maxBindGroupsPlusVertexBuffers":24,"maxBindingsPerBindGroup":1000,"maxDynamicUniformBuffersPerPipelineLayout":10,"maxDynamicStorageBuffersPerPipelineLayout":8,"maxSampledTexturesPerShaderStage":48,"maxSamplersPerShaderStage":16,"maxStorageBuffersPerShaderStage":10,"maxStorageTexturesPerShaderStage":8,"maxUniformBuffersPerShaderStage":12,"maxUniformBufferBindingSize":65536,"maxStorageBufferBindingSize":4294967292,"minUniformBufferOffsetAlignment":256,"minStorageBufferOffsetAlignment":256,"maxVertexBuffers":8,"maxBufferSize":4294967292,"maxVertexAttributes":30,"maxVertexBufferArrayStride":2048,"maxInterStageShaderVariables":28,"maxColorAttachments":8,"maxColorAttachmentBytesPerSample":128,"maxComputeWorkgroupStorageSize":32768,"maxComputeInvocationsPerWorkgroup":1024,"maxComputeWorkgroupSizeX":1024,"maxComputeWorkgroupSizeY":1024,"maxComputeWorkgroupSizeZ":64,"maxComputeWorkgroupsPerDimension":65535,"maxImmediateSize":64,"maxStorageBuffersInFragmentStage":10,"maxStorageTexturesInFragmentStage":8,"maxStorageBuffersInVertexStage":10,"maxStorageTexturesInVertexStage":8},"wgslLanguageFeatures":["buffer_view","immediate_address_space","linear_indexing","packed_4x8_integer_dot_product","pointer_composite_access","readonly_and_readwrite_storage_textures","subgroup_id","subgroup_uniformity","swizzle_assignment","texture_and_sampler_let","texture_formats_tier1","uniform_buffer_standard_layout","unrestricted_pointer_parameters"]}

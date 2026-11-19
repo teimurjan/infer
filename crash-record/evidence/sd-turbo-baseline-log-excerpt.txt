@@ -1,0 +1,5 @@
+# SD-Turbo baseline, WebContent 39079
+2026-11-15 23:17:11.010 Df runningboardd[34:49e650] [com.apple.libxpc.OSLaunchdJob:all] <OSLaunchdJob | handle=E9EDBFE2-A934-49D0-8E9B-5FC3DCC14EAB>: start succeeded, info=running, pid=39079
+2026-11-15 23:20:43.789 E  MobileSafari[38866:498f1b] [com.apple.WebKit:Process] 0x7e811c0c0 - [PID=39079] WebProcessProxy::processDidTerminateOrFailedToLaunch: reason=Crash
+2026-11-15 23:20:43.790 Df runningboardd[34:49ef88] [com.apple.runningboard:ttl] [xpcservice<com.apple.WebKit.WebContent([app<com.apple.mobilesafari(E360F616-FCAC-4FBC-867B-2AF620F4F9C7)>:38866])>{vt hash: 71395982}[uuid:540DE963-EA9C-4A46-A0FE-7F9B15C2B118]{definition:com.apple.WebKit.WebContent[extension][client]}:39079] termination reported by launchd (1, 7, 9)
+2026-11-15 23:20:43.792 E  MobileSafari[38866:498f1b] [com.apple.WebKit:Process] 0xd1b95a318 - [pageProxyID=2123, webPageID=2124, PID=39079] WebPageProxy::processDidTerminate: (pid 39079), reason=Crash

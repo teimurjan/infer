@@ -1,0 +1,34 @@
+# Dependencies and build output.
+node_modules/
+dist/
+target/
+pkg/
+__pycache__/
+*.pyc
+.venv/
+
+# Model data. The scripts in models/*/python make these files again with `uv run`.
+models/*/weights/
+models/*/golden/
+# Test tensors. The make_*.py scripts in each engine/testdata folder make them again with `uv run`.
+models/*/engine/testdata/**/*.bin
+models/*/engine/testdata/**/*.safetensors
+# Images of quantization evaluations. python/quant_eval.py makes them again.
+models/*/quant/quant_eval/
+
+# Run events that the test pages send to the server.
+runs/
+
+# Screenshots of design reviews. The decision mocks and briefs in .impeccable/ stay.
+apps/site/.impeccable/review/
+
+# Local tool, editor and system files.
+.DS_Store
+.playwright-mcp/
+.idea/
+.vscode/
+*.log
+.env
+.env.*
+*.pem
+*.key

@@ -1,0 +1,16 @@
+{
+  "name": "@infer/ui",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./styles.css": "./src/styles.css",
+    "./*": "./src/*.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc -p ."
+  },
+  "dependencies": {
+    "@fontsource-variable/archivo": "5",
+    "@fontsource-variable/source-serif-4": "5"
+  }
+}

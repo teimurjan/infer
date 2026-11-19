@@ -1,0 +1,12 @@
+{
+  "name": "@infer/probes",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "bun build memory/index.ts watchdog/index.ts capabilities/index.ts --outdir dist --root . --entry-naming '[dir].[ext]' --sourcemap=linked",
+    "typecheck": "tsc -p ."
+  },
+  "dependencies": {
+    "@infer/browser": "workspace:*"
+  }
+}

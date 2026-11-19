@@ -1,0 +1,125 @@
+/* The parts of a dictionary page, and the controls set in the same voice. Each class starts with "ui-". */
+
+/* Headword: the word an entry defines. Huge on the home page, smaller on an entry. */
+.ui-headword { font: 900 var(--size-headword) / 0.8 var(--face-head); letter-spacing: -0.06em; font-stretch: 100%; margin-left: -0.04em; }
+.ui-headword-entry { font-size: var(--size-entry); letter-spacing: -0.045em; line-height: 0.88; }
+.ui-headword-title { font-size: var(--size-title); letter-spacing: -0.03em; }
+/* Pronunciation and part of speech, under the headword. */
+.ui-pron { display: flex; flex-wrap: wrap; gap: 0 var(--s-3); align-items: baseline; margin-top: var(--s-3); font-size: var(--size-text); }
+.ui-pos { font-style: italic; font-weight: 600; }
+
+/* Senses: numbered meanings of an entry. The number sits in the grotesk. */
+.ui-senses { display: flex; flex-direction: column; gap: var(--s-2); max-width: var(--measure); }
+.ui-sense { display: grid; grid-template-columns: 1.4em 1fr; gap: var(--s-1); }
+.ui-sense-n { font: 850 1em / 1.45 var(--face-head); }
+/* A cross-reference arrow and word, in the grotesk, as dictionaries print "see". */
+.ui-see { font-family: var(--face-head); font-weight: 700; text-decoration: none; white-space: nowrap; }
+
+/* A section of an entry, opened by a short grotesk label over a rule. */
+.ui-section { display: flex; flex-direction: column; gap: var(--s-3); padding-top: var(--s-3); border-top: var(--rule) solid var(--ink); }
+.ui-section-label { font: 750 var(--size-small) / 1 var(--face-head); font-stretch: 80%; letter-spacing: 0.02em; }
+
+/* Contents map: the numbered parts of a pipeline with their true sizes. */
+.ui-contents { display: grid; grid-template-columns: 1.6em 1fr auto; column-gap: var(--s-2); font: 500 var(--size-small) / 1.6 var(--face-head); border-top: 1px solid var(--hair); padding-top: var(--s-2); }
+.ui-contents span:nth-child(3n) { text-align: right; font-variant-numeric: tabular-nums lining-nums; }
+.ui-contents span:nth-child(3n + 1) { font-weight: 800; }
+
+/* Button: primary is an ink block, secondary an ink outline, ghost a plain underlined word. 44 px high, for a thumb. */
+.ui-button {
+  display: inline-flex; align-items: center; justify-content: center; gap: var(--s-2);
+  min-height: 44px; padding: 0 var(--s-4); border: var(--rule) solid var(--ink); border-radius: 0;
+  font: 800 var(--size-text) / 1 var(--face-head); letter-spacing: -0.01em;
+  cursor: pointer; text-decoration: none; transition: background 160ms, color 160ms;
+}
+/* The primary action is the one thing that runs now, so it is the live blue. */
+.ui-button-primary { background: var(--live); border-color: var(--live); color: var(--paper); }
+.ui-button-primary:hover { background: var(--ink); border-color: var(--ink); color: var(--paper); }
+.ui-button-ink { background: var(--ink); color: var(--paper); }
+.ui-button-ink:hover { background: var(--ink-2); }
+.ui-button-secondary { background: transparent; color: var(--ink); }
+.ui-button-secondary:hover { background: var(--ink); color: var(--paper); }
+.ui-button-ghost { border-color: transparent; background: transparent; color: var(--ink); padding: 0 var(--s-1); text-decoration: underline; text-decoration-thickness: 1.5px; text-underline-offset: 0.2em; font-weight: 600; }
+.ui-button-ghost:hover { color: var(--live); }
+.ui-button-large { min-height: 52px; padding: 0 var(--s-5); font-size: 1.1875rem; }
+.ui-button:disabled { background: transparent; color: var(--ink-3); border-color: var(--hair); cursor: not-allowed; }
+.ui-button-ghost:disabled { border-color: transparent; text-decoration: none; }
+
+/* Field: a ruled box with its label above, in the grotesk. 16 px text or more, so Safari does not zoom on focus. */
+.ui-field { display: flex; flex-direction: column; gap: var(--s-1); font: 600 var(--size-small) / 1.2 var(--face-head); }
+.ui-field-hint { font: 400 var(--size-tiny) / 1.3 var(--face-text); color: var(--ink-3); }
+.ui-input {
+  width: 100%; min-height: 44px; padding: var(--s-2) var(--s-3);
+  border: var(--rule) solid var(--ink); border-radius: 0; background: var(--paper); color: var(--ink);
+  font: 400 1.0625rem / 1.35 var(--face-text);
+}
+.ui-input::placeholder { color: var(--ink-3); }
+.ui-input:focus { outline: none; border-color: var(--live); box-shadow: inset 0 0 0 1px var(--live); }
+textarea.ui-input { resize: vertical; }
+/* An input and its button joined into one ruled line, as in an entry: type, then run. */
+.ui-run-line { display: flex; }
+.ui-run-line .ui-input { border-right: 0; flex: 1; min-width: 0; }
+
+/* Status: one small grotesk word. Its tone says passed, failed, running or idle. */
+.ui-badge { font: 750 var(--size-tiny) / 1 var(--face-head); letter-spacing: 0.04em; text-transform: lowercase; color: var(--ink-3); white-space: nowrap; }
+.ui-badge[data-tone="success"] { color: var(--ink); }
+.ui-badge[data-tone="danger"] { color: var(--fail); }
+.ui-badge[data-tone="accent"] { color: var(--live); }
+.ui-badge[data-tone="warning"] { color: var(--ink-2); font-style: italic; }
+
+/* Band: a progress line. The ink rule fills with blue while it runs, ink when done, red when it failed. */
+.ui-progress { display: flex; flex-direction: column; gap: var(--s-1); }
+.ui-progress-label { display: flex; justify-content: space-between; gap: var(--s-3); font: 500 var(--size-small) / 1.3 var(--face-head); }
+.ui-progress-label span:last-child { font-variant-numeric: tabular-nums lining-nums; text-align: right; }
+.ui-progress-track { position: relative; height: 4px; background: var(--hair); overflow: hidden; }
+.ui-progress-fill { position: absolute; inset: 0 auto 0 0; width: 0; background: var(--live); transition: width 240ms var(--ease-out); }
+.ui-progress[data-state="done"] .ui-progress-fill { background: var(--ink); }
+.ui-progress[data-state="failed"] .ui-progress-fill { background: var(--fail); }
+.ui-progress[data-state="unknown"] .ui-progress-fill { width: 24% !important; animation: ui-shuttle 1.1s var(--ease-out) infinite alternate; }
+@keyframes ui-shuttle { from { left: 0; } to { left: 76%; } }
+
+/* Steps: the numbered lines of a run. A changing line snaps in by one line, with a small overshoot. */
+.ui-steps { display: flex; flex-direction: column; border-top: 1px solid var(--hair); }
+.ui-step { display: grid; grid-template-columns: 2em 1fr auto; gap: var(--s-2); align-items: baseline; padding: var(--s-2) 0; border-bottom: 1px solid var(--hair); overflow: hidden; }
+.ui-step-dot { font: 850 1.0625rem / 1 var(--face-head); }
+.ui-step-dot::before { content: attr(data-n); }
+.ui-step-title { font: 750 1.0625rem / 1.2 var(--face-head); letter-spacing: -0.01em; }
+.ui-step-detail { font: 400 var(--size-small) / 1.35 var(--face-text); color: var(--ink-2); }
+.ui-step-time { font: 600 var(--size-small) / 1 var(--face-head); font-variant-numeric: tabular-nums lining-nums; }
+.ui-step[data-state="pending"] { color: var(--ink-3); }
+.ui-step[data-state="pending"] .ui-step-detail { color: var(--ink-3); }
+.ui-step[data-state="active"] { color: var(--live); background: var(--live-wash); }
+.ui-step[data-state="active"] .ui-step-detail { color: var(--live); }
+.ui-step[data-state="failed"] { color: var(--fail); }
+.ui-step[data-state="failed"] .ui-step-detail { color: var(--fail); }
+/* The snap: the line rises from one line below, passes its place a little, and settles. */
+.ui-snap > * { animation: ui-snap 420ms var(--snap); }
+@keyframes ui-snap { from { transform: translateY(1.1em); opacity: 0; } to { transform: none; opacity: 1; } }
+/* A failure stops half a line short, as a jammed roll does. */
+.ui-step[data-state="failed"] .ui-step-title { transform: translateY(0.3em); }
+
+/* Meter: the budget rule. A scale from 0 to the limit, with the live amount filled in blue. */
+.ui-meter { display: flex; flex-direction: column; gap: var(--s-1); }
+.ui-meter-track { position: relative; height: 10px; border: 1px solid var(--ink); background: repeating-linear-gradient(90deg, transparent 0 calc(10% - 1px), var(--hair) calc(10% - 1px) 10%); }
+.ui-meter-fill { position: absolute; inset: 0 auto 0 0; background: var(--live); transition: width 240ms var(--ease-out); }
+.ui-meter[data-tone="danger"] .ui-meter-fill { background: var(--fail); }
+
+/* Log: the raw lines of the engine, as citations. Fixed width, because they are data. */
+.ui-log {
+  margin: 0; padding: var(--s-3) 0; max-height: 420px; overflow: auto;
+  border-top: 1px solid var(--hair); border-bottom: 1px solid var(--hair);
+  font: 400 0.75rem / 1.55 var(--face-data); white-space: pre-wrap; word-break: break-word;
+}
+.ui-log-line[data-tone="danger"] { color: var(--fail); }
+.ui-log-line[data-tone="success"] { color: var(--ink); font-weight: 700; }
+.ui-log-line[data-tone="muted"] { color: var(--ink-3); }
+
+/* Notice: a sentence set apart, for a reason the page cannot go on. */
+.ui-notice { padding: var(--s-3) 0; border-top: var(--rule) solid var(--fail); color: var(--fail); font-size: var(--size-text); }
+
+/* Citations: the sources of the numbers, small, numbered, at the foot of a page. */
+.ui-cites { display: flex; flex-direction: column; gap: var(--s-1); font: 400 var(--size-tiny) / 1.45 var(--face-text); color: var(--ink-2); }
+.ui-cite-mark { font: 700 0.62em / 0 var(--face-head); vertical-align: super; margin-left: 1px; text-decoration: none; color: var(--ink); }
+
+/* Muted and small helpers. */
+.ui-muted { color: var(--ink-3); }
+.ui-small { font-size: var(--size-small); }

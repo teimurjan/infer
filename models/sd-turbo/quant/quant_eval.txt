@@ -1,0 +1,25 @@
+Downloading: "https://download.pytorch.org/models/alexnet-owt-7be5be79.pth" to /Users/teimurgasanov/.cache/torch/hub/checkpoints/alexnet-owt-7be5be79.pth
+image     all 4-bit PSNR   all 4-bit LPIPS    mixed plan PSNR  mixed plan LPIPS  prompt
+    0              11.08            0.8007              29.22            0.0470  a photo of a cat sitting on a wooden table
+    1              11.23            0.7146              21.13            0.1594  a portrait of an old fisherman with a grey beard, natural light
+    2              13.27            0.6336              29.49            0.0326  a red sports car parked on a wet city street at night
+    3              10.53            0.7276              25.99            0.0497  a bowl of ramen with an egg and green onions, top view
+    4              10.87            0.6869              26.25            0.0584  a snowy mountain lake at sunrise, reflections on the water
+    5              12.88            0.6586              33.32            0.0216  a golden retriever puppy running on green grass
+    6              10.67            0.7532              21.00            0.1362  a cozy living room with a fireplace and bookshelves
+    7              12.12            0.7164              28.96            0.0540  a watercolor painting of a lighthouse on a cliff
+    8              13.22            0.8380              29.94            0.0319  a close-up photo of a hummingbird drinking from a flower
+    9              10.89            0.7406              22.86            0.0885  a busy market street in Marrakech with colorful spices
+   10              11.30            0.7089              26.67            0.0516  a futuristic city skyline with flying cars, digital art
+   11              10.33            0.7727              24.05            0.0740  a sign that says OPEN on a coffee shop door
+   12              10.89            0.7595              23.99            0.0618  a pile of fresh oranges and lemons in a wooden crate
+   13              10.89            0.7222              25.33            0.0688  an astronaut riding a horse on the moon
+   14              10.65            0.6662              23.00            0.0897  a young woman reading a book in a sunny cafe
+   15              11.50            0.7632              25.81            0.0632  a pencil sketch of an owl on a branch
+   16              11.39            0.7487              25.19            0.0705  a tropical beach with palm trees and turquoise water
+   17              10.83            0.6807              23.09            0.0825  a plate of chocolate chip cookies next to a glass of milk
+   18              13.87            0.8753              35.10            0.0368  an old castle in the fog, oil painting
+   19              11.82            0.6433              27.82            0.0291  a macro photo of dew drops on a spider web
+ mean              11.51            0.7305              26.41            0.0654
+worst              10.33            0.8753              21.00            0.1594
+wrote quant_eval/grid.png

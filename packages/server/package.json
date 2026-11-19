@@ -1,0 +1,12 @@
+{
+  "name": "@infer/server",
+  "private": true,
+  "type": "module",
+  "exports": { "./*": "./src/*.ts" },
+  "scripts": {
+    "typecheck": "tsc -p ."
+  },
+  "dependencies": {
+    "@infer/browser": "workspace:*"
+  }
+}

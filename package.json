@@ -1,0 +1,19 @@
+{
+  "name": "infer",
+  "private": true,
+  "type": "module",
+  "workspaces": ["apps/*", "packages/*", "models/*"],
+  "scripts": {
+    "serve": "bun packages/server/src/main.ts",
+    "serve:lan": "bun packages/server/src/main.ts --lan",
+    "phone": "bun run --filter @infer/site build && bun packages/harness/src/main.ts",
+    "cert": "bun packages/server/src/cert.ts",
+    "build": "bun run --filter '*' build",
+    "typecheck": "bun run --filter '*' typecheck"
+  },
+  "devDependencies": {
+    "@types/bun": "1.3.10",
+    "@webgpu/types": "^0.1.74",
+    "typescript": "^7.0.2"
+  }
+}

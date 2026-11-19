@@ -1,0 +1,21 @@
+{
+  "name": "@infer/sd-turbo",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./client/*": "./client/*.ts",
+    "./client/tests": "./client/tests/index.ts",
+    "./benchmark/*": "./benchmark/*.ts"
+  },
+  "scripts": {
+    "build": "bun run build:wasm && bun run build:web",
+    "build:wasm": "cd engine && wasm-pack build --release --target web --out-dir pkg",
+    "build:web": "bun build.ts",
+    "test": "cd engine && cargo test --release",
+    "typecheck": "tsc -p ."
+  },
+  "dependencies": {
+    "@infer/browser": "workspace:*",
+    "onnxruntime-web": "^1.17.1"
+  }
+}

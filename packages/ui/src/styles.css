@@ -1,0 +1,6 @@
+/* The whole design system in one file. A page imports this one file. */
+@import "./fonts.css";
+@import "./tokens.css";
+@import "./base.css";
+@import "./paper.css";
+@import "./components.css";

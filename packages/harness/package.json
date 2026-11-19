@@ -1,0 +1,12 @@
+{
+  "name": "@infer/harness",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "typecheck": "tsc -p ."
+  },
+  "dependencies": {
+    "@infer/browser": "workspace:*",
+    "@infer/server": "workspace:*"
+  }
+}

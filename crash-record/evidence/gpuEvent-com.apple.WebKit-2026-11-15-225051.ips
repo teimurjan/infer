@@ -1,0 +1,9 @@
+{"bug_type":"284","timestamp":"2026-11-15 22:50:51.00 +0600","os_version":"iPhone OS 26.7.1 (23H30)","roots_installed":0,"incident_id":"6645C947-C54E-441C-84E9-6D5D4B3BB450"}
+{
+  "roots_installed" : 0,
+  "bug_type" : "284",
+  "process_name" : "com.apple.WebKit",
+  "registers" : {},
+  "timestamp" : 1794761451,
+  "analysis" : {"fw_power_state":0,"fw_ta_substate":{"slot0":0,"slot1":0},"fw_power_boost_controller":0,"guilty_dm":3,"fw_power_controller_in_charge":0,"fw_cl_state":{"slot0":0,"slot1":0,"slot2":0},"fw_perf_state_lo":10,"fw_ta_state":{"slot0":0,"slot1":0},"signature":579,"fw_power_substate":0,"command_buffer_trace_id":27333702665,"fw_perf_state_select":0,"restart_reason":4,"fw_3d_state":{"slot0":0,"slot1":0,"slot2":0},"fw_gpc_perf_state":10,"fw_perf_state_hi":10,"fw_power_limit_controller":6,"restart_reason_desc":"firmware-detected lockup"}
+}

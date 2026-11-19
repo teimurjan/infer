@@ -1,0 +1,371 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-11-19T14:30:00Z",
+  "title": "Design System: infer",
+  "extensions": {
+    "colorMeta": {
+      "paper": {
+        "role": "neutral",
+        "displayName": "Bible Paper",
+        "canonical": "#fafaf7",
+        "tonalRamp": [
+          "#2a2a27",
+          "#4a4a45",
+          "#6e6e68",
+          "#93938c",
+          "#b7b7b0",
+          "#d8d8d1",
+          "#ecece6",
+          "#fafaf7"
+        ]
+      },
+      "ink": {
+        "role": "neutral",
+        "displayName": "Press Black",
+        "canonical": "#0b0b0c",
+        "tonalRamp": [
+          "#0b0b0c",
+          "#1e1e1d",
+          "#3a3a37",
+          "#55554f",
+          "#6b6b66",
+          "#93938c",
+          "#d8d8d1",
+          "#fafaf7"
+        ]
+      },
+      "ink-2": {
+        "role": "neutral",
+        "displayName": "Second Ink",
+        "canonical": "#3a3a37",
+        "tonalRamp": [
+          "#141413",
+          "#262624",
+          "#3a3a37",
+          "#52524e",
+          "#6b6b66",
+          "#8f8f89",
+          "#b9b9b2",
+          "#e4e4de"
+        ]
+      },
+      "ink-3": {
+        "role": "neutral",
+        "displayName": "Faded Ink",
+        "canonical": "#6b6b66",
+        "tonalRamp": [
+          "#1e1e1c",
+          "#33332f",
+          "#4c4c48",
+          "#6b6b66",
+          "#86867f",
+          "#a3a39c",
+          "#c2c2bb",
+          "#e2e2dc"
+        ]
+      },
+      "hair": {
+        "role": "neutral",
+        "displayName": "Hairline",
+        "canonical": "#d8d8d1",
+        "tonalRamp": [
+          "#2c2c28",
+          "#4a4a44",
+          "#6b6b64",
+          "#8e8e86",
+          "#b2b2aa",
+          "#d8d8d1",
+          "#e8e8e2",
+          "#f4f4ef"
+        ]
+      },
+      "live": {
+        "role": "primary",
+        "displayName": "Live Ultramarine",
+        "canonical": "#1d2bd9",
+        "tonalRamp": [
+          "#0a1060",
+          "#111a8f",
+          "#1823b8",
+          "#1d2bd9",
+          "#4a56e4",
+          "#7d86ec",
+          "#b3b8f4",
+          "#e4e6fb"
+        ]
+      },
+      "live-wash": {
+        "role": "primary",
+        "displayName": "Live Wash",
+        "canonical": "#1d2bd914",
+        "tonalRamp": [
+          "#1d2bd914"
+        ]
+      },
+      "fail": {
+        "role": "tertiary",
+        "displayName": "Failure Red",
+        "canonical": "#c4161c",
+        "tonalRamp": [
+          "#4a0809",
+          "#760c0f",
+          "#a01217",
+          "#c4161c",
+          "#d84a4f",
+          "#e67f82",
+          "#f1b3b5",
+          "#fae3e4"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Headword",
+        "purpose": "The home headword infer. Grows to clamp(14rem, 27vw, 24rem) in the wide home spread."
+      },
+      "headline": {
+        "displayName": "Entry Headword",
+        "purpose": "The headword of a model entry."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Test names on developer pages. All h1 to h3 share 850 and -0.035em."
+      },
+      "term": {
+        "displayName": "Term",
+        "purpose": "Usage note words, step titles, sense numbers."
+      },
+      "sense": {
+        "displayName": "Sense",
+        "purpose": "Numbered senses of a page opening."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Every sentence. Old-style figures, 68ch measure."
+      },
+      "label": {
+        "displayName": "Section Label",
+        "purpose": "Lowercase condensed grotesk labels over a rule, and the running head at 700."
+      },
+      "control": {
+        "displayName": "Control",
+        "purpose": "Button labels."
+      },
+      "number": {
+        "displayName": "Column Number",
+        "purpose": "Lining tabular numbers in contents maps, steps and bands."
+      },
+      "citation": {
+        "displayName": "Citation",
+        "purpose": "Source lists and the colophon."
+      },
+      "data": {
+        "displayName": "Engine Data",
+        "purpose": "Raw engine log lines only."
+      }
+    },
+    "shadows": [
+      {
+        "name": "focus-thicken",
+        "value": "inset 0 0 0 1px var(--live)",
+        "purpose": "Thickens the border of a focused input. The only box-shadow in the system."
+      }
+    ],
+    "motion": [
+      {
+        "name": "snap",
+        "value": "cubic-bezier(0.2, 1.4, 0.4, 1)",
+        "purpose": "A step line that changes state rises from 1.1em below over 420ms, overshoots and settles. A failed title stays 0.3em low."
+      },
+      {
+        "name": "ease-out",
+        "value": "cubic-bezier(0.16, 1, 0.3, 1)",
+        "purpose": "Thumb tab width (200ms), band and meter fills (240ms), the unknown-length shuttle (1.1s)."
+      },
+      {
+        "name": "control-color",
+        "value": "160ms",
+        "purpose": "Button background and color changes."
+      },
+      {
+        "name": "guide-fade",
+        "value": "opacity 120ms",
+        "purpose": "A new guide word fades in the running head."
+      },
+      {
+        "name": "reduced-motion",
+        "value": "0ms",
+        "purpose": "All animation and transition durations drop to zero under prefers-reduced-motion."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "wide",
+        "value": "760px"
+      },
+      {
+        "name": "spread",
+        "value": "980px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Starts a run. The only blue button.",
+      "html": "<button class=\"ds-btn ds-btn-primary\">run</button>",
+      "css": ".ds-btn{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:0 16px;border:1.5px solid var(--ink);border-radius:0;font-family: var(--face-head);font-weight:800;font-size:1.0625rem;line-height:1;letter-spacing:-0.01em;cursor:pointer;transition:background 160ms,color 160ms}.ds-btn:focus-visible{outline:2px solid var(--live);outline-offset:3px}.ds-btn-primary{background:var(--live);border-color:var(--live);color:var(--paper)}.ds-btn-primary:hover{background:var(--ink);border-color:var(--ink)}"
+    },
+    {
+      "name": "Ink Button",
+      "kind": "button",
+      "refersTo": "button-ink",
+      "description": "A black main action that runs nothing.",
+      "html": "<button class=\"ds-btn-ink\">store 2.24 GB on this device</button>",
+      "css": ".ds-btn-ink{display:inline-flex;align-items:center;min-height:52px;padding:0 24px;border:1.5px solid var(--ink);border-radius:0;background:var(--ink);color:var(--paper);font-family: var(--face-head);font-weight:800;font-size:1.1875rem;line-height:1;letter-spacing:-0.01em;cursor:pointer;transition:background 160ms}.ds-btn-ink:hover{background:var(--ink-2)}.ds-btn-ink:focus-visible{outline:2px solid var(--live);outline-offset:3px}"
+    },
+    {
+      "name": "Secondary Button",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Other actions, as an ink outline.",
+      "html": "<button class=\"ds-btn-secondary\">reset</button>",
+      "css": ".ds-btn-secondary{display:inline-flex;align-items:center;min-height:44px;padding:0 16px;border:1.5px solid var(--ink);border-radius:0;background:transparent;color:var(--ink);font-family: var(--face-head);font-weight:800;font-size:1.0625rem;line-height:1;cursor:pointer;transition:background 160ms,color 160ms}.ds-btn-secondary:hover{background:var(--ink);color:var(--paper)}.ds-btn-secondary:focus-visible{outline:2px solid var(--live);outline-offset:3px}"
+    },
+    {
+      "name": "Ghost Button",
+      "kind": "button",
+      "refersTo": "button-ghost",
+      "description": "A small action as an underlined word.",
+      "html": "<button class=\"ds-btn-ghost\">new seed</button>",
+      "css": ".ds-btn-ghost{min-height:44px;padding:0 4px;border:0;background:transparent;color:var(--ink);font-family: var(--face-head);font-weight:600;font-size:1.0625rem;text-decoration:underline;text-decoration-thickness:1.5px;text-underline-offset:0.2em;cursor:pointer}.ds-btn-ghost:hover{color:var(--live)}.ds-btn-ghost:focus-visible{outline:2px solid var(--live);outline-offset:3px}"
+    },
+    {
+      "name": "Run Line",
+      "kind": "input",
+      "refersTo": "input",
+      "description": "The prompt field joined to the run button in one ruled line.",
+      "html": "<div class=\"ds-run-line\"><input class=\"ds-input\" placeholder=\"a lighthouse on a cliff at sunset, oil painting\"><button class=\"ds-run\">run</button></div>",
+      "css": ".ds-run-line{display:flex}.ds-input{flex:1;min-width:0;min-height:44px;padding:8px 12px;border:1.5px solid var(--ink);border-right:0;border-radius:0;background:var(--paper);color:var(--ink);font:400 1.0625rem/1.35 var(--face-text);caret-color:var(--live)}.ds-input::placeholder{color:var(--ink-3)}.ds-input:focus{outline:none;border-color:var(--live);box-shadow:inset 0 0 0 1px var(--live)}.ds-run{min-height:44px;padding:0 16px;border:1.5px solid var(--live);border-radius:0;background:var(--live);color:var(--paper);font:800 1.0625rem/1 var(--face-head);cursor:pointer}.ds-run:hover{background:var(--ink);border-color:var(--ink)}"
+    },
+    {
+      "name": "Running Head",
+      "kind": "nav",
+      "refersTo": "running-head",
+      "description": "Guide words over a 1.5px ink rule.",
+      "html": "<header class=\"ds-head\"><a href=\"#\">infer</a><span><a href=\"#\" aria-current=\"page\">entry</a> <a href=\"#\">tests</a> <a href=\"#\">bench</a> sd-turbo</span></header>",
+      "css": ".ds-head{display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding-bottom:8px;border-bottom:1.5px solid var(--ink);font:700 0.875rem/1 var(--face-head);font-stretch:80%;letter-spacing:0.01em;color:var(--ink)}.ds-head a{color:inherit;text-decoration:none}.ds-head span a{font-weight:500;color:var(--ink-2);margin-right:12px}.ds-head span a[aria-current]{color:var(--ink);text-decoration:underline}.ds-head a:hover{color:var(--live)}"
+    },
+    {
+      "name": "Thumb Index",
+      "kind": "nav",
+      "refersTo": "thumb-tab",
+      "description": "Blue cut tabs on the fore-edge, one per entry that runs, then one empty cut.",
+      "html": "<nav class=\"ds-thumbs\"><a class=\"ds-thumb\" href=\"#\" aria-current=\"page\">S</a><span class=\"ds-thumb ds-thumb-empty\"></span></nav>",
+      "css": ".ds-thumbs{display:flex;flex-direction:column;align-items:flex-end;gap:6px}.ds-thumb{display:grid;place-items:center;width:30px;height:84px;border-radius:5px 0 0 5px;background:var(--live);color:var(--paper);font:850 1.0625rem/1 var(--face-head);text-decoration:none;transition:width 200ms var(--ease-out)}.ds-thumb:hover{width:36px}.ds-thumb[aria-current]{width:38px}.ds-thumb-empty{background:var(--hair)}"
+    },
+    {
+      "name": "Steps",
+      "kind": "custom",
+      "refersTo": "step-active",
+      "description": "Numbered run lines. The live line is blue, a failed line sits half a line low.",
+      "html": "<ol class=\"ds-steps\"><li data-state=\"done\"><b>1</b><span>tokenizer</span><i>11 of 77</i></li><li data-state=\"active\"><b>2</b><span>text encoder</span><i></i></li><li data-state=\"failed\"><b>3</b><span>UNet, 8-bit</span><i></i></li><li data-state=\"pending\"><b>4</b><span>TAESD</span><i></i></li></ol>",
+      "css": ".ds-steps{list-style:none;margin:0;padding:0;border-top:1px solid var(--hair)}.ds-steps li{display:grid;grid-template-columns:2em 1fr auto;gap:8px;align-items:baseline;padding:8px 0;border-bottom:1px solid var(--hair);overflow:hidden;font:750 1.0625rem/1.2 var(--face-head);animation:ds-snap 420ms var(--snap)}.ds-steps i{font:600 0.875rem/1 var(--face-head);font-style:normal;font-variant-numeric:tabular-nums lining-nums}.ds-steps [data-state=pending]{color:var(--ink-3)}.ds-steps [data-state=active]{color:var(--live);background:var(--live-wash)}.ds-steps [data-state=failed]{color:var(--fail)}.ds-steps [data-state=failed] span{transform:translateY(0.3em);display:inline-block}@keyframes ds-snap{from{transform:translateY(1.1em);opacity:0}to{transform:none;opacity:1}}"
+    },
+    {
+      "name": "Cited Number",
+      "kind": "custom",
+      "refersTo": "citation-mark",
+      "description": "A measured number with its ink citation mark.",
+      "html": "<p class=\"ds-cited\">on iPhone 16 Pro Max: <b>0.37 + 2.54 + 0.73 s</b><a class=\"ds-cite\" href=\"#\">2</a></p>",
+      "css": ".ds-cited{font:500 0.875rem/1.4 var(--face-head);color:var(--ink-2)}.ds-cited b{color:var(--ink);font-weight:750}.ds-cite{font:700 0.62em/0 var(--face-head);vertical-align:super;margin-left:1px;text-decoration:none;color:var(--ink)}"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Dictionary of Inferences",
+    "overview": "infer is a pocket dictionary printed on bible paper. The wordmark is the headword \"infer, v.\". Each model is an entry that a visitor can run. Each limit of the phone is a usage note. Black ink sits on bright paper, and the reverse page shows through, faint and mirrored. One ultramarine marks only what runs now.\n\nThe page reads like a printed reference. A running head with guide words sits over a ruled line. Heavy, tight grotesk headwords open each entry. Numbered senses follow in a text serif. Thumb tabs are cut into the fore-edge on the right. Numbers carry small citation marks that point to the run that produced them. Density is high and the voice is plain. Structure comes from rules and type weight, never from boxes, cards or shadows.\n\nMotion is a stepped roll. When a line of a run changes state, it snaps up by one line with a small overshoot. A failed line jams half a line low. The world refuses the dark AI launch page with a glowing device mock and three feature cards.",
+    "keyCharacteristics": [
+      "Bright bible paper, black ink, one live ultramarine, one failure red.",
+      "Two voices: Archivo for headwords, numbers and controls, Source Serif 4 for every sentence.",
+      "Ruled lines and square corners. No cards and no drop shadows.",
+      "The reverse page shows through as real mirrored text in columns.",
+      "Blue thumb tabs on the fore-edge, one per entry that runs.",
+      "Every measured number carries an ink citation mark.",
+      "Whole-line snap with overshoot, and a half-line drop on failure."
+    ],
+    "rules": [
+      {
+        "name": "The Live Ink Rule",
+        "body": "Blue marks what runs now, or what the hand is on. A static fact, a heading, a done step or a citation is never blue.",
+        "section": "colors"
+      },
+      {
+        "name": "The Run Button Rule",
+        "body": "Only an action that starts a run gets the blue primary button. A main action that runs nothing, such as storing the weights, is the black ink button.",
+        "section": "colors"
+      },
+      {
+        "name": "The Ink Citation Rule",
+        "body": "Citation marks are ink. They point to a source, they do not run.",
+        "section": "colors"
+      },
+      {
+        "name": "The One Red Rule",
+        "body": "Red means failure and only failure. A warning is set in second ink and italic, never in red or amber.",
+        "section": "colors"
+      },
+      {
+        "name": "The Two Voices Rule",
+        "body": "The grotesk sets headwords, numbers, labels and controls. The serif sets every sentence a visitor reads. Monospace appears only for raw engine lines.",
+        "section": "typography"
+      },
+      {
+        "name": "The Part of Speech Rule",
+        "body": "Italic marks the part of speech (\"v.\", \"n. text → image\"). The build also uses serif italic for two provisional voices, the empty plate before an image lands and the warning badge. Italic goes no further.",
+        "section": "typography"
+      },
+      {
+        "name": "The Even Figures Rule",
+        "body": "Prose numbers are old-style. Numbers in a column are lining and tabular, in the grotesk.",
+        "section": "typography"
+      },
+      {
+        "name": "The Thin Paper Rule",
+        "body": "Depth is the show-through of real text, mirrored and faint. No drop shadows, no blur, no glow, no lifted cards.",
+        "section": "elevation"
+      },
+      {
+        "name": "The Ruled Line Rule",
+        "body": "A 1.5px ink rule marks structure. A 1px hair marks a row. Nothing is boxed in a card.",
+        "section": "shapes"
+      },
+      {
+        "name": "The Square Corner Rule",
+        "body": "Corners are square. The thumb tab's cut is the single exception.",
+        "section": "shapes"
+      }
+    ],
+    "dos": [
+      "**Do** keep blue for what runs now and for the hand on a control. Make an action that starts a run the blue primary button and a main action that runs nothing the black ink button.",
+      "**Do** give every entry that runs a blue thumb tab, and end the index with one empty hair-grey cut.",
+      "**Do** carry an ink citation mark on every measured number and list its source run at the foot.",
+      "**Do** draw structure with a 1.5px ink rule and rows with a 1px hair, on square corners.",
+      "**Do** set headwords in Archivo 900 with tight negative tracking, and every sentence in Source Serif 4.",
+      "**Do** use lining tabular grotesk figures for numbers in columns, and old-style figures in prose.",
+      "**Do** step a state change one whole line on `--snap`, and leave a failed line half a line low.",
+      "**Do** keep text 16px or larger in inputs and controls 44px high."
+    ],
+    "donts": [
+      "**Do not** use blue for decoration, headings, done states or citation marks.",
+      "**Do not** use red for anything but failure, and do not add an amber or green.",
+      "**Do not** add drop shadows, glows, blurs, gradients or cards. Depth is the show-through.",
+      "**Do not** round corners other than the thumb tab's cut.",
+      "**Do not** set prose in monospace. Monospace is for raw engine lines.",
+      "**Do not** set a dark theme. The world is bright paper with black ink.",
+      "**Do not** raise the show-through above a faint 0.028, or fill it with placeholder text. It is real text of the book.",
+      "**Do not** add a pictogram icon. A cross-reference is the typographic \"→\" in the line."
+    ]
+  }
+}

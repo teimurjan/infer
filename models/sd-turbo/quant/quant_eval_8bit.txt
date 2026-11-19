@@ -1,0 +1,24 @@
+image     all 4-bit PSNR   all 4-bit LPIPS    mixed plan PSNR  mixed plan LPIPS    8-bit plan PSNR  8-bit plan LPIPS  prompt
+    0              11.08            0.8007              29.22            0.0470              34.29            0.0223  a photo of a cat sitting on a wooden table
+    1              11.23            0.7146              21.13            0.1594              22.58            0.1228  a portrait of an old fisherman with a grey beard, natural light
+    2              13.27            0.6336              29.49            0.0326              31.90            0.0201  a red sports car parked on a wet city street at night
+    3              10.53            0.7276              25.99            0.0497              29.25            0.0270  a bowl of ramen with an egg and green onions, top view
+    4              10.87            0.6869              26.25            0.0584              28.99            0.0360  a snowy mountain lake at sunrise, reflections on the water
+    5              12.88            0.6586              33.32            0.0216              36.03            0.0159  a golden retriever puppy running on green grass
+    6              10.67            0.7532              21.00            0.1362              25.57            0.0665  a cozy living room with a fireplace and bookshelves
+    7              12.12            0.7164              28.96            0.0540              32.42            0.0223  a watercolor painting of a lighthouse on a cliff
+    8              13.22            0.8380              29.94            0.0319              31.61            0.0201  a close-up photo of a hummingbird drinking from a flower
+    9              10.89            0.7406              22.86            0.0885              28.33            0.0337  a busy market street in Marrakech with colorful spices
+   10              11.30            0.7089              26.67            0.0516              29.32            0.0320  a futuristic city skyline with flying cars, digital art
+   11              10.33            0.7727              24.05            0.0740              28.76            0.0358  a sign that says OPEN on a coffee shop door
+   12              10.89            0.7595              23.99            0.0618              26.39            0.0384  a pile of fresh oranges and lemons in a wooden crate
+   13              10.89            0.7222              25.33            0.0688              29.48            0.0379  an astronaut riding a horse on the moon
+   14              10.65            0.6662              23.00            0.0897              27.86            0.0377  a young woman reading a book in a sunny cafe
+   15              11.50            0.7632              25.81            0.0632              31.02            0.0248  a pencil sketch of an owl on a branch
+   16              11.39            0.7487              25.19            0.0705              29.26            0.0291  a tropical beach with palm trees and turquoise water
+   17              10.83            0.6807              23.09            0.0825              27.27            0.0374  a plate of chocolate chip cookies next to a glass of milk
+   18              13.87            0.8753              35.10            0.0368              37.99            0.0251  an old castle in the fog, oil painting
+   19              11.82            0.6433              27.82            0.0291              30.81            0.0182  a macro photo of dew drops on a spider web
+ mean              11.51            0.7305              26.41            0.0654              29.96            0.0352
+worst              10.33            0.8753              21.00            0.1594              22.58            0.1228
+wrote quant_eval/grid.png
