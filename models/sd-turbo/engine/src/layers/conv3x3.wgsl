@@ -41,6 +41,23 @@ fn load_input(channel: u32, y: i32, x: i32) -> f32 {
     return input[(channel * shape.height + u32(y)) * shape.width + u32(x)];
 }
 
+// One input value of a row that starts at index `row`, or 0 for a column outside the image (the padding).
+// The caller checks the row, so only the column is checked here.
+fn load_column(row: u32, x: i32) -> f32 {
+    // Left or right of the image.
+    if (x < 0 || x >= i32(shape.width)) {
+        return 0.0;
+    }
+    // Inside: column x of the row.
+    return input[row + u32(x)];
+}
+
+// The weights at index `w` of output channels channel0 to channel0 + 3. Component x is channel0.
+fn four_weights(w: u32, weights_per_channel: u32) -> vec4<f32> {
+    // The 4 channels are weights_per_channel apart in the weight buffer.
+    return vec4<f32>(weight[w], weight[w + weights_per_channel], weight[w + 2u * weights_per_channel], weight[w + 3u * weights_per_channel]);
+}
+
 // 8 x 8 = 64 invocations per workgroup. Rust's WORKGROUP_SIDE must match 8.
 @compute @workgroup_size(8, 8, 1)
 // Each invocation computes a block of 4 output channels x 4 neighbor pixels of one row = 16 outputs.
@@ -64,30 +81,71 @@ fn main(@builtin(global_invocation_id) id: vec3<u32>) {
     var sum1 = vec4<f32>(0.0);
     var sum2 = vec4<f32>(0.0);
     var sum3 = vec4<f32>(0.0);
-    // Walk over every input channel.
-    for (var c = 0u; c < shape.in_channels; c++) {
-        // Walk over the 3 kernel rows.
-        for (var ky = 0u; ky < 3u; ky++) {
-            // The input row. The - 1 is the padding: kernel row 0 looks one row above.
-            let input_y = i32(y * shape.stride + ky) - 1;
-            // Walk over the 3 kernel columns.
-            for (var kx = 0u; kx < 3u; kx++) {
-                // The input column under our first pixel.
-                let input_x = i32(x0 * shape.stride + kx) - 1;
-                // The input value under each of our 4 pixels.
-                let pixels = vec4<f32>(
-                    load_input(c, input_y, input_x),
-                    load_input(c, input_y, input_x + step),
-                    load_input(c, input_y, input_x + 2 * step),
-                    load_input(c, input_y, input_x + 3 * step),
-                );
-                // Where weight[channel0][c][ky][kx] is.
-                let w = channel0 * weights_per_channel + c * 9u + ky * 3u + kx;
-                // 4 input loads and 4 weight loads feed 16 multiply-adds.
-                sum0 += weight[w] * pixels;
-                sum1 += weight[w + weights_per_channel] * pixels;
-                sum2 += weight[w + 2u * weights_per_channel] * pixels;
-                sum3 += weight[w + 3u * weights_per_channel] * pixels;
+    // Every TAESD convolution has stride 1. Its fast path loads each input value once per input row.
+    if (shape.stride == 1u) {
+        // Walk over every input channel.
+        for (var c = 0u; c < shape.in_channels; c++) {
+            // Walk over the 3 kernel rows.
+            for (var ky = 0u; ky < 3u; ky++) {
+                // The input row. The - 1 is the padding: kernel row 0 looks one row above.
+                let input_y = i32(y + ky) - 1;
+                // A row above or below the image is all padding, so it adds nothing to any sum.
+                if (input_y < 0 || input_y >= i32(shape.height)) {
+                    continue;
+                }
+                // The index of the first value of this input row.
+                let row = (c * shape.height + u32(input_y)) * shape.width;
+                // The 3 kernel columns under our 4 pixels touch only 6 input columns: x0 - 1 to x0 + 4.
+                let first = i32(x0) - 1;
+                let v0 = load_column(row, first);
+                let v1 = load_column(row, first + 1);
+                let v2 = load_column(row, first + 2);
+                let v3 = load_column(row, first + 3);
+                let v4 = load_column(row, first + 4);
+                let v5 = load_column(row, first + 5);
+                // Kernel column 0 sees columns x0 - 1 to x0 + 2, column 1 sees x0 to x0 + 3, column 2 sees x0 + 1 to x0 + 4.
+                let left = vec4<f32>(v0, v1, v2, v3);
+                let middle = vec4<f32>(v1, v2, v3, v4);
+                let right = vec4<f32>(v2, v3, v4, v5);
+                // Where weight[channel0][c][ky][0] is.
+                let w = channel0 * weights_per_channel + c * 9u + ky * 3u;
+                // The weights of our 4 output channels at each kernel column. Each component is one channel.
+                let w_left = four_weights(w, weights_per_channel);
+                let w_middle = four_weights(w + 1u, weights_per_channel);
+                let w_right = four_weights(w + 2u, weights_per_channel);
+                // 48 multiply-adds from 6 input loads and 12 weight loads.
+                sum0 += w_left.x * left + w_middle.x * middle + w_right.x * right;
+                sum1 += w_left.y * left + w_middle.y * middle + w_right.y * right;
+                sum2 += w_left.z * left + w_middle.z * middle + w_right.z * right;
+                sum3 += w_left.w * left + w_middle.w * middle + w_right.w * right;
+            }
+        }
+    } else {
+        // Walk over every input channel.
+        for (var c = 0u; c < shape.in_channels; c++) {
+            // Walk over the 3 kernel rows.
+            for (var ky = 0u; ky < 3u; ky++) {
+                // The input row. The - 1 is the padding: kernel row 0 looks one row above.
+                let input_y = i32(y * shape.stride + ky) - 1;
+                // Walk over the 3 kernel columns.
+                for (var kx = 0u; kx < 3u; kx++) {
+                    // The input column under our first pixel.
+                    let input_x = i32(x0 * shape.stride + kx) - 1;
+                    // The input value under each of our 4 pixels.
+                    let pixels = vec4<f32>(
+                        load_input(c, input_y, input_x),
+                        load_input(c, input_y, input_x + step),
+                        load_input(c, input_y, input_x + 2 * step),
+                        load_input(c, input_y, input_x + 3 * step),
+                    );
+                    // Where weight[channel0][c][ky][kx] is.
+                    let w = channel0 * weights_per_channel + c * 9u + ky * 3u + kx;
+                    // 4 input loads and 4 weight loads feed 16 multiply-adds.
+                    sum0 += weight[w] * pixels;
+                    sum1 += weight[w + weights_per_channel] * pixels;
+                    sum2 += weight[w + 2u * weights_per_channel] * pixels;
+                    sum3 += weight[w + 3u * weights_per_channel] * pixels;
+                }
             }
         }
     }
