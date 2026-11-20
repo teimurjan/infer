@@ -6,7 +6,7 @@ import { join } from 'node:path';
 
 // The weight files of the demo, at the commit of the upload of python/upload_weights.py.
 // The commit, not "main", so a later upload cannot change the weights under a deployed engine.
-const WEIGHTS_URL = 'https://huggingface.co/teimurjan/infer-sd-turbo/resolve/ad104bd1d8a5dea36cdec628db65e0deb6cf13b0';
+const WEIGHTS_URL = 'https://huggingface.co/teimurjan/infer-sd-turbo/resolve/eb09c74f3b310cc507a645857a8ebf7317bbdf21';
 // The Vercel project. The first run creates it.
 const PROJECT = 'infer';
 // The Vercel team of the project. The account has more than one team, and teimurjan.dev is in this one.
