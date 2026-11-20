@@ -483,3 +483,150 @@ Conclusion: the site and the design system are the dictionary world, the folder 
 Push: `gh repo create infer --private --source . --remote origin --push` created https://github.com/teimurjan/infer (private) and pushed commit d2eae64 to `main`.
 
 Next step: the user opens the site on the iPhone with `bun run serve:lan` and looks at the landing, the entry page and the tests page.
+
+## 2026-11-19: The site can read the SD-Turbo weights from Hugging Face
+
+Files: `apps/site/build.ts` (changed), `models/sd-turbo/client/urls.ts` (changed). The model log has a short entry with the same name.
+
+Design choices:
+
+- The weights of the demo are in the public Hugging Face repository `teimurjan/infer-sd-turbo`, at commit `ad104bd1d8a5dea36cdec628db65e0deb6cf13b0`. Vercel cannot hold them. The upload is in `models/sd-turbo/PROGRESS.md`.
+- The base URL is a build setting, not a check of the page address. `SD_TURBO_WEIGHTS_URL=<url> bun run build` writes the URL into the bundle with the `define` option of `Bun.build`. Without the variable, the pages read `/models/sd-turbo/weights/` from the dev server, as before. The Mac and the iPhone harness do not change.
+- `urls.ts` reads the name with `typeof`, because `typeof` does not throw for a name that does not exist.
+- The deploy URL names the commit, not `main`. A later upload to the repository cannot change the files of a deployed site, so the engine and its weights stay a matching pair.
+- Only `urls.weight` changes. `golden` and `testdata` stay on the dev server, because only the developer pages read them.
+
+Checks of the repository. Command: `curl -s https://huggingface.co/api/models/teimurjan/infer-sd-turbo/tree/main`. Device: Mac native.
+
+```
+.gitattributes 1519
+taesd.bin 9780736
+taesd.json 13627
+text_encoder.bin 1361551360
+text_encoder.json 45302
+tokenizer_merges.txt 524619
+tokenizer_vocab.json 1059962
+unet_q8.bin 866195840
+unet_q8.json 119668
+```
+
+The sizes of the three `.bin` files are the same as in `models/sd-turbo/weights/` (`ls -l`): 9780736, 1361551360 and 866195840 bytes.
+
+CORS and the redirect. Command: `curl -sIL -H "Origin: https://example.vercel.app" https://huggingface.co/teimurjan/infer-sd-turbo/resolve/main/taesd.bin`. The lines that matter:
+
+```
+HTTP/2 302 
+access-control-allow-origin: https://example.vercel.app
+HTTP/2 200 
+access-control-expose-headers: *
+content-length: 9780736
+access-control-allow-origin: *
+```
+
+Both steps allow a page on another site, so the `fetch` and the `HEAD` of `weightSize` can read the file and its size. `cmp -n 16` of the first 16 bytes from a `Range: bytes=0-15` request and of the local `taesd.bin` printed `first-16-bytes-match`.
+
+Builds. Command: `bun run typecheck` printed `Exited with code 0` for the four workspaces. In `apps/site/`, `bun build.ts` printed:
+
+```
+weights: from the dev server
+built 4 pages, 13 files, 5 fonts
+```
+
+With `SD_TURBO_WEIGHTS_URL=https://huggingface.co/teimurjan/infer-sd-turbo/resolve/ad104bd1d8a5dea36cdec628db65e0deb6cf13b0 bun build.ts`:
+
+```
+weights: https://huggingface.co/teimurjan/infer-sd-turbo/resolve/ad104bd1d8a5dea36cdec628db65e0deb6cf13b0
+built 4 pages, 13 files, 5 fonts
+```
+
+In that build, four `.js` files hold the URL, and no `.js` file holds `sd-turbo/weights`. One bundle has this code: `weight:(a)=>`https://huggingface.co/teimurjan/infer-sd-turbo/resolve/ad104bd1d8a5dea36cdec628db65e0deb6cf13b0/${a}``. I built `dist/` again without the variable after the check.
+
+No page has loaded the weights from Hugging Face yet. Next step: the user opens the demo with the Hugging Face build in a browser. Then the deploy folder and the Vercel deploy.
+
+Not measured on the iPhone.
+
+## 2026-11-19: The site on Vercel, and the domain infer.teimurjan.dev
+
+Files: `apps/site/deploy.ts` (new), `package.json` (the `deploy` script), `.gitignore` (`apps/site/deploy/` and `.vercel/`).
+
+Design choices:
+
+- `bun run deploy` does the whole deploy. It builds the WASM engine (`build:wasm`), builds the pages with `SD_TURBO_WEIGHTS_URL` set to the Hugging Face commit, and copies `dist/` and `engine_bg.wasm` into `apps/site/deploy/`. Then it builds `dist/` again without the variable and uploads the folder with `bunx vercel deploy --prod`.
+- The folder has the same paths as the dev server, so `/models/sd-turbo/engine/pkg/engine_bg.wasm` does not change.
+- The Vercel CLI uploads files that were built on the Mac, because the Vercel build machine has no Rust WASM toolchain and git does not have `engine/pkg/`.
+- `--project infer --create-if-missing` keeps one project, because the folder and its `.vercel/` link are made again on each run.
+- `--scope teimurjan`: the account has two teams, and `teimurjan.dev` is in `teimurjan`.
+
+The first run, without `--scope`, failed. The CLI listed the teams `speechifyinc` and `teimurjan`, and the script printed:
+
+```
+failed with exit code 1: bunx vercel deploy /Users/teimurgasanov/Projects/infer/apps/site/deploy --prod --yes --project infer --create-if-missing
+```
+
+The second run, with `--scope teimurjan`. Command: `bun run deploy`. Device: Mac native.
+
+```
+  "message": "Deployment infer-baswh2n2j-teimurjan.vercel.app ready. Production URL: https://infer-five.vercel.app",
+```
+
+The domain. Command: `bunx vercel domains add infer.teimurjan.dev infer --scope teimurjan`.
+
+```
+  "message": "Domain infer.teimurjan.dev added to project infer.",
+```
+
+Command: `bunx vercel domains verify infer.teimurjan.dev --scope teimurjan`. The record that the DNS of `teimurjan.dev` needs. The DNS is at Namecheap (`dns1.registrar-servers.com.`).
+
+```
+        "type": "CNAME",
+        "name": "infer",
+        "value": "496d93b6a5b1e346.vercel-dns-016.com."
+```
+
+Checks of the production URL, with `curl -s -o /dev/null -w "$p %{http_code} %{content_type} %{size_download}\n"`:
+
+```
+/ 200 text/html; charset=utf-8 523
+/sd-turbo/ 200 text/html; charset=utf-8 545
+/models/sd-turbo/engine/pkg/engine_bg.wasm 200 application/wasm 1275237
+```
+
+The WASM file has the same size as the local `engine_bg.wasm` (1275237 bytes). The scripts of `/sd-turbo/` hold `infer-sd-turbo/resolve/ad104bd1d8a5dea36cdec628db65e0deb6cf13b0`. The deployment URL `infer-baswh2n2j-teimurjan.vercel.app` answers 302, because Vercel Authentication protects it. The production URL answers 200.
+
+The developer pages `/sd-turbo/dev/` and `/sd-turbo/benchmark/` do not work on Vercel, because `golden/` and `engine/testdata/` are not deployed.
+
+The CNAME record is not set yet, and no browser has made an image on the deployed site yet. Next step: the user adds the CNAME at Namecheap and opens the demo.
+
+Not measured on the iPhone.
+
+## 2026-11-19: The HTTPS certificate of infer.teimurjan.dev
+
+No files changed. The user added the CNAME at Namecheap and ran `bunx vercel domains verify`, but the browser on the Mac still did not open https://infer.teimurjan.dev/.
+
+The DNS answer was right on every server. Command: `dig +short infer.teimurjan.dev CNAME @<server>` for `dns1.registrar-servers.com`, `1.1.1.1`, `8.8.8.8`, `100.100.100.100` and `192.168.31.1`. Each one printed:
+
+```
+496d93b6a5b1e346.vercel-dns-016.com.
+```
+
+Two problems were left.
+
+First, Vercel had no certificate for the name yet, so HTTPS failed and HTTP worked. Commands: `curl --resolve infer.teimurjan.dev:443:216.150.1.65 https://infer.teimurjan.dev/` and the same for port 80:
+
+```
+curl: (35) LibreSSL SSL_connect: SSL_ERROR_SYSCALL in connection to infer.teimurjan.dev:443
+http: 200 ->
+```
+
+The fix: `bunx vercel certs issue infer.teimurjan.dev --scope teimurjan`.
+
+```
+> Success! Certificate entry for infer.teimurjan.dev created [8s]
+https: 200 verify=0
+```
+
+`verify=0` means that curl accepted the certificate.
+
+Second, the system resolver of the Mac still answers that the name does not exist, while `dig` finds it. `curl https://infer.teimurjan.dev/sd-turbo/` printed `Could not resolve host: infer.teimurjan.dev`. The likely reason is a cached "no such name" answer from a visit before the CNAME existed. The SOA of `teimurjan.dev` keeps such an answer for up to 3601 s (`... 604800 3601`). The fix is to flush the DNS cache of the Mac, or to wait one hour.
+
+No browser has made an image on the deployed site yet. Not measured on the iPhone.

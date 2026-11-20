@@ -8,6 +8,7 @@
     "serve:lan": "bun packages/server/src/main.ts --lan",
     "phone": "bun run --filter @infer/site build && bun packages/harness/src/main.ts",
     "cert": "bun packages/server/src/cert.ts",
+    "deploy": "bun apps/site/deploy.ts",
     "build": "bun run --filter '*' build",
     "typecheck": "bun run --filter '*' typecheck"
   },

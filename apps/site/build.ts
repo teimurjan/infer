@@ -11,10 +11,15 @@ const FONT_PACKAGES = join(UI, 'node_modules', '@fontsource-variable');
 
 // Every page of the site.
 const pages = [...new Bun.Glob('pages/**/*.html').scanSync('.')];
+// The deployed site reads the SD-Turbo weights from Hugging Face, for example
+// SD_TURBO_WEIGHTS_URL=https://huggingface.co/<user>/<repo>/resolve/<commit> bun run build.
+const weightsUrl = process.env.SD_TURBO_WEIGHTS_URL;
+// define writes the value into the bundle in place of the name. Without the variable, the pages read the weights from the dev server.
+const define: Record<string, string> = weightsUrl ? { SD_TURBO_WEIGHTS_URL: JSON.stringify(weightsUrl.replace(/\/$/, '')) } : {};
 // An old build can hold files of a deleted page, so it goes first.
 await rm('dist', { recursive: true, force: true });
 // The font files stay outside the bundle: the copy below puts them in dist/fonts/, so the stylesheet stays small.
-const result = await Bun.build({ entrypoints: pages, outdir: 'dist', root: 'pages', minify: true, sourcemap: 'linked', external: ['/fonts/*'] });
+const result = await Bun.build({ entrypoints: pages, outdir: 'dist', root: 'pages', minify: true, sourcemap: 'linked', external: ['/fonts/*'], define });
 // Bun.build does not throw on a bad import, so stop here with its messages.
 if (!result.success) {
     console.error(result.logs.join('\n'));
@@ -34,4 +39,6 @@ for (const name of names) {
     }
     await copyFile(join(FONT_PACKAGES, found), join('dist/fonts', name));
 }
+// Print where the pages will read the weights, so a deploy build shows the URL it holds.
+console.log(`weights: ${weightsUrl ?? 'from the dev server'}`);
 console.log(`built ${pages.length} pages, ${result.outputs.length} files, ${names.length} fonts`);

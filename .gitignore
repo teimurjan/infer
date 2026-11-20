@@ -1,6 +1,9 @@
 # Dependencies and build output.
 node_modules/
 dist/
+# The folder that apps/site/deploy.ts uploads to Vercel, and the link files of the Vercel CLI.
+apps/site/deploy/
+.vercel/
 target/
 pkg/
 __pycache__/
