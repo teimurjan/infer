@@ -4477,3 +4477,720 @@ The stages took 0.37 + 2.54 + 0.73 = 3.64 s. Both weight files came from the net
 The full entry is "2026-11-19: infer, the dictionary redesign, and the rename" in `PROGRESS.md` at the repository root. The demo of this model is now its entry page at `/sd-turbo/`. `client/entry.ts` holds the definition, the parts and the measured times of the iPhone run of 2026-11-19. The test tensors in `engine/testdata/` are no longer in git. `README.md` has the `uv run` commands that make them again.
 
 Not measured on the iPhone.
+
+## 2026-11-19: A script that uploads the demo weights to Hugging Face
+
+Files: `python/upload_weights.py` (new).
+
+Design choices:
+
+- The weights go to a Hugging Face model repository, not to Vercel. One Vercel CLI deployment holds at most 100 MB on Hobby and 1 GB on Pro, and the demo needs 2239.3 MB.
+- The script uploads only the eight files that the entry page fetches: `text_encoder`, `unet_q8` and `taesd` (each a `.bin` and a `.json`), and the two tokenizer files. `unet.bin`, `unet_packed.bin` and `vae.bin` stay on the Mac.
+- The repository is public, because the browser fetches the files without a token.
+- The upload uses `upload_large_folder`, which uploads in parts and resumes if you run the same command again.
+- `--dry-run` lists the files and uploads nothing. A missing file stops the script before the upload.
+
+Command: `uv run python/upload_weights.py example/infer-sd-turbo --dry-run`. Device: Mac native.
+
+```
+text_encoder.bin: 1361.6 MB
+text_encoder.json: 0.0 MB
+unet_q8.bin: 866.2 MB
+unet_q8.json: 0.1 MB
+taesd.bin: 9.8 MB
+taesd.json: 0.0 MB
+tokenizer_vocab.json: 1.1 MB
+tokenizer_merges.txt: 0.5 MB
+total: 2239.3 MB in 8 files
+```
+
+Failed: `hf auth whoami` does not start, because the `hf` command in `~/.local/bin` points to a deleted Python (`/opt/homebrew/anaconda3/envs/omnisvg/bin/python3.10`). `uvx --from huggingface_hub hf auth login` runs the same command without that Python.
+
+The real upload has not run yet. Next step: the user logs in and runs the upload. Then `client/urls.ts` gets the base URL of the repository for production.
+
+Not measured on the iPhone.
+
+## 2026-11-19: The upload script uses upload_folder of huggingface_hub 2.x
+
+This entry corrects "2026-11-19: A script that uploads the demo weights to Hugging Face".
+
+Files: `python/upload_weights.py` (changed).
+
+The first real upload failed on the Mac, with a write token. Command: `uv run python/upload_weights.py teimurjan/infer-sd-turbo`. Device: Mac native.
+
+```
+  File "/Users/teimurgasanov/Projects/infer/models/sd-turbo/python/upload_weights.py", line 65, in upload
+    api.upload_large_folder(repo_id=repo, repo_type="model", folder_path=WEIGHTS, allow_patterns=DEMO_FILES)
+    ^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'HfApi' object has no attribute 'upload_large_folder'
+```
+
+The reason: the script header asked for any `huggingface_hub`, so `uv run` installed 2.4.0. Version 2.x removed `upload_large_folder`. Its `upload_folder` now uploads in parts through `hf_xet`, and a second run of the same call resumes. My earlier check used 1.31.0 from another environment, so it did not find the problem.
+
+The fix: the script calls `upload_folder`, and the header asks for `huggingface_hub>=2.4,<3`, so a new major version cannot change the call again.
+
+Command: `uv run python/upload_weights.py teimurjan/infer-sd-turbo --dry-run`. Device: Mac native.
+
+```
+total: 2239.3 MB in 8 files
+```
+
+The real upload has not run yet. Not measured on the iPhone.
+
+## 2026-11-19: The upload stalled, because each upload piece timed out
+
+Files: `python/upload_weights.py` (changed).
+
+The upload of `uv run python/upload_weights.py teimurjan/infer-sd-turbo` showed this for about one hour. Device: Mac native.
+
+```
+Preparing   ████████████████████  8 / 8 ✓
+Uploading   ░░░░░░░░░░░░░░░░░░░░  0 / 3 files  93.3MB · 0.00B/s
+```
+
+The log of hf_xet, `~/.cache/huggingface/xet/logs/xet_20261119T153640362+0600_70284.log`, shows the reason. hf_xet uploads two pieces of about 67 MB at the same time (`xorb.len":67100171`). Each upload failed with `source: TimedOut` after exactly 300 s, the default `read_timeout = 300s`. The 18 `TimedOut` lines came in pairs, about 5 minutes apart, from 09:41:42 to 10:25:33 UTC. Then hf_xet started the same pieces again, so the upload never moved forward.
+
+The upload speed of the Mac, measured with `curl -X POST --data-binary @up20.bin https://speed.cloudflare.com/__up` (20 MB of random bytes, stopped by `-m 90`):
+
+```
+cloudflare upload: 15335424 bytes in 90.002318s = 170389 B/s
+```
+
+Calculation: one piece takes 67100171 / 170389 = 394 s, which is more than 300 s. Two pieces at the same time take about 788 s each.
+
+The fix: the script sets `HF_XET_CLIENT_READ_TIMEOUT=1800s` and `HF_XET_FIXED_UPLOAD_CONCURRENCY=1` before it imports huggingface_hub. A download of `Qwen/Qwen3-0.6B` `tokenizer.json` with these settings confirms that hf_xet reads them (log `xet_20261119T163018377+0600_98891.log`):
+
+```
+"message":"Config: read_timeout = 1800s (user set)"
+"message":"Config: ac_max_upload_concurrency = 1 (user set)"
+"message":"Config: ac_min_upload_concurrency = 1 (user set)"
+"message":"Config: ac_initial_upload_concurrency = 1 (user set)"
+```
+
+Calculation of the expected upload time: 2239.3 MB / 0.170389 MB/s = 13142 s, about 3.7 hours.
+
+The real upload has not finished yet. Not measured on the iPhone.
+
+## 2026-11-19: The site can read the SD-Turbo weights from Hugging Face
+
+The full entry has the same name in `PROGRESS.md` at the repository root. `client/urls.ts` reads the weights from `SD_TURBO_WEIGHTS_URL` when `apps/site/build.ts` gets that variable. Without it, the weights come from the dev server, as before. The upload to `teimurjan/infer-sd-turbo` finished at commit `ad104bd1d8a5dea36cdec628db65e0deb6cf13b0`, and the sizes of the three `.bin` files match the local files.
+
+Not measured on the iPhone.
+
+## 2026-11-19: Step 3 of the plan: each input value loaded once per row in the float 3x3 convolution
+
+Files changed:
+
+- `engine/src/layers/conv3x3.wgsl`: a fast path for stride 1, and the helpers `load_column` and `four_weights`. The old loop stays for stride 2, unchanged.
+
+Design choices:
+
+- This is the same change as "Change 1b" in the packed 3x3 convolution. With stride 1, the 3 kernel columns under 4 pixels touch only 6 input columns, x0 - 1 to x0 + 4. The fast path loads those 6 values once per input row, in place of 12 loads with 4 bounds checks each.
+- The 12 weights of one input row (3 kernel columns x 4 output channels) are loaded once, before the 48 multiply-adds.
+- Every TAESD convolution has stride 1, so all 35 `conv3x3` calls per image take the fast path. The UNet does not use this kernel, because its 3x3 convolutions are packed.
+- The workgroup stays at 8 x 8 x 1. The smallest TAESD image is 64 x 64 with 64 channels, so a row has 16 pixel blocks and every lane has work.
+- The branch is on a uniform value, so all lanes take the same side.
+
+Before, `cargo run --release --example generate -- --packed --profile`, Mac native, two runs (only these lines kept):
+
+```
+taesd: ran in 0.33 s; measured peak 201507152 bytes (201.5 MB)
+taesd_image: largest difference from PyTorch (packed) 6.182194e-4
+conv3x3              35     242.42   14.9%     4.34    1.2%
+all kernels        1091    1628.47  100.0%
+taesd: ran in 0.34 s; measured peak 201507152 bytes (201.5 MB)
+taesd_image: largest difference from PyTorch (packed) 6.182194e-4
+conv3x3              35     243.00   14.9%     4.33    1.2%
+all kernels        1091    1626.43  100.0%
+```
+
+Before, `cargo test --release --test layers --test taesd -- --nocapture`, Mac native:
+
+```
+conv3x3: 1.02 GB/s median, 1.08 GB/s best (30 submits, 4 runs per submit, 55.6 ms median submit, 61.2 ms longest), largest error 6.4373016e-6
+conv3x3_stride2: 1.33 GB/s median, 1.33 GB/s best (30 submits, 8 runs per submit, 61.7 ms median submit, 64.5 ms longest), largest error 6.198883e-6
+taesd_image: largest error 7.867813110351563e-6, mean error 2.493081107483401e-7, worst at [0, 2, 87, 199] (engine -0.00572145, golden -0.005713582), 1 submits, longest 3.5 ms, peak 201474352 bytes
+```
+
+After, the same test command, Mac native:
+
+```
+conv3x3: 1.75 GB/s median, 1.79 GB/s best (30 submits, 8 runs per submit, 64.8 ms median submit, 66.3 ms longest), largest error 6.4373016e-6
+conv3x3_stride2: 1.30 GB/s median, 1.31 GB/s best (30 submits, 8 runs per submit, 63.1 ms median submit, 64.2 ms longest), largest error 6.198883e-6
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 9.77s
+taesd_blocks_3: largest error 1.6063451766967773e-5, mean error 3.397037897636887e-8, worst at [0, 41, 87, 199] (engine 0.09152818, golden 0.09154424), 3 submits, longest 38.7 ms, peak 201474352 bytes
+taesd_image: largest error 7.867813110351563e-6, mean error 2.493081107483401e-7, worst at [0, 2, 87, 199] (engine -0.00572145, golden -0.005713582), 1 submits, longest 3.0 ms, peak 201474352 bytes
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.62s
+```
+
+After, the profile command, Mac native, three runs:
+
+```
+unet: ran in 1.48 s; measured peak 813334128 bytes (813.3 MB)
+taesd: ran in 0.31 s; measured peak 201507152 bytes (201.5 MB)
+unet_output: largest difference from PyTorch (packed) 9.655952e-6
+taesd_image: largest difference from PyTorch (packed) 6.182194e-4
+conv3x3              35     161.24   10.5%     6.53    1.8%
+all kernels        1091    1538.99  100.0%
+unet: ran in 1.48 s; measured peak 813334128 bytes (813.3 MB)
+taesd: ran in 0.24 s; measured peak 201507152 bytes (201.5 MB)
+unet_output: largest difference from PyTorch (packed) 9.655952e-6
+taesd_image: largest difference from PyTorch (packed) 6.182194e-4
+conv3x3              35     142.11    9.3%     7.41    2.0%
+all kernels        1091    1522.99  100.0%
+taesd: ran in 0.25 s; measured peak 201507152 bytes (201.5 MB)
+conv3x3              35     145.68    9.5%     7.22    2.0%
+all kernels        1091    1528.29  100.0%
+```
+
+Calculation, Mac native: the mean before is (242.42 + 243.00) / 2 = 242.71 ms. The mean after is (161.24 + 142.11 + 145.68) / 3 = 149.68 ms. The cut is 1 - 149.68 / 242.71 = 38.3%.
+
+Deliberate-bug check: `let right = vec4<f32>(v2, v3, v4, v5);` became `vec4<f32>(v2, v3, v4, v4)`. Command: `cargo test --release --test layers --test taesd`. Device: Mac native.
+
+```
+thread 'layers_match_pytorch' (13621331) panicked at tests/layers.rs:51:5:
+largest error above 1e-4: ["conv3x3: 2.2017481e0"]
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 9.36s
+```
+
+The bug was then removed, and the test passed again.
+
+Browser runs. Command: `bun run build`, then `bun run serve`, then the dev pages `http://127.0.0.1:8765/sd-turbo/dev/?test=<test>&run=<id>` in Playwright Chromium (Chrome for Testing 158, persistent context). Device: Mac Chromium. The TAESD page:
+
+```
+taesd_image: largest error 7.867813e-6 against diffusers
+taesd: PASSED: total 542.7 ms from latent upload to image on the CPU, with 9 read-backs
+```
+
+The golden image page:
+
+```
+text_encoder: ran in 0.18 s; measured peak 1364710096 bytes (1364.7 MB)
+unet: ran in 1.73 s; measured peak 979476080 bytes (979.5 MB)
+taesd: ran in 0.28 s; measured peak 201474352 bytes (201.5 MB)
+golden-image: PASSED: image bytes: 1064 of 1048576 differ from golden/unet_q8/taesd_image, by at most 1
+```
+
+The kernel profile page (only these lines kept):
+
+```
+taesd: ran in 0.21 s; measured peak 201507152 bytes (201.5 MB)
+profile: timing: GPU timestamps, one compute pass per dispatch; door: 369.46 GB/s
+kernel            calls   total ms    time     GB/s    door
+attention           235     717.66   42.9%     1.67    0.5%
+conv3x3              35     112.90    6.8%     9.32    2.5%
+all kernels        1091    1671.88  100.0%
+```
+
+Calculation, Mac Chromium: the last Chromium profile, in "Change 1b", had `conv3x3` at 280.05 ms. The cut is 1 - 112.90 / 280.05 = 59.7%. That profile used the packed UNet, not `unet_q8`, but the TAESD part is the same.
+
+Failed: `bun run phone sd-turbo:taesd --mac` stopped with `Could not create a session: You must enable 'Allow remote automation' in the Developer section of Safari Settings to control Safari via WebDriver.` The iPhone was offline in `xcrun xctrace list devices`, so the harness could not run on the phone.
+
+Conclusion: step 3 is done on the Mac. Not measured on the iPhone. Next step: the user connects the iPhone and runs `bun run phone sd-turbo:profile`. The iPhone `conv3x3` row was 410.64 ms before this change.
+
+## 2026-11-19: Step 3 on the iPhone
+
+This entry adds the iPhone run to "2026-11-19: Step 3 of the plan: each input value loaded once per row in the float 3x3 convolution".
+
+Failed runs first. Command: `bun run phone sd-turbo:profile --timeout 15`. Device: iPhone.
+
+```
+FAILED: the certificate names 10.120.1.165, 127.0.0.1, but the Mac has 192.168.31.188, 100.124.252.28, 192.168.64.1, 192.168.139.3, 192.168.158.0, 169.254.159.67: make a new certificate with: bun run cert
+```
+
+The Wi-Fi address of the Mac changed. `bun run cert` made a new certificate for 192.168.31.188. The next run failed once with `FAILED: Could not create a session: Some devices were found, but could not be used:`. The same command then ran.
+
+Command: `bun run phone sd-turbo:profile --timeout 15`. Device: iPhone. Events: `runs/20261119174848-sd-turbo-dev-test-profile-m0de.jsonl`.
+
+```
+   2.4 s  profile: copy: 39.40 GB/s median, 42.11 GB/s best (30 submits, 16 runs per submit, 54.5 ms median submit, 67.0 ms longest)
+text_encoder: ran in 0.31 s; measured peak 1364742864 bytes (1364.7 MB)
+unet: ran in 2.82 s; measured peak 979508848 bytes (979.5 MB)
+taesd: ran in 0.85 s; measured peak 201507152 bytes (201.5 MB)
+  85.6 s  profile: timing: GPU timestamps, one compute pass per dispatch; door: 39.40 GB/s
+kernel            calls   total ms    time     GB/s    door
+conv3x3_packed       52     981.91   35.2%     0.84    2.1%
+attention           235     832.02   29.8%     1.44    3.7%
+linear_packed       192     484.60   17.4%     3.46    8.8%
+conv3x3              35     253.21    9.1%     4.16   10.5%
+linear              138      93.34    3.3%    13.81   35.0%
+conv1x1_packed       14      50.62    1.8%     2.38    6.0%
+add                 139      22.19    0.8%    31.61   80.2%
+group_norm           61      18.01    0.6%    20.04   50.9%
+geglu                16      11.65    0.4%    47.59  120.8%
+taesd relu           21      10.91    0.4%    49.01  124.4%
+taesd add_relu       10       9.02    0.3%    44.28  112.4%
+layer_norm           95       6.78    0.2%    45.34  115.1%
+taesd upsample        3       5.13    0.2%    21.46   54.5%
+vector_packed        24       4.21    0.2%     6.70   17.0%
+transpose add        16       3.98    0.1%    34.83   88.4%
+concat               12       2.14    0.1%    58.80  149.2%
+gelu                 23       0.57    0.0%   101.33  257.2%
+upsample              3       0.30    0.0%    71.41  181.2%
+taesd image           1       0.07    0.0%    85.94  218.1%
+taesd clamp           1       0.01    0.0%    12.43   31.6%
+all kernels        1091    2790.67  100.0%
+PASSED: profile table printed
+```
+
+Calculation: "Change 1b on the iPhone" had `conv3x3` at 410.64 ms. The cut is 1 - 253.21 / 410.64 = 38.3%. The Mac native cut was also 38.3%. The rows that this step did not change stayed close: `conv3x3_packed` 978.59 ms then 981.91 ms, `attention` 838.71 ms then 832.02 ms. So the drop is from the change, not from a different state of the phone.
+
+Command: `bun run phone sd-turbo:golden-image --timeout 10`. Device: iPhone. Events: `runs/20261119175037-sd-turbo-dev-test-golden-image-rs6d.jsonl`.
+
+```
+text_encoder: ran in 0.44 s; measured peak 1364710096 bytes (1364.7 MB)
+unet: ran in 2.56 s; measured peak 979476080 bytes (979.5 MB)
+taesd: ran in 0.51 s; measured peak 201474352 bytes (201.5 MB)
+golden-image: image bytes: 1073 of 1048576 differ from golden/unet_q8/taesd_image, by at most 1
+golden-image: PASSED: image bytes: 1073 of 1048576 differ from golden/unet_q8/taesd_image, by at most 1
+```
+
+Calculation: "Golden image on the iPhone, through the harness" had the TAESD stage at 0.73 s. Now it is 0.51 s, 0.22 s less. The image bytes are the same count as before the change: 1073 of 1048576, by at most 1.
+
+In both runs, the weights came from the network, not from the cache (`from network in 48.44 s` and `from network in 42.31 s` for the text encoder). The cause is not known.
+
+Conclusion: step 3 is done, on the Mac and on the iPhone. Next step: step 4 of the plan, attention in one pass.
+
+## 2026-11-19: Step 4 of the plan: attention in one pass
+
+Files changed:
+
+- `engine/src/attention/attention.wgsl`: one loop over tiles of 16 keys, with an online softmax. The scores binding is gone.
+- `engine/src/attention/mod.rs`, `engine/src/attention/slots.rs`: no scores buffer and no scores size check. `AttentionSlots` has `chunk_rows` in place of the `scores` slot, and the head count is the row width / 64.
+- `engine/src/unet/plan/transformer.rs`, `engine/src/unet/plan/forward.rs`, `engine/src/text/plan.rs`: the attention op has no scratch tensor. The plans no longer need the head counts, so `LEVEL_HEADS` and `HEADS` are gone.
+- `engine/src/unet/transformer.rs`: `CHUNK_ROWS = 256` moved here from the plan, because only the binding needs it now. `engine/src/text/bind.rs`: the text encoder uses one chunk of 77 rows.
+- `engine/src/plan/graph.rs`: `op_with_scratch` is gone, because nothing uses it. Its test uses `op`. `engine/src/gpu.rs`: `max_storage_binding_bytes` is gone for the same reason. `engine/src/error.rs`: `ScoresTooLarge` is gone.
+
+Design choices:
+
+- The old kernel wrote every score to a storage buffer in pass 1. In pass 2, each of the 16 lanes of a row read every score back and computed the same `exp` again, so each score had 16 copies of `exp`.
+- The new kernel keeps 16 query rows x 16 lanes per workgroup, as before. Each tile of 16 keys has four parts, with a barrier after each part. (1) Each invocation copies one vec4 of the key rows and one vec4 of the value rows into workgroup memory. (2) Lane l makes the score of key l for its row. (3) Each lane finds the new maximum of its row from the 16 scores, and makes the weight `exp(score - maximum)` of its own key: one `exp` per score. (4) Lane l adds the 16 weighted value rows into its vec4 of the output.
+- The online softmax: the running total and the running sum are made with the running maximum. When the maximum grows, both are multiplied by `exp(old maximum - new maximum)`. The 16 lanes of a row get the same inputs, so they keep the same running values.
+- A key past the end, or past the row with the causal mask, gets the score -3.4e38, so its weight is 0. Key 0 is in the first tile and every row sees it, so the maximum is a real score after the first tile.
+- The scores of a tile sit in workgroup memory as [key][row], so the 16 rows that read the same key read 16 neighbor addresses.
+- The loop count depends only on the key count, which is the same for all invocations, so every invocation reaches every barrier.
+- This step does only the one-pass change. It does not change how many rows or output values each invocation computes.
+
+Before, `cargo test --release --test attention --test text -- --nocapture`, Mac native:
+
+```
+attention_self: 316.93 G ops/s median, 319.01 G ops/s best (30 submits, 1 runs per submit, 67.8 ms median submit, 68.0 ms longest), chunk 256 rows, largest error 4.8056245e-7, peak 47186432 bytes allocated (47.2 MB, the full scores table alone would be 335.5 MB)
+attention_cross: 223.52 G ops/s median, 225.36 G ops/s best (30 submits, 32 runs per submit, 57.8 ms median submit, 58.5 ms longest), chunk 256 rows, largest error 8.34465e-7, peak 16320512 bytes allocated (16.3 MB, the full scores table alone would be 6.3 MB)
+attention_self: 365.52 G ops/s median, 371.67 G ops/s best (30 submits, 1 runs per submit, 58.8 ms median submit, 60.4 ms longest), chunk 1000 rows, largest error 4.8056245e-7, peak 108134560 bytes allocated (108.1 MB, the full scores table alone would be 335.5 MB)
+text_encoder: largest error 2.288818359375e-5, mean error 2.481718759764614e-6, worst at [0, 30, 267] (engine 10.422267, golden 10.422244), 23 submits, longest 2.6 ms, peak 1364710096 bytes
+```
+
+After, the same command, Mac native:
+
+```
+attention_self: 316.03 G ops/s median, 318.41 G ops/s best (30 submits, 1 runs per submit, 68.0 ms median submit, 68.7 ms longest), chunk 256 rows, largest error 1.6391277e-7, peak 26214912 bytes allocated (26.2 MB, the full scores table alone would be 335.5 MB)
+attention_cross: 211.16 G ops/s median, 212.24 G ops/s best (30 submits, 32 runs per submit, 61.2 ms median submit, 61.8 ms longest), chunk 256 rows, largest error 5.364418e-7, peak 15926272 bytes allocated (15.9 MB, the full scores table alone would be 6.3 MB)
+attention_self: 412.88 G ops/s median, 416.28 G ops/s best (30 submits, 1 runs per submit, 52.0 ms median submit, 52.6 ms longest), chunk 1000 rows, largest error 1.6391277e-7, peak 26214560 bytes allocated (26.2 MB, the full scores table alone would be 335.5 MB)
+test attention_matches_pytorch_without_the_full_table ... ok
+text_encoder: largest error 2.574920654296875e-5, mean error 2.4916817335410397e-6, worst at [0, 30, 267] (engine 10.42227, golden 10.422244), 23 submits, longest 2.6 ms, peak 1364394704 bytes
+```
+
+`cargo run --release --example generate -- --packed --profile`, Mac native. Before, two runs:
+
+```
+text_encoder: largest difference from PyTorch (float32) 2.2888184e-5
+unet_output: largest difference from PyTorch (packed) 9.655952e-6
+final_latent: largest difference from PyTorch (packed) 1.411438e-4
+taesd_image: largest difference from PyTorch (packed) 6.182194e-4
+attention           235     406.55   27.0%     2.95    0.8%
+all kernels        1091    1506.27  100.0%
+attention           235     406.66   27.0%     2.95    0.8%
+all kernels        1091    1508.22  100.0%
+```
+
+After, two runs:
+
+```
+text_encoder: prepared; planned activations 2523136 bytes (2.5 MB); planned peak 1364427472 bytes (1364.4 MB); live 1364112080 bytes
+unet: prepared; planned activations 105899008 bytes (105.9 MB); planned peak 808091248 bytes (808.1 MB); live 808025712 bytes
+unet: ran in 1.44 s; measured peak 808091248 bytes (808.1 MB)
+text_encoder: largest difference from PyTorch (float32) 2.5749207e-5
+unet_output: largest difference from PyTorch (packed) 9.775162e-6
+final_latent: largest difference from PyTorch (packed) 1.4305115e-4
+taesd_image: largest difference from PyTorch (packed) 5.21183e-4
+attention           235     402.99   26.7%     2.98    0.8%
+all kernels        1091    1506.89  100.0%
+unet: ran in 1.48 s; measured peak 808091248 bytes (808.1 MB)
+attention           235     404.81   26.6%     2.96    0.8%
+all kernels        1091    1523.85  100.0%
+```
+
+Calculations, Mac native:
+
+- Attention: the mean before is (406.55 + 406.66) / 2 = 406.61 ms. The mean after is (402.99 + 404.81) / 2 = 403.90 ms. The Mac GPU is not faster with this change.
+- UNet plan: 111141888 - 105899008 = 5242880 bytes less activations (5.2 MB). Text plan: 2838528 - 2523136 = 315392 bytes less. The UNet scratch was 5 x 4096 x 256 x 4 = 20971520 bytes, but the planner had already shared most of its bytes with other tensors.
+
+Command: `cargo test --release` (all test files), Mac native: every `test result:` line says `ok`, 15 lines, 0 failed.
+
+Deliberate-bug check: `total = total * rescale + tile_total;` became `total = total + tile_total;`. Command: `cargo test --release --test attention --test text`. Device: Mac native.
+
+```
+failed: ["attention_self chunk 256: error 1.5272264e-1, peak 26214912 bytes", "attention_cross chunk 256: error 1.4382781e0, peak 15926272 bytes", "attention_self chunk 1000: error 1.5272264e-1, peak 26214560 bytes"]
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 6.39s
+```
+
+The bug was then removed.
+
+iPhone. Command: `bun run build`, then `bun run phone sd-turbo:profile --timeout 15`, two runs. Device: iPhone. Events: `runs/20261119175850-sd-turbo-dev-test-profile-ois8.jsonl` and `runs/20261119180034-sd-turbo-dev-test-profile-mj6y.jsonl`. First run:
+
+```
+   2.0 s  profile: copy: 44.74 GB/s median, 47.72 GB/s best (30 submits, 16 runs per submit, 48.0 ms median submit, 51.0 ms longest)
+text_encoder: ran in 0.41 s; measured peak 1364427472 bytes (1364.4 MB)
+unet: ran in 2.60 s; measured peak 974265968 bytes (974.3 MB)
+taesd: ran in 0.58 s; measured peak 201507152 bytes (201.5 MB)
+conv3x3_packed       52     974.92   36.1%     0.84    1.9%
+attention           235     604.29   22.4%     1.99    4.4%
+linear_packed       192     471.05   17.4%     3.56    8.0%
+conv3x3              35     292.70   10.8%     3.60    8.0%
+linear              138     244.73    9.1%     5.27   11.8%
+conv1x1_packed       14      31.89    1.2%     3.78    8.5%
+group_norm           61      16.26    0.6%    22.20   49.6%
+add                 139      12.31    0.5%    56.96  127.3%
+taesd relu           21      11.08    0.4%    48.25  107.8%
+geglu                16      10.48    0.4%    52.91  118.3%
+taesd add_relu       10       9.98    0.4%    40.01   89.4%
+layer_norm           95       7.77    0.3%    39.59   88.5%
+vector_packed        24       3.94    0.1%     7.16   16.0%
+taesd upsample        3       3.64    0.1%    30.27   67.7%
+transpose add        16       2.46    0.1%    56.35  125.9%
+concat               12       2.07    0.1%    60.91  136.1%
+gelu                 23       1.01    0.0%    57.70  129.0%
+upsample              3       0.28    0.0%    76.59  171.2%
+taesd image           1       0.06    0.0%    98.82  220.9%
+taesd clamp           1       0.02    0.0%     7.38   16.5%
+all kernels        1091    2700.93  100.0%
+  84.8 s  profile: PASSED: profile table printed
+```
+
+Second run (only these lines kept):
+
+```
+   3.4 s  profile: copy: 47.20 GB/s median, 48.26 GB/s best (30 submits, 32 runs per submit, 91.0 ms median submit, 96.0 ms longest)
+text_encoder: ran in 0.32 s; measured peak 1364427472 bytes (1364.4 MB)
+unet: ran in 2.54 s; measured peak 974265968 bytes (974.3 MB)
+taesd: ran in 0.52 s; measured peak 201507152 bytes (201.5 MB)
+conv3x3_packed       52     976.99   38.5%     0.84    1.8%
+attention           235     600.81   23.7%     2.00    4.2%
+linear_packed       192     465.44   18.3%     3.60    7.6%
+conv3x3              35     275.53   10.9%     3.82    8.1%
+linear              138     107.46    4.2%    12.00   25.4%
+all kernels        1091    2537.61  100.0%
+PASSED: profile table printed
+```
+
+Calculation, iPhone: "Step 3 on the iPhone" had `attention` at 832.02 ms. The mean after is (604.29 + 600.81) / 2 = 602.55 ms. The cut is 1 - 602.55 / 832.02 = 27.6%. The `linear` row of the first run, 244.73 ms, did not repeat: it was 107.46 ms in the second run and 93.34 ms before this step. This step does not change the `linear` kernel, so the 244.73 ms is noise of that one run.
+
+Command: `bun run build`, then `bun run phone sd-turbo:golden-image --timeout 10`. Device: iPhone. Events: `runs/20261119180423-sd-turbo-dev-test-golden-image-2jtv.jsonl`.
+
+```
+text_encoder: ran in 0.32 s; measured peak 1364394704 bytes (1364.4 MB)
+unet: ran in 2.32 s; measured peak 974233200 bytes (974.2 MB)
+taesd: ran in 0.55 s; measured peak 201474352 bytes (201.5 MB)
+ 122.6 s  golden-image: image bytes: 1069 of 1048576 differ from golden/unet_q8/taesd_image, by at most 1
+PASSED: image bytes: 1069 of 1048576 differ from golden/unet_q8/taesd_image, by at most 1
+```
+
+Calculation: the UNet stage was 2.56 s in "Step 3 on the iPhone" and is 2.32 s now, 0.24 s less. The UNet peak is 979476080 - 974233200 = 5242880 bytes lower, the same 5.2 MB as the plan.
+
+Not run: "Make 20" on the iPhone with this kernel.
+
+Conclusion: step 4 is done. On the iPhone, attention is 27.6% faster. On the Mac GPU it is not faster, so the limit there is not the score round trip. The new kernel makes about one workgroup memory load per 2 multiply-adds. A next change for attention is register blocking: more query rows or more output values per invocation, so each loaded key and value feeds more multiply-adds.
+
+## 2026-11-20: "Make 20" on the iPhone after steps 3 and 4
+
+The user ran `bun run phone sd-turbo:make-20` and reported "it's passed". Device: iPhone. Events: `runs/20261120043434-sd-turbo-dev-test-make-20-1ny2.jsonl`. The lines below come from that file.
+
+Failed first: `bun run phone sd-turbo:make-twenty` stopped with `FAILED: no test with the id make-twenty`. The agent gave the wrong test id. The id is `make-20`.
+
+```
+make-20: image 1 of 20: 63.60 s; longest submit 72.0 ms; live 0 bytes; WASM memory 23789568 bytes; 1069 image bytes differ, by at most 1
+make-20: image 2 of 20: 5.04 s; longest submit 77.0 ms; live 0 bytes; WASM memory 23789568 bytes; 1069 image bytes differ, by at most 1
+make-20: image 3 of 20: 4.96 s; longest submit 83.0 ms; live 0 bytes; WASM memory 23789568 bytes; 1069 image bytes differ, by at most 1
+make-20: image 4 of 20: 5.36 s; longest submit 87.0 ms; live 0 bytes; WASM memory 23789568 bytes; 1069 image bytes differ, by at most 1
+make-20: image 5 of 20: 5.27 s; longest submit 88.0 ms; live 0 bytes; WASM memory 23789568 bytes; 1069 image bytes differ, by at most 1
+make-20: image 6 of 20: 5.37 s; longest submit 91.0 ms; live 0 bytes; WASM memory 23789568 bytes; 1069 image bytes differ, by at most 1
+make-20: image 7 of 20: 5.48 s; longest submit 91.0 ms; live 0 bytes; WASM memory 23789568 bytes; 1069 image bytes differ, by at most 1
+make-20: image 8 of 20: 5.70 s; longest submit 93.0 ms; live 0 bytes; WASM memory 23789568 bytes; 1069 image bytes differ, by at most 1
+make-20: image 9 of 20: 5.43 s; longest submit 94.0 ms; live 0 bytes; WASM memory 23789568 bytes; 1069 image bytes differ, by at most 1
+make-20: image 10 of 20: 6.48 s; longest submit 128.0 ms; live 0 bytes; WASM memory 23789568 bytes; 1069 image bytes differ, by at most 1
+make-20: image 11 of 20: 5.78 s; longest submit 102.0 ms; live 0 bytes; WASM memory 23789568 bytes; 1069 image bytes differ, by at most 1
+make-20: image 12 of 20: 5.64 s; longest submit 101.0 ms; live 0 bytes; WASM memory 23789568 bytes; 1069 image bytes differ, by at most 1
+make-20: image 13 of 20: 6.11 s; longest submit 108.0 ms; live 0 bytes; WASM memory 23789568 bytes; 1069 image bytes differ, by at most 1
+make-20: image 14 of 20: 5.75 s; longest submit 106.0 ms; live 0 bytes; WASM memory 23789568 bytes; 1069 image bytes differ, by at most 1
+make-20: image 15 of 20: 5.86 s; longest submit 114.0 ms; live 0 bytes; WASM memory 23789568 bytes; 1069 image bytes differ, by at most 1
+make-20: image 16 of 20: 6.17 s; longest submit 117.0 ms; live 0 bytes; WASM memory 23789568 bytes; 1069 image bytes differ, by at most 1
+make-20: image 17 of 20: 6.25 s; longest submit 117.0 ms; live 0 bytes; WASM memory 23789568 bytes; 1069 image bytes differ, by at most 1
+make-20: image 18 of 20: 6.00 s; longest submit 116.0 ms; live 0 bytes; WASM memory 23789568 bytes; 1069 image bytes differ, by at most 1
+make-20: image 19 of 20: 6.18 s; longest submit 122.0 ms; live 0 bytes; WASM memory 23789568 bytes; 1069 image bytes differ, by at most 1
+make-20: image 20 of 20: 6.24 s; longest submit 128.0 ms; live 0 bytes; WASM memory 23789568 bytes; 1069 image bytes differ, by at most 1
+make-20: PASSED: 20 images in 172.78 s
+```
+
+Calculations. The earlier run is in "2026-11-19: "Make 20" with the 8-bit UNet on the iPhone, and the 8-bit UNet as the default".
+
+- Image 1 took 63.60 s, because the weights came from the network. So the means leave it out.
+- Mean of images 2 to 20: before 8.17 s, now (5.04 + 4.96 + ... + 6.24) / 19 = 5.74 s. That is 1 - 5.74 / 8.17 = 29.7% less.
+- Mean of images 5 to 20, after the phone is warm: before 8.66 s, now 5.86 s. That is 1 - 5.86 / 8.66 = 32.3% less.
+- Longest submit: before 198 ms (79% of the 250 ms limit), now 128 ms (images 10 and 20), 128 / 250 = 51% of the limit.
+- Image 20 is 6.24 / 5.04 = 1.24 times slower than image 2. Before, the warm images were 1.58 times slower.
+- Every image: live 0 bytes, WASM memory 23789568 bytes, and 1069 image bytes differ, by at most 1.
+
+Conclusion: steps 3 and 4 also hold over 20 images in a row, with more margin under the submit limit. Next step: step 5 of the plan.
+
+## 2026-11-20: Step 5 of the plan: 8 rows per invocation in the packed linear layer
+
+Files added:
+
+- `engine/src/layers/packed/linear.rs`: `linear_workgroups`, the grid of the packed linear layer, with `ROWS = 8`, `COLUMNS = 4` and `WORKGROUP = [8, 8]`.
+
+Files changed:
+
+- `engine/src/layers/packed/linear.wgsl`: each invocation computes 8 rows x 4 columns in place of 4 x 4.
+- `engine/src/layers/packed/mod.rs`: `plan_packed` takes the grid of the packed linear layer from `linear_workgroups`. The float linear layer keeps its own grid.
+
+Design choices:
+
+- Each step of the loop unpacks 4 weights from each of the 4 weight rows. Before, those 16 integers fed 4 input rows, 64 multiply-adds. Now they feed 8 input rows, 128 multiply-adds, so the unpacking per multiply-add is half.
+- An invocation holds 8 running vec4 sums, 32 floats. The sums are 8 named variables, not an array, so the compiler keeps them in registers.
+- A row past the last one reads the last row, and its output is not written, as before. The cross attention reads 77 text rows, which is 9 blocks of 8 and 5 rows.
+
+Before, Mac native. `cargo test --release --test packed_layers -- --nocapture`:
+
+```
+linear_q4: 14.15 GB/s median, 14.18 GB/s best (30 submits, 128 runs per submit, 95.3 ms median submit, 97.0 ms longest), largest error 1.0728836e-6
+linear_q8: 14.21 GB/s median, 14.23 GB/s best (30 submits, 128 runs per submit, 95.4 ms median submit, 97.5 ms longest), largest error 1.4305115e-6
+```
+
+`cargo run --release --example generate -- --packed --profile`, two runs:
+
+```
+unet: ran in 1.48 s; measured peak 808091248 bytes (808.1 MB)
+linear_packed       192     262.24   17.2%     6.32    1.7%
+all kernels        1091    1524.63  100.0%
+unet: ran in 1.44 s; measured peak 808091248 bytes (808.1 MB)
+linear_packed       192     261.07   17.3%     6.34    1.7%
+all kernels        1091    1508.55  100.0%
+```
+
+After, Mac native. `cargo test --release --test packed_layers --test unet_packed -- --nocapture`:
+
+```
+linear_q4: 17.00 GB/s median, 17.02 GB/s best (30 submits, 128 runs per submit, 79.3 ms median submit, 80.1 ms longest), largest error 1.0728836e-6
+linear_q8: 17.02 GB/s median, 17.07 GB/s best (30 submits, 128 runs per submit, 79.6 ms median submit, 80.7 ms longest), largest error 1.4305115e-6
+unet_output: largest error 9.775161743164063e-6, mean error 8.534745274957345e-7, worst at [0, 1, 15, 7] (engine 3.0165648, golden 3.016555), 1 submits, longest 2.7 ms, peak 818478704 bytes
+```
+
+The profile command, two runs:
+
+```
+unet: ran in 1.41 s; measured peak 808091248 bytes (808.1 MB)
+unet_output: largest difference from PyTorch (packed) 9.775162e-6
+final_latent: largest difference from PyTorch (packed) 1.4305115e-4
+taesd_image: largest difference from PyTorch (packed) 5.21183e-4
+linear_packed       192     216.31   14.7%     7.66    2.1%
+all kernels        1091    1475.40  100.0%
+unet: ran in 1.42 s; measured peak 808091248 bytes (808.1 MB)
+linear_packed       192     216.99   14.8%     7.63    2.0%
+all kernels        1091    1464.12  100.0%
+```
+
+Calculation, Mac native: before (262.24 + 261.07) / 2 = 261.66 ms, after (216.31 + 216.99) / 2 = 216.65 ms. The cut is 1 - 216.65 / 261.66 = 17.2%.
+
+Deliberate-bug check: `let start7 = min(row0 + 7u, last_row)` became `min(row0 + 6u, last_row)`, so row 7 of each block reads row 6. Command: `cargo test --release --test packed_layers`. Device: Mac native.
+
+```
+largest error above 1e-4: ["linear_q4: 4.095663e0", "linear_q8: 4.1370864e0"]
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 22.94s
+```
+
+The bug was then removed. `cargo test --release` then gave 14 `test result: ok` lines, 0 failed. Correction to "2026-11-19: Step 4 of the plan: attention in one pass": that entry says 15 lines. The output of that run had 14 lines.
+
+iPhone. Command: `bun run build`, then `bun run phone sd-turbo:profile --timeout 15`, two runs. Events: `runs/20261120044258-sd-turbo-dev-test-profile-7jpr.jsonl` and `runs/20261120044537-sd-turbo-dev-test-profile-qw5h.jsonl`. Only these lines kept:
+
+```
+   2.3 s  profile: copy: 44.74 GB/s median, 47.72 GB/s best (30 submits, 16 runs per submit, 48.0 ms median submit, 51.0 ms longest)
+text_encoder: ran in 0.35 s; measured peak 1364427472 bytes (1364.4 MB)
+unet: ran in 2.30 s; measured peak 974265968 bytes (974.3 MB)
+taesd: ran in 0.41 s; measured peak 201507152 bytes (201.5 MB)
+conv3x3_packed       52     983.18   39.7%     0.84    1.9%
+attention           235     604.42   24.4%     1.98    4.4%
+linear_packed       192     357.37   14.4%     4.69   10.5%
+conv3x3              35     232.23    9.4%     4.53   10.1%
+linear              138     187.48    7.6%     6.88   15.4%
+all kernels        1091    2473.86  100.0%
+PASSED: profile table printed
+```
+
+```
+   3.5 s  profile: copy: 45.94 GB/s median, 47.72 GB/s best (30 submits, 32 runs per submit, 93.5 ms median submit, 99.0 ms longest)
+text_encoder: ran in 0.25 s; measured peak 1364427472 bytes (1364.4 MB)
+unet: ran in 2.33 s; measured peak 974265968 bytes (974.3 MB)
+taesd: ran in 0.49 s; measured peak 201507152 bytes (201.5 MB)
+conv3x3_packed       52     977.98   39.7%     0.84    1.8%
+attention           235     605.88   24.6%     1.98    4.3%
+linear_packed       192     351.73   14.3%     4.77   10.4%
+conv3x3              35     279.71   11.4%     3.76    8.2%
+linear              138     136.61    5.5%     9.44   20.5%
+all kernels        1091    2462.97  100.0%
+PASSED: profile table printed
+```
+
+Calculation, iPhone: before, the two profiles of step 4 had `linear_packed` at 471.05 ms and 465.44 ms, mean 468.25 ms. After, (357.37 + 351.73) / 2 = 354.55 ms. The cut is 1 - 354.55 / 468.25 = 24.3%. The `linear` and `conv3x3` rows move by up to 50 ms between runs, but this step does not change them.
+
+Command: `bun run phone sd-turbo:golden-image --timeout 10`. Device: iPhone. Events: `runs/20261120044421-sd-turbo-dev-test-golden-image-mfd8.jsonl`.
+
+```
+text_encoder: ran in 0.40 s; measured peak 1364394704 bytes (1364.4 MB)
+unet: ran in 2.14 s; measured peak 974233200 bytes (974.2 MB)
+taesd: ran in 0.51 s; measured peak 201474352 bytes (201.5 MB)
+PASSED: image bytes: 1069 of 1048576 differ from golden/unet_q8/taesd_image, by at most 1
+```
+
+The UNet stage was 2.32 s in the golden image run of step 4, and is 2.14 s now.
+
+Not run: "Make 20" on the iPhone with this kernel.
+
+Conclusion: step 5 is done. Next step in the plan: step 6, float16 math, which starts with a check of `shader-f16` on the iPhone.
+
+## 2026-11-20: Step 6 of the plan, part 1: shader-f16 on the iPhone, and a float16 math benchmark
+
+Files added:
+
+- `engine/src/bench/math_f16.wgsl`: the loop of `math.wgsl`, with every multiply-add in float16 (`enable f16;`).
+
+Files changed:
+
+- `engine/src/gpu.rs`: the device asks for `SHADER_F16` when the adapter has it, next to `TIMESTAMP_QUERY`. `has_shader_f16` tells the caller.
+- `engine/src/bench/math.rs`: `run_math` runs one math shader by name. `math_benchmark` runs the float32 shader, `math_f16_benchmark` the float16 one.
+- `engine/src/bench/mod.rs`: `run_benchmarks` adds the `math_f16` line when the device has `shader-f16`.
+
+The plan says to check `shader-f16` on the iPhone first. The capabilities probe already did this. `packages/probes/crumbs.jsonl` holds one report from the iPhone, with the user agent `Mozilla/5.0 (iPhone; CPU iPhone OS 18_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.6.2 Mobile/15E148 Safari/604.1`, the same as the harness runs of today. That report has no date. Its feature lines:
+
+```
+"features": {"shader-f16": true, "subgroups": false, "timestamp-query": true}
+```
+
+So the iPhone has `shader-f16`, and it has no `subgroups`.
+
+Design choices:
+
+- A kernel in float16 can be faster for two reasons: fewer bytes per value, and faster math. The kernels with the most time are not limited by bytes (for example `conv3x3_packed` at 0.84 GB/s of the 47.72 GB/s door on the iPhone). So the first question is the math speed. The float16 benchmark answers it before any kernel changes.
+- The float16 loop is the float32 loop with the same 4 dependent multiply-adds per step, so the two numbers compare directly. The buffers stay float32. The value stays between 1 and 5, far inside the float16 range.
+- Asking for `SHADER_F16` changes nothing for the float32 shaders.
+
+Command: `cargo run --release --example bench`. Device: Mac native.
+
+```
+copy: 333.56 GB/s median, 365.62 GB/s best (30 submits, 128 runs per submit, 51.5 ms median submit, 54.4 ms longest)
+math: 1415.17 G ops/s median, 1489.87 G ops/s best (30 submits, 32 runs per submit, 48.6 ms median submit, 52.5 ms longest)
+math_f16: 1613.00 G ops/s median, 1614.53 G ops/s best (30 submits, 64 runs per submit, 85.2 ms median submit, 86.8 ms longest)
+```
+
+Command: `bun run build`, `bun run serve`, then `http://127.0.0.1:8765/sd-turbo/dev/?test=bench&run=<id>` in Playwright Chromium. Device: Mac Chromium.
+
+```
+bench: copy: 328.49 GB/s median, 347.77 GB/s best (30 submits, 128 runs per submit, 52.3 ms median submit, 56.0 ms longest)
+math: 4102.66 G ops/s median, 4152.23 G ops/s best (30 submits, 128 runs per submit, 67.0 ms median submit, 71.3 ms longest)
+math_f16: 4021.62 G ops/s median, 4335.61 G ops/s best (30 submits, 128 runs per submit, 68.3 ms median submit, 73.1 ms longest)
+```
+
+Calculations: Mac native, 1613.00 / 1415.17 = 1.14, so float16 math is 14% faster. Mac Chromium, 4021.62 / 4102.66 = 0.98, so it is the same speed. The two Mac runtimes do not agree, so only the iPhone number can decide.
+
+Command: `cargo test --release`. Device: Mac native. 14 `test result: ok` lines, 0 failed.
+
+Failed: `bun run phone sd-turbo:bench --timeout 5` stopped with `FAILED: no iPhone is connected: plug it in with a cable, unlock it, and tap Trust`.
+
+Not measured on the iPhone. Next step: the user connects the iPhone, and `bun run phone sd-turbo:bench` gives the `math_f16` line. If float16 math is not clearly faster than float32 on the iPhone, float16 can only help kernels that are limited by bytes, and the plan for step 6 changes.
+
+## 2026-11-20: Step 6 of the plan, part 2: the float16 math benchmark on the iPhone
+
+This entry adds the iPhone run to "Step 6 of the plan, part 1".
+
+Failed first: the next run of `bun run phone sd-turbo:bench --timeout 5` again gave `no iPhone is connected`. Then `xcrun devicectl list devices` showed the phone as `connected`, and the run after it stopped with `FAILED: the certificate names 192.168.31.188, 127.0.0.1, but the Mac has 10.120.1.197, ...`. `bun run cert` made a new certificate for 10.120.1.197.
+
+Command: `bun run phone sd-turbo:bench --timeout 5`. Device: iPhone. Events: `runs/20261120071011-sd-turbo-dev-test-bench-2k7t.jsonl`.
+
+```
+   6.4 s  bench: copy: 44.74 GB/s median, 46.68 GB/s best (30 submits, 16 runs per submit, 48.0 ms median submit, 54.0 ms longest)
+math: 636.29 G ops/s median, 648.30 G ops/s best (30 submits, 16 runs per submit, 54.0 ms median submit, 55.0 ms longest)
+math_f16: 648.30 G ops/s median, 660.76 G ops/s best (30 submits, 16 runs per submit, 53.0 ms median submit, 54.0 ms longest)
+   6.4 s  PASSED: benchmarks ran
+```
+
+Calculation: 648.30 / 636.29 = 1.019, so float16 math is 1.9% faster. The median submits are 54.0 ms and 53.0 ms. Safari's clock shows whole milliseconds, so the two differ by one clock step. The two numbers are the same within what this clock can measure.
+
+Conclusion: on the iPhone, float16 math is not faster than float32 math. So float16 can help only a kernel that is limited by bytes. The three largest kernels are not: on the iPhone, `conv3x3_packed` runs at 0.84 GB/s, `attention` at 1.98 GB/s and `linear_packed` at 4.77 GB/s, against the 44.74 GB/s copy speed. The plan of step 6 ("one kernel at a time to float16") would not make these kernels faster. The `math_f16` benchmark and the `SHADER_F16` request stay, so a later step can use them.
+
+## 2026-11-20: Step 2 of the plan, part 1: a 20-image test of a float16 and an 8-bit text encoder
+
+The user asked whether step 2 lowers the quality. This step measures it before any engine change.
+
+Files added:
+
+- `python/eval_images.py`: the shared parts of the 20-image tests, moved out of `quant_eval.py`: the 20 prompts, the noise, the image loop, PSNR, LPIPS, the grid, `load_pipeline` and `print_scores`.
+- `python/text_quant_eval.py`: the 20-image test of the text encoder.
+- `quant/text_quant_eval.txt`: its output. `quant/text_quant_eval/grid.png`: its grid, one column per version.
+
+Files changed:
+
+- `python/quant_eval.py`: imports the shared parts. `save_grid` takes the path of the grid.
+- `.gitignore` at the repository root: ignores `quant/text_quant_eval/`, as it ignores `quant/quant_eval/`. The grid is 26,265,501 bytes, and the script makes it again.
+
+Design choices:
+
+- Only the text encoder changes. Every version uses the 8-bit UNet that the engine ships (`quant/quant_plan_8bit.json`), so the scores show the loss of the text encoder alone.
+- The reference is the float32 text encoder, which the engine runs now. `quant_eval.py` ran the text encoder in float16, so this test loads its own float32 copy.
+- The 8-bit version rounds every linear layer and the token table to 8 bits, with one scale per output row (`fake_quantize` of `quantize.py`, the method of the 8-bit UNet). For the token table, one row is one token. Layer norms, biases and the position table stay float32. The math stays float32, as in the engine.
+- The float16 version runs all weights and all math in float16.
+- The images use the saved noise of `quant_eval.py`, so the rows match the UNet test.
+
+Check of the move: `uv run python/quant_eval.py`, then `diff` of its output with `quant/quant_eval_8bit.txt`, without the `wrote` line. Device: Mac, Python through `uv run`, Mac GPU. The diff printed nothing, so the refactored script prints the same table as before.
+
+Command: `uv run python/text_quant_eval.py > quant/text_quant_eval.txt`, in the model folder. Device: Mac, Python through `uv run`, Mac GPU.
+
+```
+text encoder file: float32 1361.6 MB, float16 680.8 MB, 8-bit 342.1 MB
+float16 embeddings: largest difference 3.4167e-02, rms difference 2.0159e-03 of the float32 rms
+8-bit embeddings: largest difference 2.0843e-01, rms difference 2.3566e-02 of the float32 rms
+image       float16 PSNR     float16 LPIPS         8-bit PSNR       8-bit LPIPS  prompt
+    0              53.23            0.0004              37.75            0.0090  a photo of a cat sitting on a wooden table
+    1              51.22            0.0004              31.22            0.0233  a portrait of an old fisherman with a grey beard, natural light
+    2              52.87            0.0002              39.13            0.0021  a red sports car parked on a wet city street at night
+    3              49.03            0.0005              41.99            0.0020  a bowl of ramen with an egg and green onions, top view
+    4              48.57            0.0005              43.55            0.0017  a snowy mountain lake at sunrise, reflections on the water
+    5              53.37            0.0003              44.97            0.0024  a golden retriever puppy running on green grass
+    6              49.40            0.0004              35.42            0.0074  a cozy living room with a fireplace and bookshelves
+    7              54.06            0.0003              41.64            0.0025  a watercolor painting of a lighthouse on a cliff
+    8              52.74            0.0003              40.57            0.0033  a close-up photo of a hummingbird drinking from a flower
+    9              47.69            0.0005              33.62            0.0124  a busy market street in Marrakech with colorful spices
+   10              47.97            0.0005              39.23            0.0036  a futuristic city skyline with flying cars, digital art
+   11              47.90            0.0006              37.74            0.0040  a sign that says OPEN on a coffee shop door
+   12              49.27            0.0003              38.36            0.0034  a pile of fresh oranges and lemons in a wooden crate
+   13              49.57            0.0006              36.11            0.0099  an astronaut riding a horse on the moon
+   14              48.18            0.0005              32.47            0.0128  a young woman reading a book in a sunny cafe
+   15              51.54            0.0005              40.69            0.0048  a pencil sketch of an owl on a branch
+   16              49.55            0.0004              40.06            0.0023  a tropical beach with palm trees and turquoise water
+   17              50.05            0.0003              38.03            0.0040  a plate of chocolate chip cookies next to a glass of milk
+   18              55.51            0.0006              47.97            0.0024  an old castle in the fog, oil painting
+   19              51.41            0.0002              43.74            0.0012  a macro photo of dew drops on a spider web
+ mean              50.66            0.0004              39.21            0.0057
+worst              47.69            0.0006              31.22            0.0233
+wrote quant/text_quant_eval/grid.png
+```
+
+Calculations:
+
+- File sizes: the 8-bit file is 342.1 / 1361.6 = 25.1% of the float32 file, 1019.5 MB less. The float16 file is 680.8 MB, 680.8 MB less.
+- The 8-bit text encoder against the 8-bit UNet of "An 8-bit UNet file, side by side with the mixed plan": mean LPIPS 0.0057 against 0.0352, so 0.0352 / 0.0057 = 6.2 times less change. Worst LPIPS 0.0233 against 0.1228.
+- The float16 text encoder: mean LPIPS 0.0004, mean PSNR 50.66 dB.
+
+What the grid shows, checked by the agent on rows 1 (the fisherman, the worst LPIPS of the 8-bit version) and 14 (the woman in the cafe): the three columns show the same picture. The face, the beard, the book and the cups are the same. The 8-bit fisherman differs only in fine wrinkle texture. The user has not looked at the grid yet.
+
+Not measured on the iPhone. This step changes no engine code.
+
+Conclusion: an 8-bit text encoder changes the images much less than the 8-bit UNet that ships now. A float16 text encoder changes them almost not at all. Next step, if the user agrees: an 8-bit text encoder file, and the engine runs it with the packed linear kernel. The token table needs a kernel that unpacks the 77 rows of a prompt.

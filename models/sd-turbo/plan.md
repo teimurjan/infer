@@ -28,18 +28,18 @@ Every number below is from `PROGRESS.md`. Each step ends with a measurement on t
 - Also: about 1 GB less to download, and a much lower peak.
 - Done when: the iPhone warm time drops, the golden compare passes, and the page peak stays under the tab limit.
 
-### 3. TAESD 3x3 convolution: load each input value once per row
+### 3. TAESD 3x3 convolution: load each input value once per row (done: iPhone conv3x3 410.64 ms to 253.21 ms)
 
 - Why: the float 3x3 convolution of TAESD takes 410.64 ms per image on the iPhone. The same change cut the packed 3x3 convolution by 39.2% on the iPhone.
 - Done when: the iPhone profile shows a lower `conv3x3` row, and the TAESD golden test passes.
 
-### 4. Attention in one pass
+### 4. Attention in one pass (done: iPhone attention 832.02 ms to 602.55 ms)
 
 - Why: attention takes 838.71 ms per image on the iPhone. It runs at about a quarter of the math rate of the phone. Each score goes to memory once and comes back 16 times, with 16 copies of the same `exp`.
 - Do: an online softmax (a running maximum and sum) in one loop. The scores never go to memory. The scores scratch leaves the activation plan.
 - Done when: the iPhone profile shows a lower `attention` row, and the attention and UNet golden tests pass.
 
-### 5. Packed linear layer: 8 rows per invocation
+### 5. Packed linear layer: 8 rows per invocation (done: iPhone linear_packed 468.25 ms to 354.55 ms)
 
 - Why: `linear_packed` takes 469.73 ms per image on the iPhone. Each unpacked weight feeds only 4 rows.
 - Done when: the iPhone profile shows a lower `linear_packed` row, and the golden tests pass.
