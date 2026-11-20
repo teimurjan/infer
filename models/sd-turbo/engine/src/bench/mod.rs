@@ -19,12 +19,17 @@ pub(crate) use measure::{Kernel, measure};
 // The copy benchmark alone. The profiler uses its median as the door number.
 pub use copy::copy_benchmark;
 
-// Run both benchmarks, one after the other, and return one report each.
+// Run the benchmarks, one after the other, and return one report each.
 pub async fn run_benchmarks(gpu: &Gpu) -> Result<Vec<BenchReport>, EngineError> {
     // Memory speed first.
     let copy = copy::copy_benchmark(gpu).await?;
-    // Then arithmetic speed.
+    // Then float32 arithmetic speed.
     let math = math::math_benchmark(gpu).await?;
-    // Both reports, in the order they ran.
-    Ok(vec![copy, math])
+    // Float16 arithmetic speed, only where the device has shader-f16.
+    if !gpu.has_shader_f16() {
+        return Ok(vec![copy, math]);
+    }
+    let math_f16 = math::math_f16_benchmark(gpu).await?;
+    // The reports, in the order they ran.
+    Ok(vec![copy, math, math_f16])
 }

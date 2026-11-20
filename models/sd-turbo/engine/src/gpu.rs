@@ -45,11 +45,17 @@ impl Gpu {
         // Wait for the adapter, or stop with an error.
         let adapter = instance.request_adapter(&options).await.map_err(EngineError::NoAdapter)?;
         // Ask for timestamps if the adapter has them. The profiler uses them. Nothing else changes with them.
-        let required_features = adapter.features() & wgpu::Features::TIMESTAMP_QUERY;
+        // Also ask for shader-f16 if the adapter has it, so shaders can use the float16 type.
+        let required_features = adapter.features() & (wgpu::Features::TIMESTAMP_QUERY | wgpu::Features::SHADER_F16);
         // Default asks for the standard WebGPU limits, which every WebGPU GPU supports.
         let (device, queue) = adapter.request_device(&wgpu::DeviceDescriptor { required_features, ..Default::default() }).await.map_err(EngineError::NoDevice)?;
         // Keep the device and the queue together.
         Ok(Self { device, queue, memory: Rc::default(), bind_groups: Cell::new(0), longest_submit: Cell::new(0.0), profile: RefCell::new(None) })
+    }
+
+    // True if shaders on this device can use the float16 type ("enable f16;").
+    pub(crate) fn has_shader_f16(&self) -> bool {
+        self.device.features().contains(wgpu::Features::SHADER_F16)
     }
 
     // The largest number of workgroups that one dispatch can start along x.
