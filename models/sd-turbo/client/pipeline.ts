@@ -7,8 +7,8 @@ import type { Inputs } from './golden.ts';
 import { urls } from './urls.ts';
 import { loadWeights, type LoadProgress, type LoadResult } from './weights.ts';
 
-// The weight file of the text encoder, at float32.
-export const TEXT_FILE = 'text_encoder';
+// The text encoder file: every matrix at 8 bits (quant/text_plan_8bit.json), 342 MB in place of 1362 MB at float32.
+export const TEXT_FILE = 'text_encoder_q8';
 // The UNet file: 281 of 282 layers at 8 bits (quant/quant_plan_8bit.json). "Make 20" passed on the iPhone with it.
 export const DEFAULT_UNET_FILE = 'unet_q8';
 // The small image decoder. It is read whole, not streamed.

@@ -22,13 +22,15 @@ def row_words(row_values: int, bits: int) -> int:
 
 
 # Round each row of `weight` to `bits` bits. Return the integers (one row per output channel) and the float16 scales.
-def quantize_rows(weight: np.ndarray, bits: int) -> tuple[np.ndarray, np.ndarray]:
+# `min_scale` is the smallest scale. 0 keeps the rounding that made the UNet files, so they stay the same bytes.
+def quantize_rows(weight: np.ndarray, bits: int, min_scale: float = 0.0) -> tuple[np.ndarray, np.ndarray]:
     # The largest integer level. 7 for 4 bits, 127 for 8 bits.
     max_level = 2 ** (bits - 1) - 1
     # One row per output channel, in float32. Dim 0 is the output channel for Linear and Conv2d.
     rows = weight.astype(np.float32).reshape(weight.shape[0], -1)
     # The scale maps the largest absolute value of a row to max_level. The minimum avoids a divide by zero.
-    scale = (np.maximum(np.abs(rows).max(axis=1), 1e-12) / max_level).astype(np.float16)
+    # Then no scale is below min_scale. Rows with a larger scale do not change.
+    scale = np.maximum(np.maximum(np.abs(rows).max(axis=1), 1e-12) / max_level, min_scale).astype(np.float16)
     # Divide by the scale as stored, so each integer is the nearest one for the scale that the engine reads.
     levels = np.clip(np.rint(rows / scale.astype(np.float32)[:, None]), -max_level - 1, max_level).astype(np.int8)
     # The integers and the scales.
@@ -71,6 +73,8 @@ def dequantize(levels: np.ndarray, scale: np.ndarray, shape: tuple) -> np.ndarra
 
 # The packed dtype names of the weight index, and their bit widths.
 INDEX_BITS = {"int4": 4, "int8": 8}
+# The float dtype names of the weight index. The packed UNet keeps its small tensors in float16, the packed text encoder in float32.
+INDEX_FLOATS = {"float16": np.float16, "float32": np.float32}
 
 
 # The bytes of one index entry, as numpy values of `dtype`.
@@ -104,7 +108,7 @@ def read_packed_file(data: np.ndarray, index: list[dict]) -> dict[str, np.ndarra
             # integer x scale in float64, as the converter checks it.
             state[entry["name"]] = dequantize(unpack_rows(words, bits, row_values), scale, shape)
         else:
-            # A float16 tensor: its value, as float64.
-            state[entry["name"]] = entry_values(data, entry, np.float16, values).astype(np.float64).reshape(shape)
+            # A float tensor: its value, as float64.
+            state[entry["name"]] = entry_values(data, entry, INDEX_FLOATS[entry["dtype"]], values).astype(np.float64).reshape(shape)
     # Every tensor.
     return state

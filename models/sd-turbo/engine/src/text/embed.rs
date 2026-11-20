@@ -38,17 +38,25 @@ pub(super) fn bind_positions(gpu: &Gpu, weights: &impl WeightBuffers, pool: &Act
     Ok(kernel.keeping(positions.buffer.into_owned()))
 }
 
-// Copy row ids[p] of the token table to row p of `embeddings`, for the 77 positions, in one submit.
-// A buffer copy needs no bind group and no new buffer. `table_rows` is the row count of the table, for the id check.
-pub(super) fn copy_token_rows(gpu: &Gpu, table: &wgpu::Buffer, table_rows: usize, ids: &[u32], embeddings: &wgpu::Buffer) -> Result<(), EngineError> {
+// Fail unless `ids` has exactly 77 ids, each a row of a table of `table_rows` rows.
+pub(super) fn check_ids(ids: &[u32], table_rows: usize) -> Result<(), EngineError> {
     // A prompt has exactly 77 tokens, padded by the tokenizer.
     if ids.len() != TOKENS as usize {
         return Err(EngineError::LengthMismatch { actual: ids.len(), expected: TOKENS as usize });
     }
-    // An id past the table would copy bytes that are not a token.
+    // An id past the table would read bytes that are not a token.
     if let Some(&id) = ids.iter().find(|&&id| id as usize >= table_rows) {
         return Err(EngineError::WeightShape { name: TOKEN_TABLE.to_string(), shape: vec![table_rows, WIDTH as usize], expected: format!("a row below {table_rows}, not {id}") });
     }
+    // All good.
+    Ok(())
+}
+
+// Copy row ids[p] of the token table to row p of `embeddings`, for the 77 positions, in one submit.
+// A buffer copy needs no bind group and no new buffer. `table_rows` is the row count of the table, for the id check.
+pub(super) fn copy_token_rows(gpu: &Gpu, table: &wgpu::Buffer, table_rows: usize, ids: &[u32], embeddings: &wgpu::Buffer) -> Result<(), EngineError> {
+    // 77 ids, each inside the table.
+    check_ids(ids, table_rows)?;
     // The bytes of one row.
     let row_bytes = u64::from(WIDTH) * F32_BYTES;
     // Record the 77 copies.

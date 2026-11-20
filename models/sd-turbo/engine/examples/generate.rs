@@ -17,6 +17,7 @@ const SIDE: usize = 512;
 // Start it with `cargo run --release --example generate` in engine/, for the float32 UNet. It writes engine/target/generate.ppm.
 // With `-- --packed`, the text encoder and UNet stages stream their files into GPU buffers as the web page does,
 // the UNet file is the packed 4-bit and 8-bit one, and it writes engine/target/generate_packed.ppm.
+// With `-- --q8`, it streams the files that the site loads, text_encoder_q8 and unet_q8, and writes engine/target/generate_q8.ppm.
 // With `--profile`, it first measures the door number with the copy benchmark, then times every kernel and prints the table.
 // `--wall-clock` with `--profile` times each dispatch with the CPU clock, as on a device without timestamps.
 fn main() -> ExitCode {
@@ -67,19 +68,23 @@ fn has_flag(flag: &str) -> bool {
 
 // Pick the UNet weights from the command line, then generate.
 async fn run() -> Result<(), String> {
-    // The packed file when the user asks for it.
-    if has_flag("--packed") {
+    // The streamed files of the packed runs.
+    let folder = project_folder().join("weights");
+    if has_flag("--q8") {
+        // The files of the site. Their golden set holds the embeddings of the 8-bit text encoder too.
+        generate_with(StreamedFile(&folder.join("text_encoder_q8.bin")), StreamedFile(&folder.join("unet_q8.bin")), "text_encoder_q8_unet_q8", "text_encoder_q8_unet_q8", "generate_q8.ppm").await
+    } else if has_flag("--packed") {
         // The files stream into the GPU when their stage starts. Compare with the packed golden set.
-        let folder = project_folder().join("weights");
-        generate_with(StreamedFile(&folder.join("text_encoder.bin")), StreamedFile(&folder.join("unet_packed.bin")), "packed", "generate_packed.ppm").await
+        generate_with(StreamedFile(&folder.join("text_encoder.bin")), StreamedFile(&folder.join("unet_packed.bin")), "float32", "packed", "generate_packed.ppm").await
     } else {
         // Each kernel gets its own GPU copy of its float32 weights. Compare with the float32 golden set.
-        generate_with(FromReader(&weights("text_encoder")?), FromReader(&weights("unet")?), "float32", "generate.ppm").await
+        generate_with(FromReader(&weights("text_encoder")?), FromReader(&weights("unet")?), "float32", "float32", "generate.ppm").await
     }
 }
 
-// Read the inputs, generate with the weights `text` and `unet`, compare with the golden set `set`, and write the image to target/<image>.
-async fn generate_with(text: impl TextWeights, unet: impl UnetWeights, set: &str, image: &str) -> Result<(), String> {
+// Read the inputs, generate with the weights `text` and `unet`, compare the text embeddings with the golden set `text_set`
+// and the other outputs with the golden set `set`, and write the image to target/<image>.
+async fn generate_with(text: impl TextWeights, unet: impl UnetWeights, text_set: &str, set: &str, image: &str) -> Result<(), String> {
     // The 77 token ids, saved as float32 whole numbers.
     let ids: Vec<u32> = golden("float32/text_input_ids.safetensors")?.iter().map(|&id| id as u32).collect();
     // The starting noise, the sigma and the timestep of the golden run.
@@ -98,9 +103,9 @@ async fn generate_with(text: impl TextWeights, unet: impl UnetWeights, set: &str
     // Generate, and print each stage event as it happens.
     let inputs = GenerateInputs { token_ids: &ids, noise: &noise, sigma, timestep };
     let result = generate(&gpu, StageWeights { text, unet, decoder: &decoder }, &inputs, |event| println!("{event}")).await.map_err(|error| error.to_string())?;
-    // Compare each output with the PyTorch run with the same weights. The text encoder is always float32.
+    // Compare each output with the PyTorch run with the same weights. The text encoder output has its own set.
     for (name, values) in [("text_encoder", &result.text), ("unet_output", &result.noise_prediction), ("final_latent", &result.latent), ("taesd_image", &result.image)] {
-        let tensor_set = if name == "text_encoder" { "float32" } else { set };
+        let tensor_set = if name == "text_encoder" { text_set } else { set };
         println!("{name}: largest difference from PyTorch ({tensor_set}) {:e}", largest_difference(values, &golden(&format!("{tensor_set}/{name}.safetensors"))?));
     }
     // The table, if a profile ran. take_profile also ends it.

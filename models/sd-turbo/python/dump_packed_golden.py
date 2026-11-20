@@ -1,6 +1,6 @@
 # /// script
 # requires-python = ">=3.10,<3.14"
-# dependencies = ["torch", "diffusers", "accelerate", "safetensors", "numpy"]
+# dependencies = ["torch", "diffusers", "transformers", "accelerate", "safetensors", "numpy"]
 # ///
 # The block above tells `uv run` which Python and which packages this script needs.
 
@@ -8,6 +8,8 @@
 # A packed weight is integer x float16 scale. Every other tensor is the float16 value of the file. So the engine and this run
 # differ only by float32 rounding, and the golden compare checks the packed kernels, not the rounding of the weights.
 # It also runs the same model in float64 and prints the difference, which is the size of the float32 rounding.
+# With a second name, for example `uv run dump_packed_golden.py unet_q8 text_encoder_q8`, the text embeddings come from
+# the packed text encoder file in float32, not from the float32 golden set, and the set also holds them as text_encoder.
 
 # json reads the weight index and writes the manifest.
 import json
@@ -22,6 +24,8 @@ import numpy as np
 import torch
 # UNet2DConditionModel is the SD-Turbo UNet. AutoencoderTiny is TAESD.
 from diffusers import AutoencoderTiny, UNet2DConditionModel
+# CLIPTextModel is the text encoder, and CLIPTokenizer turns the prompt into token ids.
+from transformers import CLIPTextModel, CLIPTokenizer
 # Image writes the PNG. Pillow comes with diffusers.
 from PIL import Image
 # load_file and save_file read and write .safetensors files.
@@ -37,11 +41,16 @@ MODEL_ID = "stabilityai/sd-turbo"
 STEM = sys.argv[1] if len(sys.argv) > 1 else "unet_packed"
 PACKED_BIN = Path(f"weights/{STEM}.bin")
 PACKED_INDEX = Path(f"weights/{STEM}.json")
+# The packed text encoder file, or None for the float32 text embeddings of the golden set.
+TEXT_STEM = sys.argv[2] if len(sys.argv) > 2 else None
+# The golden prompt, as in dump_golden.py.
+PROMPT = "a photo of a cat sitting on a wooden table"
 # The float32 golden set, which has the UNet inputs.
 INPUT_DIR = Path("golden/float32")
 # The new golden set of the packed UNet.
 # unet_packed keeps its old folder golden/packed. Another file gets golden/<stem>.
-SET_DIR = Path("golden/packed" if STEM == "unet_packed" else f"golden/{STEM}")
+# With a packed text encoder, the set is golden/<text stem>_<stem>, for example golden/text_encoder_q8_unet_q8.
+SET_DIR = Path(f"golden/{TEXT_STEM}_{STEM}" if TEXT_STEM else "golden/packed" if STEM == "unet_packed" else f"golden/{STEM}")
 # The modules whose output we save, and the golden name of each. The same names as the float32 set.
 PARTS = {"time_embedding": "time_embedding", "conv_in": "conv_in", "down_block_0": "down_blocks.0", "down_block_1": "down_blocks.1", "down_block_2": "down_blocks.2", "down_block_3": "down_blocks.3", "mid_block": "mid_block", "up_block_0": "up_blocks.0", "up_block_1": "up_blocks.1", "up_block_2": "up_blocks.2", "up_block_3": "up_blocks.3"}
 
@@ -74,7 +83,7 @@ def run(unet: UNet2DConditionModel, dtype: torch.dtype) -> dict[str, torch.Tenso
     # Turn off gradient tracking, because we only run the model forward.
     with torch.inference_mode():
         # The same three inputs as the float32 golden run.
-        output = unet(read_input("unet_input").to(dtype), read_input("timestep")[0].to(dtype), encoder_hidden_states=read_input("text_encoder").to(dtype), return_dict=False)[0]
+        output = unet(read_input("unet_input").to(dtype), read_input("timestep")[0].to(dtype), encoder_hidden_states=text.to(dtype), return_dict=False)[0]
     # Remove the hooks.
     for handle in handles:
         handle.remove()
@@ -84,6 +93,34 @@ def run(unet: UNet2DConditionModel, dtype: torch.dtype) -> dict[str, torch.Tenso
     return records
 
 
+# The text embeddings of the golden prompt from the packed text encoder file, in float32, as the engine computes them.
+def packed_text_embeddings(text_stem: str) -> torch.Tensor:
+    # The published text encoder in float32. Its weights are replaced below.
+    model = CLIPTextModel.from_pretrained(MODEL_ID, subfolder="text_encoder", torch_dtype=torch.float32).to("cpu")
+    # The packed file: integer x scale for the 8-bit matrices, float32 for the rest.
+    state = packed_state(np.fromfile(f"weights/{text_stem}.bin", dtype=np.uint8), json.loads(Path(f"weights/{text_stem}.json").read_text()))
+    # The file uses the published names, "text_model.embeddings...". Some transformers versions drop "text_model." from
+    # the model's own names, so a file name that the model does not know loses that prefix.
+    known = set(model.state_dict())
+    state = {name if name in known else name.removeprefix("text_model."): value for name, value in state.items()}
+    # The position ids are a buffer of the model, not a weight of the file. Every weight must come from the file.
+    missing = known - set(state) - {"text_model.embeddings.position_ids", "embeddings.position_ids"}
+    if missing or set(state) - set(model.state_dict()):
+        raise RuntimeError(f"{text_stem} does not match CLIPTextModel: missing {sorted(missing)[:3]}")
+    model.load_state_dict({name: value.float() for name, value in state.items()}, strict=False)
+    # The 77 token ids, as the pipeline makes them.
+    tokenizer = CLIPTokenizer.from_pretrained(MODEL_ID, subfolder="tokenizer")
+    ids = tokenizer(PROMPT, padding="max_length", max_length=tokenizer.model_max_length, truncation=True, return_tensors="pt").input_ids
+    # last_hidden_state, after the final layer norm.
+    with torch.inference_mode():
+        return model(ids)[0].contiguous()
+
+
+# The text embeddings that the UNet reads.
+text = packed_text_embeddings(TEXT_STEM) if TEXT_STEM else read_input("text_encoder")
+if TEXT_STEM:
+    # How far the packed text encoder moves the embeddings from the float32 golden ones.
+    print(f"text_encoder: packed vs float32 weights largest difference {(text - read_input('text_encoder')).abs().max().item():.3e}")
 # Load the UNet, put the packed values into it, and run it.
 unet = UNet2DConditionModel.from_pretrained(MODEL_ID, subfolder="unet", torch_dtype=torch.float32).to("cpu")
 # The packed file and its index.
@@ -98,6 +135,9 @@ if missing or unexpected:
 # The float32 run: the golden set.
 unet.load_state_dict({name: value.float() for name, value in state.items()})
 golden = run(unet, torch.float32)
+# The set holds the packed text embeddings too, so the engine can check its text stage against them.
+if TEXT_STEM:
+    golden["text_encoder"] = text
 # The float64 run: the size of the float32 rounding.
 unet.to(torch.float64).load_state_dict(state)
 reference = run(unet, torch.float64)

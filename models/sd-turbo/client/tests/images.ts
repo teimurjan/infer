@@ -7,12 +7,12 @@ import { openCache } from '../cache.ts';
 import { loadTokenizer } from '../engine.ts';
 import { GOLDEN_PROMPT, GOLDEN_SEED, readGolden, readGoldenInputs, type Inputs } from '../golden.ts';
 import { compareBytes, toRgba, type ByteCompare } from '../image.ts';
-import { DEFAULT_UNET_FILE, generate, type PipelineEvent } from '../pipeline.ts';
+import { DEFAULT_UNET_FILE, TEXT_FILE, generate, type PipelineEvent } from '../pipeline.ts';
 import { SIGMA, TIMESTEP } from '../schedule.ts';
 import { session } from './session.ts';
 
-// The golden set of the UNet file: python/dump_packed_golden.py writes golden/<name> for unet_q8.
-const GOLDEN_SET = DEFAULT_UNET_FILE;
+// The golden set of the two packed files: `uv run python/dump_packed_golden.py unet_q8 text_encoder_q8` writes golden/text_encoder_q8_unet_q8.
+const GOLDEN_SET = `${TEXT_FILE}_${DEFAULT_UNET_FILE}`;
 // The largest byte difference that passes. The Mac Chromium result before the restructure was "by at most 1".
 const BYTE_BOUND = 1;
 // The number of images of "Make 20".

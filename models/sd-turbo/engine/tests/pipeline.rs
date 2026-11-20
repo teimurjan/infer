@@ -31,9 +31,9 @@ fn largest_difference(engine: &[f32], golden: &[f32]) -> f32 {
 }
 
 // Run the three stages with the weights `text` and `unet`, and compare the UNet output, the latent and the image with the golden set `set`.
-// The text encoder output is always compared with the float32 set. The three stages must run one after the other,
+// The text encoder output is compared with the golden set `text_set`. The three stages must run one after the other,
 // each must free all its buffers, and the measured peak of each planned stage must be its planned peak.
-fn generate_and_check(text: impl TextWeights, unet: impl UnetWeights, set: &str) {
+fn generate_and_check(text: impl TextWeights, unet: impl UnetWeights, text_set: &str, set: &str) {
     // The 77 token ids, the noise, the sigma and the timestep of the golden run.
     let ids: Vec<u32> = golden("text_input_ids").unwrap_or_else(|error| panic!("{error}")).values.iter().map(|&id| id as u32).collect();
     let noise = read_tensors(&project_folder().join("golden").join("starting_noise.safetensors")).unwrap_or_else(|error| panic!("{error}")).remove(0).values;
@@ -64,10 +64,10 @@ fn generate_and_check(text: impl TextWeights, unet: impl UnetWeights, set: &str)
         // The next stage starts with no engine buffer from this one.
         assert_eq!(*live, 0, "{stage}: live bytes after the stage was freed");
     }
-    // Every output against PyTorch. The text encoder has no packed weights, so it uses the float32 set.
+    // Every output against PyTorch. The text encoder output has its own set: float32, or the set of the packed text encoder.
     for ((name, tolerance), values) in TOLERANCES.into_iter().zip([&result.text, &result.noise_prediction, &result.latent, &result.image]) {
         // The golden set of this output.
-        let tensor_set = if name == "text_encoder" { "float32" } else { set };
+        let tensor_set = if name == "text_encoder" { text_set } else { set };
         // The difference from the golden tensor.
         let difference = largest_difference(values, &golden_in(tensor_set, name).unwrap_or_else(|error| panic!("{error}")).values);
         println!("{name}: largest difference from PyTorch ({tensor_set}) {difference:e}");
@@ -90,7 +90,7 @@ fn generate_and_check(text: impl TextWeights, unet: impl UnetWeights, set: &str)
 fn stages_with_float_unet_match_pytorch() {
     // Each kernel gets its own GPU copy of its float32 weights.
     let (text, unet) = (weights("text_encoder"), weights("unet"));
-    generate_and_check(FromReader(&text), FromReader(&unet), "float32");
+    generate_and_check(FromReader(&text), FromReader(&unet), "float32", "float32");
 }
 
 // The packed UNet, against the packed golden set. Both planned stages stream their file into GPU buffers when they start,
@@ -100,5 +100,15 @@ fn stages_with_packed_unet_match_pytorch() {
     // The two files, streamed when their stage starts.
     let folder = project_folder().join("weights");
     let (text, unet) = (folder.join("text_encoder.bin"), folder.join("unet_packed.bin"));
-    generate_and_check(StreamedFile(&text), StreamedFile(&unet), "packed");
+    generate_and_check(StreamedFile(&text), StreamedFile(&unet), "float32", "packed");
+}
+
+// The files that the site loads: the 8-bit text encoder and the 8-bit UNet, streamed as the web page does.
+// The golden set holds the text embeddings of the 8-bit text encoder too.
+#[test]
+fn stages_with_packed_text_and_unet_match_pytorch() {
+    // The two files, streamed when their stage starts.
+    let folder = project_folder().join("weights");
+    let (text, unet) = (folder.join("text_encoder_q8.bin"), folder.join("unet_q8.bin"));
+    generate_and_check(StreamedFile(&text), StreamedFile(&unet), "text_encoder_q8_unet_q8", "text_encoder_q8_unet_q8");
 }

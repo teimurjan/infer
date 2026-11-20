@@ -51,8 +51,14 @@ def align(offset: int) -> int:
     return (offset + ALIGNMENT - 1) // ALIGNMENT * ALIGNMENT
 
 
+# The smallest float16 scale of each network. The text encoder's token table has 229 rows of almost zeros. Their scale
+# would round to 0 or to a coarse float16 subnormal, so the value check below fails. The smallest normal float16, 6.1e-5, fixes it.
+# The UNet keeps 0, the rounding that made unet_packed and unet_q8, so those files keep their bytes.
+MIN_SCALE = {"unet": 0.0, "text_encoder": float(np.finfo(np.float16).tiny)}
+
+
 # The stored form of one source tensor. A weight in the plan becomes packed words plus a float16 scale per row.
-def stored_tensors(name: str, tensor: np.ndarray, dtype_name: str, plan: dict[str, int]) -> list[Stored]:
+def stored_tensors(name: str, tensor: np.ndarray, dtype_name: str, plan: dict[str, int], min_scale: float) -> list[Stored]:
     # "conv_in.weight" belongs to the layer "conv_in". Other names, such as biases, are never in the plan.
     layer = name.removesuffix(".weight")
     # Every tensor that is not a planned weight keeps its values, in the chosen dtype.
@@ -62,7 +68,7 @@ def stored_tensors(name: str, tensor: np.ndarray, dtype_name: str, plan: dict[st
     # 4 or 8, from the plan.
     bits = plan[layer]
     # The integers and the scale of each output channel.
-    levels, scale = quantize_rows(tensor, bits)
+    levels, scale = quantize_rows(tensor, bits, min_scale)
     # The packed words keep the PyTorch shape in the index, so the engine knows the layer sizes.
     words = (name, PACKED[bits], list(tensor.shape), pack_rows(levels, bits).astype("<u4").tobytes())
     # One float16 scale per output channel, under the weight name plus "_scale".
@@ -72,7 +78,7 @@ def stored_tensors(name: str, tensor: np.ndarray, dtype_name: str, plan: dict[st
 
 
 # Copy every tensor of one safetensors file into one flat file. Return the index entries and the bytes of each entry.
-def write_flat(source: Path, bin_path: Path, dtype_name: str, plan: dict[str, int]) -> tuple[list[dict], dict[str, int]]:
+def write_flat(source: Path, bin_path: Path, dtype_name: str, plan: dict[str, int], min_scale: float) -> tuple[list[dict], dict[str, int]]:
     # One entry per stored tensor, in file order.
     index = []
     # The byte length of each stored tensor, to find the largest one.
@@ -82,7 +88,7 @@ def write_flat(source: Path, bin_path: Path, dtype_name: str, plan: dict[str, in
         # Sorted names give the same file every run.
         for name in sorted(reader.keys()):
             # One tensor, or the words and the scales of a planned weight.
-            for stored_name, stored_dtype, shape, data in stored_tensors(name, reader.get_tensor(name), dtype_name, plan):
+            for stored_name, stored_dtype, shape, data in stored_tensors(name, reader.get_tensor(name), dtype_name, plan, min_scale):
                 # Write zero bytes until the file position is aligned.
                 writer.write(b"\0" * (align(writer.tell()) - writer.tell()))
                 # Record where this tensor starts, before we write it.
@@ -114,7 +120,7 @@ def check_packed(name: str, source: np.ndarray, words: bytes, scale: bytes, bits
 
 
 # Read every tensor back from the flat file and stop if one byte differs from what the converter meant to write.
-def check_flat(source: Path, bin_path: Path, index: list[dict], dtype_name: str, plan: dict[str, int]) -> None:
+def check_flat(source: Path, bin_path: Path, index: list[dict], dtype_name: str, plan: dict[str, int], min_scale: float) -> None:
     # Map the flat file into memory without reading it all.
     flat = np.memmap(bin_path, dtype=np.uint8, mode="r")
     # Find the offset of each stored tensor by its name.
@@ -126,7 +132,7 @@ def check_flat(source: Path, bin_path: Path, index: list[dict], dtype_name: str,
             # The source values.
             tensor = reader.get_tensor(name)
             # What the converter should have written for this tensor.
-            stored = stored_tensors(name, tensor, dtype_name, plan)
+            stored = stored_tensors(name, tensor, dtype_name, plan, min_scale)
             # The bytes in the file at each stored offset.
             on_disk = [flat[offsets[stored_name] : offsets[stored_name] + len(data)].tobytes() for stored_name, _, _, data in stored]
             # Every byte must be the same.
@@ -152,7 +158,9 @@ def convert(network: str, dtype_name: str, plan: dict[str, int], stem: str | Non
     # The flat file.
     bin_path = OUT_DIR / f"{stem}.bin"
     # Write the flat file.
-    index, sizes = write_flat(source, bin_path, dtype_name, plan)
+    # The smallest scale of this network. Networks without a plan are never rounded, so 0 is fine for them.
+    min_scale = MIN_SCALE.get(network, 0.0)
+    index, sizes = write_flat(source, bin_path, dtype_name, plan, min_scale)
     # Every planned layer must have a weight in the source. A missing one means a wrong plan file.
     missing = sorted(set(plan) - {entry["name"].removesuffix(".weight") for entry in index})
     # Stop with the names.
@@ -163,7 +171,7 @@ def convert(network: str, dtype_name: str, plan: dict[str, int], stem: str | Non
     # Write the index next to the flat file, as one JSON list.
     (OUT_DIR / f"{stem}.json").write_text(f"[\n{lines}\n]\n")
     # Read the flat file back and compare it with the source.
-    check_flat(source, bin_path, index, dtype_name, plan)
+    check_flat(source, bin_path, index, dtype_name, plan, min_scale)
     # The name of the largest tensor. One GPU buffer on the iPhone holds about 1073 MB.
     largest = max(sizes, key=sizes.get)
     # How many weights were packed at each bit width.
@@ -181,8 +189,8 @@ def parse_args() -> tuple[list[str], str, dict[str, int], str | None]:
     parser.add_argument("networks", nargs="*", help=f"any of {', '.join(NETWORKS)}; none means all")
     # float32 is the default, because every kernel reads float32 today.
     parser.add_argument("--dtype", choices=list(DTYPES), default="float32")
-    # A JSON file of layer name to 4 or 8, from quant_plan.py. Only the UNet has a plan.
-    parser.add_argument("--plan", type=Path, help="pack the weights of the UNet layers in this plan, for example quant_plan.json")
+    # A JSON file of layer name to 4 or 8, from quant_plan.py for the UNet or text_plan.py for the text encoder.
+    parser.add_argument("--plan", type=Path, help="pack the weights of the layers in this plan, for example quant/quant_plan.json")
     # The output name without .bin or .json. The browser cache knows a file by its name, so a changed file needs a new name.
     parser.add_argument("--stem", help="the output file name without extension, for example unet_q8; only with one network")
     # Parse the command line.
@@ -193,10 +201,10 @@ def parse_args() -> tuple[list[str], str, dict[str, int], str | None]:
     if unknown:
         # parser.error prints the message and exits.
         parser.error(f"unknown networks: {', '.join(unknown)}")
-    # The plan holds UNet layer names, so it cannot apply to any other network.
-    if args.plan and args.networks != ["unet"]:
+    # A plan holds the layer names of one network, so it cannot apply to two.
+    if args.plan and len(args.networks) != 1:
         # parser.error prints the message and exits.
-        parser.error("--plan works only with the single network unet")
+        parser.error("--plan works only with a single network")
     # Two networks cannot share one output name.
     if args.stem and len(args.networks) != 1:
         # parser.error prints the message and exits.

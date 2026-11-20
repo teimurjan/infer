@@ -31,8 +31,8 @@ WEIGHTS = Path(__file__).parent.parent / "weights"
 # The files that the entry page fetches, from client/pipeline.ts and client/engine.ts.
 # Each weight is a .bin file with the tensors and a .json file that is its index.
 DEMO_FILES = [
-    "text_encoder.bin",
-    "text_encoder.json",
+    "text_encoder_q8.bin",
+    "text_encoder_q8.json",
     "unet_q8.bin",
     "unet_q8.json",
     "taesd.bin",
