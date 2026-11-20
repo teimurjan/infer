@@ -11,9 +11,13 @@ use crate::error::EngineError;
 
 // conv3x3.rs holds the workgroup grid of the packed 3x3 convolution, which differs from the float one.
 mod conv3x3;
+// linear.rs holds the workgroup grid of the packed linear layer, which differs from the float one.
+mod linear;
 
 // The workgroup grid of the packed 3x3 convolution.
 use conv3x3::conv3x3_workgroups;
+// The workgroup grid of the packed linear layer.
+use linear::linear_workgroups;
 // The float layer plans, the binding helpers, and the prepared layer from the parent module.
 use super::{Binding, LayerPlan, LayerShape, PreparedLayer, bind_plan, connect, plan_layer};
 // The one-row layer plan.
@@ -87,8 +91,8 @@ fn plan_packed(shape: &LayerShape, bits: WeightBits) -> Result<PackedPlan, Engin
     let row_words = (row_values * bits.value() as usize).div_ceil(WORD_BITS);
     // The packed kernel, its label and its workgroups, for each layer kind.
     let (label, shader, workgroups) = match shape {
-        // Matrix multiply plus bias. Same grid as the float kernel.
-        LayerShape::Linear(_) => ("linear_packed", LINEAR_SHADER, float_plan.workgroups),
+        // Matrix multiply plus bias. Its own grid, because each invocation takes 8 rows, not 4.
+        LayerShape::Linear(linear) => ("linear_packed", LINEAR_SHADER, linear_workgroups(linear)),
         // 1x1 convolution. Same grid as the float kernel.
         LayerShape::Conv1x1(_) => ("conv1x1_packed", CONV1X1_SHADER, float_plan.workgroups),
         // 3x3 convolution. Its own grid, because its workgroup has another shape.
