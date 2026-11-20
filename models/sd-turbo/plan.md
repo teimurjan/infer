@@ -21,7 +21,7 @@ Every number below is from `PROGRESS.md`. Each step ends with a measurement on t
 - Do: the user runs `generate.html?unet=unet_q8` with "Make 20" on the iPhone. If all 20 images finish, `unet_q8` becomes the default on all pages. A golden set for it is made, and the benchmark runs again.
 - Done when: the iPhone benchmark shows 10 of 10 with the 8-bit UNet.
 
-### 2. Small text encoder, and both models stay loaded
+### 2. Small text encoder, and both models stay loaded (8-bit text encoder done: 342.1 MB, peak 344.9 MB; both models loaded: not done)
 
 - Why: the engine loads its weights again for every image. On the iPhone, this takes about 1.0 s to 1.2 s for the text encoder and 0.4 s to 0.6 s for the UNet. The warm image takes 5.64 s. The float32 text encoder is 1364.7 MB at its peak, the largest stage. It does not fit next to the UNet.
 - Do: pack the text encoder at 8 bits (about 340 MB), with the same sensitivity and image test as the UNet. Then keep the text encoder and the UNet on the GPU for the whole page.

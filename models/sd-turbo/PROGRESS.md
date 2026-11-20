@@ -5194,3 +5194,175 @@ What the grid shows, checked by the agent on rows 1 (the fisherman, the worst LP
 Not measured on the iPhone. This step changes no engine code.
 
 Conclusion: an 8-bit text encoder changes the images much less than the 8-bit UNet that ships now. A float16 text encoder changes them almost not at all. Next step, if the user agrees: an 8-bit text encoder file, and the engine runs it with the packed linear kernel. The token table needs a kernel that unpacks the 77 rows of a prompt.
+
+## 2026-11-20: Step 2 of the plan, part 2: the 8-bit text encoder in the engine, on the iPhone, and on Hugging Face
+
+The user agreed to the 8-bit text encoder after part 1, and asked to upload the new weights before the commit and the push.
+
+Files added:
+
+- `python/text_plan.py`: writes `quant/text_plan_8bit.json`, every matrix of the text encoder at 8 bits: the 138 linear layers and the token table, 139 layers. The position table, the layer norms and the biases stay float32.
+- `quant/text_plan_8bit.json`: that plan.
+- `engine/src/text/token_rows_packed.wgsl`: unpacks the 77 rows of the prompt's tokens from the packed token table into the embeddings slot, one invocation per value.
+- `engine/src/text/token_rows.rs`: `PackedTokenRows`, the binding of that kernel. Each run writes the 77 ids into a small buffer, then submits the kernel.
+- `golden/text_encoder_q8_unet_q8/`: the golden set of the two packed files, with the text embeddings. Git ignores `golden/`.
+
+Files changed:
+
+- `python/convert_weights.py`: `--plan` works for any single network, not only the UNet. `MIN_SCALE` gives each network its smallest float16 scale (see below).
+- `python/pack_weights.py`: `quantize_rows` takes `min_scale`, 0 by default. `read_packed_file` reads float32 tensors too, through `INDEX_FLOATS`.
+- `python/dump_packed_golden.py`: a second name, for example `text_encoder_q8`, makes the UNet read the text embeddings of that packed file, and the set holds them as `text_encoder`.
+- `engine/src/text/mod.rs`: `TokenRows` picks how a run writes the token rows: buffer copies from a float32 table, or the kernel of a packed table. `prepare_loaded` decides by the table's type.
+- `engine/src/text/embed.rs`: `check_ids` holds the checks of the 77 ids, for both paths.
+- `engine/tests/pipeline.rs`: the test `stages_with_packed_text_and_unet_match_pytorch` streams `text_encoder_q8` and `unet_q8`. `generate_and_check` takes the golden set of the text embeddings.
+- `engine/examples/generate.rs`: `--q8` streams the two files of the site.
+- `client/pipeline.ts`: `TEXT_FILE` is `text_encoder_q8`. `client/tests/images.ts`: the golden set is `text_encoder_q8_unet_q8`. `client/entry.ts`: the part is "text encoder, 8-bit", with the iPhone times of this entry.
+- `python/upload_weights.py`: the demo files have `text_encoder_q8` in place of `text_encoder`.
+
+Design choices:
+
+- The linear layers of the text encoder need no new kernel. `bind_rows_linear` already picks the packed kernel when the weight file holds a packed matrix.
+- The token table is read by row, not multiplied, so it needs its own kernel. The float32 path keeps its 77 buffer copies.
+- An 8-bit integer times a float16 scale needs at most 7 + 11 bits, so the unpacked rows are exact in f32, and they equal the weights of the PyTorch golden run.
+- The other tensors of the file stay float32, as the 20-image test of part 1 measured.
+
+Failed first: `uv run python/convert_weights.py text_encoder --plan quant/text_plan_8bit.json --stem text_encoder_q8` stopped with `RuntimeError: text_model.embeddings.token_embedding.weight: a packed value is inf steps from its source value`. A check of the token table showed `zero rows 0 min row max 1.6081378e-11 tiny rows 229`: 229 rows have a largest value below 1e-4, so their scale rounds to 0 in float16. A floor at the smallest float16 subnormal then failed with `a packed value is 5.7503662109375 steps from its source value`, because subnormal scales are too coarse. A floor at the smallest normal float16 (6.1e-5) passed for the text encoder, but it changed `unet_q8`: a rebuild as `unet_q8_check` gave md5 `abaa1258a923e4b6dd7bdf4bbb9ff560`, not `90cce6d22e488f3aa5f37bcf3928ee3c`. So the floor is per network: `MIN_SCALE` is 0 for the UNet and 6.1e-5 for the text encoder.
+
+Check that the UNet file keeps its bytes: `uv run python/convert_weights.py unet --plan quant/quant_plan_8bit.json --dtype float16 --stem unet_q8_check`, then `md5 -q` of both files. Device: Mac. The `.bin` and the `.json` gave `90cce6d22e488f3aa5f37bcf3928ee3c` and `2d5aba0ab5d6549d6e6741a97f9bce3c`, the same as `unet_q8`.
+
+Commands, in the model folder. Device: Mac, Python through `uv run`, CPU.
+
+```
+quant/text_plan_8bit.json: 139 layers at 8 bits, from text_model.embeddings.token_embedding to text_model.encoder.layers.9.self_attn.v_proj
+text_encoder_q8: 511 tensors, 342071808 bytes, float32, packed 0 int4, 139 int8, largest text_model.embeddings.token_embedding.weight 50593792 bytes, read back equal
+```
+
+`uv run python/dump_packed_golden.py unet_q8 text_encoder_q8` (only these lines kept). The first run failed with `RuntimeError: text_encoder_q8 does not match CLIPTextModel: missing ['embeddings.position_embedding.weight', ...]`: this transformers version names the keys without `text_model.`. The script now drops that prefix from a name that the model does not know.
+
+```
+text_encoder: packed vs float32 weights largest difference 1.348e-01
+unet_output: packed vs float32 weights largest difference 1.045e-01
+golden/text_encoder_q8_unet_q8:
+  text_encoder     shape=(1, 77, 1024) dtype=float32
+  taesd_image      shape=(1, 3, 512, 512) dtype=float32
+```
+
+The agent put the cat of `golden/unet_q8` and of `golden/text_encoder_q8_unet_q8` side by side. They show the same cat, with the same pose, fur and table.
+
+Command: `cargo test --release --test pipeline -- --nocapture`. Device: Mac native. The new test (only these lines kept):
+
+```
+Prepared { stage: TextEncoder, planned_activations: Some(2523136), planned_peak: Some(344917684), live: 344602292 }
+Ran { stage: TextEncoder, measured_peak: 344917684, seconds: 0.135711041 }
+text_encoder: largest difference from PyTorch (text_encoder_q8_unet_q8) 2.670288e-5
+unet_output: largest difference from PyTorch (text_encoder_q8_unet_q8) 9.059906e-6
+final_latent: largest difference from PyTorch (text_encoder_q8_unet_q8) 1.335144e-4
+taesd_image: largest difference from PyTorch (text_encoder_q8_unet_q8) 4.492998e-4
+image bytes: 1148 of 1048576 differ, by at most 1
+test stages_with_packed_text_and_unet_match_pytorch ... ok
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 5.89s
+```
+
+Deliberate-bug check: `[row % 2u]` became `[(row + 1u) % 2u]` in `token_rows_packed.wgsl`, so each row reads the scale of its neighbor row. Command: `cargo test --release --test pipeline stages_with_packed_text`. Device: Mac native.
+
+```
+text_encoder: 8.347024e-1 is above 5e-5
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.65s
+```
+
+The bug was then removed. `cargo test --release` gave 14 `test result: ok` lines, 0 failed. `bun run typecheck` and `bun run build` passed in every workspace.
+
+Mac Chromium: the dev pages in Playwright Chromium, as in "Step 3 of the plan". Golden image (only these lines kept):
+
+```
+golden-image: text_encoder_q8: 511 tensors in 511 GPU buffers, 342071808 bytes, largest buffer 50593792 bytes; from network in 1.22 s
+text_encoder: ran in 0.36 s; measured peak 344917684 bytes (344.9 MB)
+unet: ran in 1.25 s; measured peak 974233200 bytes (974.2 MB)
+taesd: ran in 0.22 s; measured peak 201474352 bytes (201.5 MB)
+golden-image: PASSED: image bytes: 1178 of 1048576 differ from golden/text_encoder_q8_unet_q8/taesd_image, by at most 1
+```
+
+Make 20 (only these lines kept):
+
+```
+make-20: image 1 of 20: 2.42 s; longest submit 35.9 ms; live 0 bytes; WASM memory 25886720 bytes; 1178 image bytes differ, by at most 1
+make-20: image 2 of 20: 2.53 s; longest submit 36.1 ms; live 0 bytes; WASM memory 25886720 bytes; 1178 image bytes differ, by at most 1
+make-20: image 20 of 20: 2.35 s; longest submit 36.0 ms; live 0 bytes; WASM memory 25886720 bytes; 1178 image bytes differ, by at most 1
+[done] 20 images in 49.34 s true
+```
+
+iPhone. The first tries failed: `FAILED: no iPhone is connected: plug it in with a cable, unlock it, and tap Trust` (devicectl showed `unavailable`, then `available (paired)`), then `FAILED: Could not create a session: Some devices were found, but could not be used:`. The next run worked.
+
+Command: `bun run phone sd-turbo:golden-image --timeout 12`. Device: iPhone. Events: `runs/20261120083709-sd-turbo-dev-test-golden-image-29ry.jsonl`.
+
+```
+  39.5 s  golden-image: text_encoder_q8: 511 tensors in 511 GPU buffers, 342071808 bytes, largest buffer 50593792 bytes; from network in 38.73 s
+text_encoder: ran in 0.45 s; measured peak 344917684 bytes (344.9 MB)
+unet: ran in 2.33 s; measured peak 974233200 bytes (974.2 MB)
+taesd: ran in 0.46 s; measured peak 201474352 bytes (201.5 MB)
+ 136.3 s  PASSED: image bytes: 1122 of 1048576 differ from golden/text_encoder_q8_unet_q8/taesd_image, by at most 1
+```
+
+Command: `bun run phone sd-turbo:make-20 --timeout 25`. Device: iPhone. Events: `runs/20261120083931-sd-turbo-dev-test-make-20-odt8.jsonl`.
+
+```
+make-20: image 1 of 20: 111.95 s; longest submit 73.0 ms; live 0 bytes; WASM memory 25362432 bytes; 1122 image bytes differ, by at most 1
+make-20: image 2 of 20: 4.88 s; longest submit 74.0 ms; live 0 bytes; WASM memory 25362432 bytes; 1122 image bytes differ, by at most 1
+make-20: image 3 of 20: 4.87 s; longest submit 79.0 ms; live 0 bytes; WASM memory 25362432 bytes; 1122 image bytes differ, by at most 1
+make-20: image 4 of 20: 4.77 s; longest submit 82.0 ms; live 0 bytes; WASM memory 25362432 bytes; 1122 image bytes differ, by at most 1
+make-20: image 5 of 20: 4.91 s; longest submit 85.0 ms; live 0 bytes; WASM memory 25362432 bytes; 1122 image bytes differ, by at most 1
+make-20: image 6 of 20: 4.88 s; longest submit 87.0 ms; live 0 bytes; WASM memory 25362432 bytes; 1122 image bytes differ, by at most 1
+make-20: image 7 of 20: 5.29 s; longest submit 88.0 ms; live 0 bytes; WASM memory 25362432 bytes; 1122 image bytes differ, by at most 1
+make-20: image 8 of 20: 5.11 s; longest submit 89.0 ms; live 0 bytes; WASM memory 25362432 bytes; 1122 image bytes differ, by at most 1
+make-20: image 9 of 20: 5.57 s; longest submit 102.0 ms; live 0 bytes; WASM memory 25362432 bytes; 1122 image bytes differ, by at most 1
+make-20: image 10 of 20: 5.76 s; longest submit 112.0 ms; live 0 bytes; WASM memory 25362432 bytes; 1122 image bytes differ, by at most 1
+make-20: image 11 of 20: 5.81 s; longest submit 119.0 ms; live 0 bytes; WASM memory 25362432 bytes; 1122 image bytes differ, by at most 1
+make-20: image 12 of 20: 5.99 s; longest submit 131.0 ms; live 0 bytes; WASM memory 25362432 bytes; 1122 image bytes differ, by at most 1
+make-20: image 13 of 20: 6.21 s; longest submit 131.0 ms; live 0 bytes; WASM memory 25362432 bytes; 1122 image bytes differ, by at most 1
+make-20: image 14 of 20: 6.35 s; longest submit 120.0 ms; live 0 bytes; WASM memory 25362432 bytes; 1122 image bytes differ, by at most 1
+make-20: image 15 of 20: 5.58 s; longest submit 107.0 ms; live 0 bytes; WASM memory 25362432 bytes; 1122 image bytes differ, by at most 1
+make-20: image 16 of 20: 5.96 s; longest submit 116.0 ms; live 0 bytes; WASM memory 25362432 bytes; 1122 image bytes differ, by at most 1
+make-20: image 17 of 20: 6.15 s; longest submit 112.0 ms; live 0 bytes; WASM memory 25362432 bytes; 1122 image bytes differ, by at most 1
+make-20: image 18 of 20: 6.12 s; longest submit 106.0 ms; live 0 bytes; WASM memory 25362432 bytes; 1122 image bytes differ, by at most 1
+make-20: image 19 of 20: 5.46 s; longest submit 111.0 ms; live 0 bytes; WASM memory 25362432 bytes; 1122 image bytes differ, by at most 1
+make-20: image 20 of 20: 5.91 s; longest submit 122.0 ms; live 0 bytes; WASM memory 25362432 bytes; 1122 image bytes differ, by at most 1
+make-20: PASSED: 20 images in 217.64 s
+```
+
+Upload. Command: `uv run python/upload_weights.py teimurjan/infer-sd-turbo`. Device: Mac native. It ran about 40 minutes. The hf_xet log showed `predicted bandwidth = 220578` bytes per second.
+
+```
+text_encoder_q8.bin: 342.1 MB
+text_encoder_q8.json: 0.1 MB
+unet_q8.bin: 866.2 MB
+unet_q8.json: 0.1 MB
+taesd.bin: 9.8 MB
+taesd.json: 0.0 MB
+tokenizer_vocab.json: 1.1 MB
+tokenizer_merges.txt: 0.5 MB
+total: 1219.8 MB in 8 files
+uploaded. base URL: https://huggingface.co/teimurjan/infer-sd-turbo/resolve/main/
+```
+
+Check with `HfApi().model_info("teimurjan/infer-sd-turbo", files_metadata=True)`:
+
+```
+commit eb09c74f3b310cc507a645857a8ebf7317bbdf21
+text_encoder_q8.bin 342071808
+text_encoder_q8.json 62317
+hub d01c1a1d09239322eed2fc2d7c573ac52b682e34a2fd0668486bccb2749a2ca3
+local d01c1a1d09239322eed2fc2d7c573ac52b682e34a2fd0668486bccb2749a2ca3
+```
+
+The sizes and the SHA-256 of the uploaded file equal the local file. The old `text_encoder.bin` stays in the repository, so the deployed site of the old commit still works. `apps/site/deploy.ts` now reads the weights at commit `eb09c74f3b310cc507a645857a8ebf7317bbdf21`. The root log has an entry for that change.
+
+Calculations:
+
+- Download of the demo: 2239.3 MB before, 1219.8 MB now, 1019.5 MB less (45.5%).
+- Text stage peak: 1364394704 before, 344917684 now, 1019476020 bytes less. The largest stage is now the UNet, 974.2 MB, which is 50.7% of the 1920 MB tab budget.
+- iPhone stage times against the step 5 golden image run: text encoder 0.40 s then 0.45 s, UNet 2.14 s then 2.33 s, TAESD 0.51 s then 0.46 s. These runs differ by up to 0.2 s from run to run, so this step does not change the stage times. It does not change the kernels either.
+- iPhone Make 20, images 2 to 20: (4.88 + 4.87 + ... + 5.91) / 19 = 5.56 s, against 5.74 s in "Make 20 on the iPhone after steps 3 and 4". Longest submit 131 ms, 52% of the 250 ms limit. Image 20 is 5.91 / 4.88 = 1.21 times slower than image 2.
+
+Not done: the text encoder and the UNet do not yet stay on the GPU between images. That is the second half of step 2. Both now fit together: 344.9 + 974.2 = 1319.1 MB, below the 1920 MB tab budget, but this is not measured.
+
+Conclusion: the site loads 1019.5 MB less, and the largest memory peak is 974.2 MB. Next step: keep both models on the GPU for the whole page, so a warm image skips the two weight loads.

@@ -630,3 +630,13 @@ https: 200 verify=0
 Second, the system resolver of the Mac still answers that the name does not exist, while `dig` finds it. `curl https://infer.teimurjan.dev/sd-turbo/` printed `Could not resolve host: infer.teimurjan.dev`. The likely reason is a cached "no such name" answer from a visit before the CNAME existed. The SOA of `teimurjan.dev` keeps such an answer for up to 3601 s (`... 604800 3601`). The fix is to flush the DNS cache of the Mac, or to wait one hour.
 
 No browser has made an image on the deployed site yet. Not measured on the iPhone.
+
+## 2026-11-20: The deploy reads the weights of the 8-bit text encoder
+
+The full entry is "2026-11-20: Step 2 of the plan, part 2: the 8-bit text encoder in the engine, on the iPhone, and on Hugging Face" in `models/sd-turbo/PROGRESS.md`.
+
+Files changed:
+
+- `apps/site/deploy.ts`: `WEIGHTS_URL` reads the Hugging Face commit `eb09c74f3b310cc507a645857a8ebf7317bbdf21`, which has `text_encoder_q8`. The old commit `ad104bd1d8a5dea36cdec628db65e0deb6cf13b0` stays readable, so a site that was deployed before this change still works.
+
+The deploy has not run. Not measured on the iPhone through the deployed site.
