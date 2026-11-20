@@ -16,8 +16,9 @@ models/*/golden/
 # Test tensors. The make_*.py scripts in each engine/testdata folder make them again with `uv run`.
 models/*/engine/testdata/**/*.bin
 models/*/engine/testdata/**/*.safetensors
-# Images of quantization evaluations. python/quant_eval.py makes them again.
+# Images of quantization evaluations. python/quant_eval.py and python/text_quant_eval.py make them again.
 models/*/quant/quant_eval/
+models/*/quant/text_quant_eval/
 
 # Run events that the test pages send to the server.
 runs/

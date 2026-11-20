@@ -1,0 +1,27 @@
+text encoder file: float32 1361.6 MB, float16 680.8 MB, 8-bit 342.1 MB
+float16 embeddings: largest difference 3.4167e-02, rms difference 2.0159e-03 of the float32 rms
+8-bit embeddings: largest difference 2.0843e-01, rms difference 2.3566e-02 of the float32 rms
+image       float16 PSNR     float16 LPIPS         8-bit PSNR       8-bit LPIPS  prompt
+    0              53.23            0.0004              37.75            0.0090  a photo of a cat sitting on a wooden table
+    1              51.22            0.0004              31.22            0.0233  a portrait of an old fisherman with a grey beard, natural light
+    2              52.87            0.0002              39.13            0.0021  a red sports car parked on a wet city street at night
+    3              49.03            0.0005              41.99            0.0020  a bowl of ramen with an egg and green onions, top view
+    4              48.57            0.0005              43.55            0.0017  a snowy mountain lake at sunrise, reflections on the water
+    5              53.37            0.0003              44.97            0.0024  a golden retriever puppy running on green grass
+    6              49.40            0.0004              35.42            0.0074  a cozy living room with a fireplace and bookshelves
+    7              54.06            0.0003              41.64            0.0025  a watercolor painting of a lighthouse on a cliff
+    8              52.74            0.0003              40.57            0.0033  a close-up photo of a hummingbird drinking from a flower
+    9              47.69            0.0005              33.62            0.0124  a busy market street in Marrakech with colorful spices
+   10              47.97            0.0005              39.23            0.0036  a futuristic city skyline with flying cars, digital art
+   11              47.90            0.0006              37.74            0.0040  a sign that says OPEN on a coffee shop door
+   12              49.27            0.0003              38.36            0.0034  a pile of fresh oranges and lemons in a wooden crate
+   13              49.57            0.0006              36.11            0.0099  an astronaut riding a horse on the moon
+   14              48.18            0.0005              32.47            0.0128  a young woman reading a book in a sunny cafe
+   15              51.54            0.0005              40.69            0.0048  a pencil sketch of an owl on a branch
+   16              49.55            0.0004              40.06            0.0023  a tropical beach with palm trees and turquoise water
+   17              50.05            0.0003              38.03            0.0040  a plate of chocolate chip cookies next to a glass of milk
+   18              55.51            0.0006              47.97            0.0024  an old castle in the fog, oil painting
+   19              51.41            0.0002              43.74            0.0012  a macro photo of dew drops on a spider web
+ mean              50.66            0.0004              39.21            0.0057
+worst              47.69            0.0006              31.22            0.0233
+wrote quant/text_quant_eval/grid.png
