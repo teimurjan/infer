@@ -15,7 +15,7 @@ pub(crate) use forward::{DOWN_LAYERS, DOWN_NAMES, LEVEL_CHANNELS, UP_NAMES};
 
 // The activation plan of one UNet run, for the report.
 pub struct ActivationPlan {
-    // Every tensor of the forward pass, scratch included.
+    // Every tensor of the forward pass.
     pub tensors: usize,
     // Every op of the forward pass.
     pub ops: usize,

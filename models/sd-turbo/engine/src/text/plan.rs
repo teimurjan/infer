@@ -6,8 +6,6 @@ use crate::plan::{Graph, MemoryPlan, assign_slots};
 pub(crate) const TOKENS: u32 = 77;
 // Values per token (hidden_size).
 pub(crate) const WIDTH: u32 = 1024;
-// Attention heads (num_attention_heads). 1024 / 16 = 64 values per head.
-const HEADS: u32 = 16;
 // Encoder layers (num_hidden_layers).
 pub(crate) const LAYERS: usize = 23;
 // The width of the MLP (intermediate_size).
@@ -38,8 +36,8 @@ fn text_graph() -> Graph {
         // layer_norm1, then q, k and v with bias.
         let norm1 = graph.op(format!("{prefix}.layer_norm1"), &[hidden], rows);
         let [query, key, value] = ["q_proj", "k_proj", "v_proj"].map(|part| graph.op(format!("{prefix}.self_attn.{part}"), &[norm1], rows));
-        // Causal self attention, with its scores scratch of [heads][keys][rows]. 77 rows fit one chunk.
-        let mixed = graph.op_with_scratch(format!("{prefix}.self_attn.attention"), &[query, key, value], rows, [HEADS, TOKENS, TOKENS]);
+        // Causal self attention. It keeps its scores in workgroup memory, so it needs no scratch tensor.
+        let mixed = graph.op(format!("{prefix}.self_attn.attention"), &[query, key, value], rows);
         // out_proj, then add it into the stream.
         let attention = graph.op(format!("{prefix}.self_attn.out_proj"), &[mixed], rows);
         graph.update(hidden, &[attention]);

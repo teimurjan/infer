@@ -1,15 +1,12 @@
 // The graph that records the ops.
 use crate::plan::{Graph, TensorId};
 
-// Query rows per attention dispatch. The attention kernel puts the scores of one chunk into a scratch buffer
-// of heads x key_tokens x chunk values. 256 is the chunk that ran on the iPhone in 145.0 ms per submit ("Attention on the iPhone").
-const CHUNK_ROWS: u32 = 256;
 // The feed-forward layer is 4 times wider than the block (GEGLU, mult=4 in diffusers).
 const FEED_FORWARD_FACTOR: u32 = 4;
 
 // One Transformer2DModel with use_linear_projection=True and one BasicTransformerBlock, as the ops that the engine will run.
 // `text` is the text encoder output, [77, 1024, 1]. Returns the output, the same size as `input`.
-pub(super) fn transformer(graph: &mut Graph, prefix: &str, input: TensorId, text: TensorId, heads: u32) -> TensorId {
+pub(super) fn transformer(graph: &mut Graph, prefix: &str, input: TensorId, text: TensorId) -> TensorId {
     // The input size.
     let [channels, height, width] = graph.dims(input);
     // Every pixel is one token.
@@ -21,9 +18,9 @@ pub(super) fn transformer(graph: &mut Graph, prefix: &str, input: TensorId, text
     // The one block of this transformer.
     let block = format!("{prefix}.transformer_blocks.0");
     // Self attention: keys and values come from the block itself.
-    attention(graph, &block, 1, hidden, None, heads);
+    attention(graph, &block, 1, hidden, None);
     // Cross attention: keys and values come from the text.
-    attention(graph, &block, 2, hidden, Some(text), heads);
+    attention(graph, &block, 2, hidden, Some(text));
     // The feed-forward part.
     feed_forward(graph, &block, hidden);
     // proj_out: a linear layer on each token row.
@@ -33,11 +30,11 @@ pub(super) fn transformer(graph: &mut Graph, prefix: &str, input: TensorId, text
 }
 
 // LayerNorm, then attention `number` (1 or 2) of the block, then add the result into `hidden` in place.
-fn attention(graph: &mut Graph, block: &str, number: u32, hidden: TensorId, text: Option<TensorId>, heads: u32) {
+fn attention(graph: &mut Graph, block: &str, number: u32, hidden: TensorId, text: Option<TensorId>) {
     // [tokens, channels, 1].
     let rows = graph.dims(hidden);
-    // The token count and the channel count.
-    let [tokens, channels, _] = rows;
+    // The channel count.
+    let [_, channels, _] = rows;
     // norm1 before attn1, norm2 before attn2.
     let norm = graph.op(format!("{block}.norm{number}"), &[hidden], rows);
     // For example "...transformer_blocks.0.attn1".
@@ -51,10 +48,8 @@ fn attention(graph: &mut Graph, block: &str, number: u32, hidden: TensorId, text
     // to_k and to_v: linear layers without bias, to the channel count of the block.
     let key = graph.op(format!("{name}.to_k"), &[source], [key_tokens, channels, 1]);
     let value = graph.op(format!("{name}.to_v"), &[source], [key_tokens, channels, 1]);
-    // A chunk is never larger than the query count.
-    let chunk = CHUNK_ROWS.min(tokens);
-    // The attention kernel, with its scores scratch of [heads][key_tokens][chunk].
-    let mixed = graph.op_with_scratch(format!("{name}.attention"), &[query, key, value], rows, [heads, key_tokens, chunk]);
+    // The attention kernel. It keeps its scores in workgroup memory, so it needs no scratch tensor.
+    let mixed = graph.op(format!("{name}.attention"), &[query, key, value], rows);
     // to_out.0: a linear layer with bias.
     let output = graph.op(format!("{name}.to_out.0"), &[mixed], rows);
     // Add it into the block, in place.

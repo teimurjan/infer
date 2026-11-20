@@ -8,8 +8,6 @@ use super::transformer::transformer;
 // The numbers below come from unet/config.json of stabilityai/sd-turbo.
 // Channels of the four levels (block_out_channels).
 pub(crate) const LEVEL_CHANNELS: [u32; 4] = [320, 640, 1280, 1280];
-// Attention heads of the four levels. diffusers calls this attention_head_dim, but for SD 2 it is the head count.
-const LEVEL_HEADS: [u32; 4] = [5, 10, 20, 20];
 // ResNet blocks per down level (layers_per_block). An up level has one more.
 pub(crate) const DOWN_LAYERS: usize = 2;
 // The input has 4 latent channels at 64 x 64 (in_channels, sample_size).
@@ -98,7 +96,7 @@ fn down_path(graph: &mut Graph, conv_in: TensorId, time: TensorId, text: TensorI
             hidden = resnet(graph, &format!("{prefix}.resnets.{layer}"), hidden, time, channels);
             // The transformer, except on the last level.
             if !last {
-                hidden = transformer(graph, &format!("{prefix}.attentions.{layer}"), hidden, text, LEVEL_HEADS[level]);
+                hidden = transformer(graph, &format!("{prefix}.attentions.{layer}"), hidden, text);
             }
             // The up path reads this tensor later.
             skips.push(hidden);
@@ -121,12 +119,12 @@ fn down_path(graph: &mut Graph, conv_in: TensorId, time: TensorId, text: TensorI
 
 // UNetMidBlock2DCrossAttn: ResNet, transformer, ResNet, at 1280 channels.
 fn mid_block(graph: &mut Graph, input: TensorId, time: TensorId, text: TensorId) -> TensorId {
-    // The channels and heads of the last level.
-    let (channels, heads) = (LEVEL_CHANNELS[3], LEVEL_HEADS[3]);
+    // The channels of the last level.
+    let channels = LEVEL_CHANNELS[3];
     // The first ResNet block.
     let hidden = resnet(graph, "mid_block.resnets.0", input, time, channels);
     // The transformer.
-    let hidden = transformer(graph, "mid_block.attentions.0", hidden, text, heads);
+    let hidden = transformer(graph, "mid_block.attentions.0", hidden, text);
     // The second ResNet block.
     resnet(graph, "mid_block.resnets.1", hidden, time, channels)
 }
@@ -155,7 +153,7 @@ fn up_path(graph: &mut Graph, input: TensorId, skips: &[TensorId], time: TensorI
             hidden = resnet(graph, &resnet_name, joined, time, LEVEL_CHANNELS[down_level]);
             // Up level 0 (UpBlock2D) has no attention. The others do.
             if level > 0 {
-                hidden = transformer(graph, &format!("{prefix}.attentions.{layer}"), hidden, text, LEVEL_HEADS[down_level]);
+                hidden = transformer(graph, &format!("{prefix}.attentions.{layer}"), hidden, text);
             }
         }
         // Levels 0 to 2 end with a 2x nearest upsample and a 3x3 convolution.

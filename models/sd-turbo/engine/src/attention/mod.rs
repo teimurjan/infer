@@ -79,7 +79,7 @@ pub(crate) struct PreparedAttention {
     dispatches: Vec<Dispatch>,
     // The buffer the kernel writes.
     output: GpuBuffer,
-    // The query, key, value, scores and chunk buffers. We keep them, because the browser frees a buffer when Rust drops it.
+    // The query, key, value and chunk buffers. We keep them, because the browser frees a buffer when Rust drops it.
     _buffers: Vec<GpuBuffer>,
 }
 
@@ -109,24 +109,16 @@ pub(crate) fn prepare_attention(gpu: &Gpu, shape: &AttentionShape, chunk_rows: u
     if shape.head_size != HEAD_SIZE {
         return Err(EngineError::HeadSize { value: shape.head_size, supported: HEAD_SIZE });
     }
-    // A chunk larger than the queries would only waste scratch memory.
+    // A chunk is never larger than the query count.
     let chunk_rows = chunk_rows.min(query_tokens);
     // Each tensor must have one row per token.
     check_length("query", tensors.query, query_tokens as usize * shape.channels())?;
     check_length("key", tensors.key, key_tokens as usize * shape.channels())?;
     check_length("value", tensors.value, key_tokens as usize * shape.channels())?;
-    // The scratch holds the scores of one chunk for all heads.
-    let scores_values = chunk_rows as usize * key_tokens as usize * heads as usize;
-    // One binding must cover all of it.
-    let scores_bytes = scores_values as u64 * F32_BYTES;
-    if scores_bytes > gpu.max_storage_binding_bytes() {
-        return Err(EngineError::ScoresTooLarge { bytes: scores_bytes, max: gpu.max_storage_binding_bytes() });
-    }
-    // The tensors go to @binding(1) to @binding(3), the scratch to @binding(4), the output to @binding(5).
+    // The tensors go to @binding(1) to @binding(3), the output to @binding(4).
     let query = gpu.storage_buffer_from("attention query", tensors.query, MemoryCategory::Activations);
     let key = gpu.storage_buffer_from("attention key", tensors.key, MemoryCategory::Activations);
     let value = gpu.storage_buffer_from("attention value", tensors.value, MemoryCategory::Activations);
-    let scores = gpu.empty_storage_buffer("attention scores", scores_values);
     let output = gpu.empty_storage_buffer("attention output", tensors.query.len());
     // Compile once. Every chunk uses the same pipeline with its own sizes.
     let pipeline = compute_pipeline(gpu, "attention", SHADER);
@@ -135,14 +127,14 @@ pub(crate) fn prepare_attention(gpu: &Gpu, shape: &AttentionShape, chunk_rows: u
         .map(|(start, rows)| {
             // The field order of the Shape struct in attention.wgsl.
             // The last 0 turns the causal mask off: these test cases are the UNet attentions.
-            let sizes = gpu.uniform_buffer("attention chunk", &[key_tokens, heads, chunk_rows, start, rows, 0]);
+            let sizes = gpu.uniform_buffer("attention chunk", &[key_tokens, heads, start, rows, 0]);
             // x covers the rows of the chunk, 16 per workgroup. y picks the head.
             let workgroups = [rows.div_ceil(ROWS_PER_WORKGROUP), heads, 1];
             // The query and output rows of the chunk, and every key and value, as in slots.rs.
             let channels = shape.channels() as u64;
             let work = Work::f32_values("attention", 2 * u64::from(rows) * channels + 2 * u64::from(key_tokens) * channels);
             // Connect the buffers in binding order.
-            let dispatch = Dispatch::with_pipeline(gpu, "attention", &pipeline, &[&sizes, &query, &key, &value, &scores, &output], workgroups, work)?;
+            let dispatch = Dispatch::with_pipeline(gpu, "attention", &pipeline, &[&sizes, &query, &key, &value, &output], workgroups, work)?;
             // Keep the sizes buffer with its dispatch.
             Ok((dispatch, sizes))
         })
@@ -152,7 +144,7 @@ pub(crate) fn prepare_attention(gpu: &Gpu, shape: &AttentionShape, chunk_rows: u
         .into_iter()
         .unzip();
     // Keep every buffer alive as long as the dispatches.
-    let buffers = [query, key, value, scores].into_iter().chain(chunk_buffers).collect();
+    let buffers = [query, key, value].into_iter().chain(chunk_buffers).collect();
     // Everything together.
     Ok(PreparedAttention { dispatches, output, _buffers: buffers })
 }

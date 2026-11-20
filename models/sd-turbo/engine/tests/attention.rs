@@ -9,7 +9,7 @@ use engine::{AttentionCase, AttentionTensors, Gpu, check_attention, f32_from_le_
 // The largest error we accept. Each output is an average of value rows near -3..3, so f32 rounding stays near 1e-6.
 // 1e-4 leaves room and still catches a wrong index or a wrong softmax.
 const TOLERANCE: f32 = 1e-4;
-// The chunk size for the main runs: 256 rows. The scores of one chunk are 256 x 4096 x 5 x 4 bytes = 21 MB.
+// The chunk size for the main runs: 256 rows, as in the UNet.
 const CHUNK_ROWS: u32 = 256;
 // A chunk size that does not divide 4096 or 64, so the last chunk and the last workgroup are partly empty.
 const UNEVEN_CHUNK_ROWS: u32 = 1000;

@@ -27,8 +27,6 @@ pub enum EngineError {
     ZeroStride,
     // Attention keeps one query row of one head in registers, so the head size is fixed.
     HeadSize { value: u32, supported: u32 },
-    // The scores of one chunk do not fit into one storage buffer binding. A smaller chunk fixes it.
-    ScoresTooLarge { bytes: u64, max: u64 },
     // A dispatch needs more workgroups along one axis than the GPU allows.
     TooManyWorkgroups { workgroups: u32, max: u32 },
     // No test case has this name.
@@ -104,7 +102,6 @@ impl fmt::Display for EngineError {
             // Show the size we got and the one we support.
             Self::HeadSize { value, supported } => write!(formatter, "head size is {value}, the attention kernel supports only {supported}"),
             // Show both sizes and the fix.
-            Self::ScoresTooLarge { bytes, max } => write!(formatter, "the scores of one chunk need {bytes} bytes, one binding can hold {max}, use a smaller chunk"),
             // Show the count and the limit.
             Self::TooManyWorkgroups { workgroups, max } => write!(formatter, "{workgroups} workgroups along one axis, the limit is {max}"),
             // Show the name.

@@ -3,20 +3,22 @@
 // The tensors use the layout of the SD-Turbo UNet before it splits the heads: [tokens][heads * 64].
 // Head h owns values h * 64 to h * 64 + 63 of every row.
 // Self attention has as many keys as queries. Cross attention has other keys, for example 77 text tokens.
-// The scores of the chunk go to a scratch buffer of [heads][key_tokens][chunk_rows] values,
-// so memory grows with the chunk size, not with query_tokens x key_tokens.
+// The kernel walks over the keys in tiles of 16, with an "online softmax": a running maximum and a running total.
+// The scores live only in workgroup memory for one tile, so they never go to the storage buffers.
 
 // One head has 64 values, which is 16 vec4. Rust's HEAD_SIZE must be 64.
 const HEAD_VEC4S: u32 = 16u;
 // Query rows per workgroup. Rust's ROWS_PER_WORKGROUP must match.
 const ROWS: u32 = 16u;
-// Invocations that share one query row. For the scores, lane l takes keys l, l + 16, l + 32, and so on.
+// Invocations that share one query row. For the scores, lane l takes key l of the tile.
 // For the output, lane l owns vec4 number l of the row. 16 rows x 16 lanes = 256 invocations.
 const LANES: u32 = 16u;
+// Keys per tile. It equals LANES, so each lane makes one score per tile.
+const TILE_KEYS: u32 = 16u;
 // 1 / sqrt(64). It is a power of 2, so scaling by it adds no rounding error.
 const SCALE: f32 = 0.125;
 // Almost the lowest f32 (the exact limit is -3.40282347e38, and some compilers reject a literal written past it).
-// The running maximum starts here. Any real score is larger.
+// The running maximum starts here, and a key that the row must not see gets this score. Any real score is larger.
 const LOWEST: f32 = -3.4e38;
 
 // The sizes of this chunk. Rust writes one of these per chunk, before the first run.
@@ -25,11 +27,9 @@ struct Shape {
     key_tokens: u32,
     // Heads, for example 5.
     heads: u32,
-    // Rows of a full chunk. It is the step between keys in the scores buffer.
-    chunk_rows: u32,
     // The first query row of this chunk.
     chunk_start: u32,
-    // Query rows in this chunk. The last chunk can have fewer than chunk_rows.
+    // Query rows in this chunk. The last chunk can have fewer rows than the others.
     rows: u32,
     // 1: query row i sees only keys 0 to i (the causal mask of the text encoder). 0: every key.
     causal: u32,
@@ -43,14 +43,20 @@ struct Shape {
 @group(0) @binding(2) var<storage, read> key: array<vec4<f32>>;
 // All value rows, in the same layout as the keys.
 @group(0) @binding(3) var<storage, read> value: array<vec4<f32>>;
-// Scratch for the scores of this chunk: [heads][key_tokens][chunk_rows]. Every chunk reuses it.
-@group(0) @binding(4) var<storage, read_write> scores: array<f32>;
 // The output rows, in the same layout as the queries.
-@group(0) @binding(5) var<storage, read_write> output: array<vec4<f32>>;
+@group(0) @binding(4) var<storage, read_write> output: array<vec4<f32>>;
 
-// The largest score that each invocation found, so the 16 lanes of a row can combine theirs.
-// "workgroup" memory is shared by the 256 invocations of a workgroup.
-var<workgroup> lane_largest: array<f32, 256>;
+// "workgroup" memory is shared by the 256 invocations of a workgroup. It is much faster than a storage buffer.
+// The 16 key rows of this tile, for our head: [key in tile][vec4 part].
+var<workgroup> tile_key: array<vec4<f32>, 256>;
+// The 16 value rows of this tile, in the same layout.
+var<workgroup> tile_value: array<vec4<f32>, 256>;
+// The scores of the tile: [key in tile][row in group]. Neighbor rows sit next to each other,
+// so the 16 rows that read the same key read 16 neighbor addresses.
+var<workgroup> tile_score: array<f32, 256>;
+// exp(score - running maximum) of each score, in the same layout. A separate array, because some lanes
+// still read tile_score while the others write their weights.
+var<workgroup> tile_weight: array<f32, 256>;
 
 // The index of vec4 number `part` of head `head` in row `token`.
 fn row_vec4(token: u32, head: u32, part: u32) -> u32 {
@@ -58,11 +64,10 @@ fn row_vec4(token: u32, head: u32, part: u32) -> u32 {
     return (token * shape.heads + head) * HEAD_VEC4S + part;
 }
 
-// The index of the score of key `key_index` for query row `local_row` of the chunk.
-// Neighbor rows are next to each other, so invocations of neighbor rows read and write neighbor addresses.
-fn score_index(head: u32, key_index: u32, local_row: u32) -> u32 {
-    // Skip the earlier heads and keys, then go to our row.
-    return (head * shape.key_tokens + key_index) * shape.chunk_rows + local_row;
+// The index of key `key_in_tile` and row `row_in_group` in tile_score and tile_weight.
+fn tile_index(key_in_tile: u32, row_in_group: u32) -> u32 {
+    // Skip the earlier keys, then go to our row.
+    return key_in_tile * ROWS + row_in_group;
 }
 
 // 256 invocations per workgroup: 16 query rows x 16 lanes, for one head.
@@ -70,8 +75,7 @@ fn score_index(head: u32, key_index: u32, local_row: u32) -> u32 {
 fn main(@builtin(workgroup_id) group: vec3<u32>, @builtin(local_invocation_index) local: u32) {
     // y picks the head.
     let head = group.y;
-    // Our row in the workgroup, 0 to 15. The GPU runs 32 neighbor invocations together:
-    // 16 rows x 2 lanes. They read the same 2 key rows, which the cache serves once.
+    // Our row in the workgroup, 0 to 15.
     let row_in_group = local % ROWS;
     // Our lane, 0 to 15.
     let lane = local / ROWS;
@@ -82,7 +86,7 @@ fn main(@builtin(workgroup_id) group: vec3<u32>, @builtin(local_invocation_index
     let in_chunk = local_row < shape.rows;
     // Our row in the full query tensor.
     let row = shape.chunk_start + local_row;
-    // Our whole query row, scaled by 1 / 8, in registers. Every lane needs all of it for its dot products.
+    // Our whole query row, scaled by 1 / 8, in registers. Every lane needs all of it for its dot product.
     // WGSL starts every var at 0.
     var q: array<vec4<f32>, HEAD_VEC4S>;
     // Only a real row reads the query.
@@ -92,57 +96,81 @@ fn main(@builtin(workgroup_id) group: vec3<u32>, @builtin(local_invocation_index
             q[part] = query[row_vec4(row, head, part)] * SCALE;
         }
     }
-
-    // The keys that this row sees: all of them, or with the causal mask only keys 0 to row. Key `row` is always seen, so the total of pass 2 is never 0.
+    // The keys that this row sees: all of them, or with the causal mask only keys 0 to row.
+    // Key 0 is always seen and sits in the first tile, so the running maximum is a real score after that tile.
     let keys = select(shape.key_tokens, min(row + 1u, shape.key_tokens), shape.causal == 1u);
-    // Pass 1: our scores, and the largest of them. Softmax needs the largest score of the row before it can start.
+
+    // Every lane of a row keeps the same three running values. They get the same inputs, so they stay equal.
+    // The largest score of the row so far.
     var largest = LOWEST;
-    // Our keys: lane, lane + 16, lane + 32, and so on.
-    for (var key_index = lane; key_index < keys; key_index += LANES) {
-        // Rows outside the chunk do nothing.
-        if (in_chunk) {
+    // The sum of exp(score - largest) so far.
+    var total = 0.0;
+    // Our vec4 of the sum of exp(score - largest) x value row so far.
+    var sum = vec4<f32>(0.0);
+    // The tile in workgroup memory that this invocation fills: key `local / 16`, vec4 part `local % 16`.
+    let fill_key = local / HEAD_VEC4S;
+    let fill_part = local % HEAD_VEC4S;
+
+    // The loop count depends only on the uniform key count, so every invocation reaches every barrier.
+    for (var tile_start = 0u; tile_start < shape.key_tokens; tile_start += TILE_KEYS) {
+        // Step 1: copy the key and value rows of this tile into workgroup memory, one vec4 per invocation.
+        let source_key = tile_start + fill_key;
+        // The last tile can stick out past the keys. Its extra rows stay 0, and their scores are masked below.
+        var key_part = vec4<f32>(0.0);
+        var value_part = vec4<f32>(0.0);
+        if (source_key < shape.key_tokens) {
+            key_part = key[row_vec4(source_key, head, fill_part)];
+            value_part = value[row_vec4(source_key, head, fill_part)];
+        }
+        tile_key[local] = key_part;
+        tile_value[local] = value_part;
+        // Wait until the whole tile is in workgroup memory.
+        workgroupBarrier();
+
+        // Step 2: the score of our row and key `lane` of the tile.
+        let key_index = tile_start + lane;
+        // A key past the end, or past our row with the causal mask, gets the lowest score, so its weight is exp(lowest) = 0.
+        var score = LOWEST;
+        if (key_index < keys) {
             // The dot product of our query row and this key. 4 separate sums in a vec4, added at the end,
             // so the GPU does not wait for each add to finish before the next one.
             var products = vec4<f32>(0.0);
             for (var part = 0u; part < HEAD_VEC4S; part++) {
-                products += q[part] * key[row_vec4(key_index, head, part)];
+                products += q[part] * tile_key[lane * HEAD_VEC4S + part];
             }
-            let score = products.x + products.y + products.z + products.w;
-            // Keep it for pass 2.
-            scores[score_index(head, key_index, local_row)] = score;
-            // Track the largest of our keys.
-            largest = max(largest, score);
+            score = products.x + products.y + products.z + products.w;
         }
-    }
-    // Share our largest score with the other lanes of the row.
-    lane_largest[local] = largest;
-    // Wait until all lanes have written their largest score (workgroup memory).
-    workgroupBarrier();
-    // Also wait until their scores are visible (storage memory). Pass 2 reads the scores of all lanes,
-    // and workgroupBarrier alone does not cover storage memory.
-    storageBarrier();
-    // The largest score of the whole row: the largest of all lanes. Lane l of our row sits at row_in_group + l * ROWS.
-    for (var other = 0u; other < LANES; other++) {
-        largest = max(largest, lane_largest[row_in_group + other * ROWS]);
-    }
+        // Share it with the other lanes of our row.
+        tile_score[tile_index(lane, row_in_group)] = score;
+        // Wait until all 16 scores of every row are there.
+        workgroupBarrier();
 
-    // Pass 2: softmax weights and the weighted sum of the values. Each lane goes over every key,
-    // but only for its own vec4 of the output. All lanes compute the same weights and the same total.
-    // exp(score - largest) is at most 1, so it cannot overflow. Dividing by the total at the end gives the softmax.
-    var total = 0.0;
-    // Our 4 values of the weighted sum.
-    var sum = vec4<f32>(0.0);
-    // Every key that this row sees.
-    for (var key_index = 0u; key_index < keys; key_index++) {
-        // Rows outside the chunk do nothing.
-        if (in_chunk) {
-            // The weight before dividing by the total. One of the 16 lanes wrote this score in pass 1.
-            let weight = exp(scores[score_index(head, key_index, local_row)] - largest);
-            // Add it to the total.
-            total += weight;
-            // Add weight x our vec4 of the value row.
-            sum += weight * value[row_vec4(key_index, head, lane)];
+        // Step 3: the new running maximum of our row, and the weight of our score.
+        var new_largest = largest;
+        for (var other = 0u; other < TILE_KEYS; other++) {
+            new_largest = max(new_largest, tile_score[tile_index(other, row_in_group)]);
         }
+        // One exp per score: each lane makes the weight of its own key. exp of a value of at most 0 cannot overflow.
+        tile_weight[tile_index(lane, row_in_group)] = exp(score - new_largest);
+        // The old total and sum were made with the old maximum. This factor moves them to the new one.
+        // In the first tile, largest is LOWEST and the factor is 0, which leaves the empty total and sum at 0.
+        let rescale = exp(largest - new_largest);
+        largest = new_largest;
+        // Wait until every weight of the tile is there.
+        workgroupBarrier();
+
+        // Step 4: add the 16 weights and the weighted value rows of the tile, for our vec4 of the output.
+        var tile_total = 0.0;
+        var tile_sum = vec4<f32>(0.0);
+        for (var other = 0u; other < TILE_KEYS; other++) {
+            let weight = tile_weight[tile_index(other, row_in_group)];
+            tile_total += weight;
+            tile_sum += weight * tile_value[other * HEAD_VEC4S + lane];
+        }
+        total = total * rescale + tile_total;
+        sum = sum * rescale + tile_sum;
+        // Wait until every lane is done with this tile, before the next tile overwrites it.
+        workgroupBarrier();
     }
 
     // Only a real row writes its output.

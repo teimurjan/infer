@@ -58,11 +58,6 @@ impl Gpu {
         self.device.limits().max_compute_workgroups_per_dimension
     }
 
-    // The largest buffer that one storage @binding can cover, in bytes. WebGPU guarantees at least 128 MiB.
-    pub(crate) fn max_storage_binding_bytes(&self) -> u64 {
-        self.device.limits().max_storage_buffer_binding_size
-    }
-
     // The most bytes that our GPU buffers held at one time since the last reset_peak_bytes.
     // It counts only buffers that the engine made, not memory that the driver or the browser uses.
     pub(crate) fn peak_bytes(&self) -> u64 {

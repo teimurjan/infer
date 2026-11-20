@@ -20,7 +20,7 @@ use crate::step::{Layout, Step};
 use crate::weights::WeightBuffers;
 
 // The layout of the text encoder.
-use super::plan::{EMBEDDINGS, LAYERS, OUTPUT, layer_prefix};
+use super::plan::{EMBEDDINGS, LAYERS, OUTPUT, TOKENS, layer_prefix};
 // The position add.
 use super::embed::bind_positions;
 
@@ -45,7 +45,7 @@ pub(super) fn bind_text(gpu: &Gpu, weights: &impl WeightBuffers, pool: &Activati
 // The kernels of one CLIPEncoderLayer, in run order.
 fn bind_layer(gpu: &Gpu, weights: &impl WeightBuffers, pool: &ActivationPool, prefix: &str) -> Result<Vec<BoundKernel>, EngineError> {
     // The tensor names of the plan.
-    let [norm1, query, key, value, mixed, scores, attention] = ["layer_norm1", "self_attn.q_proj", "self_attn.k_proj", "self_attn.v_proj", "self_attn.attention", "self_attn.attention.scratch", "self_attn.out_proj"].map(|part| format!("{prefix}.{part}"));
+    let [norm1, query, key, value, mixed, attention] = ["layer_norm1", "self_attn.q_proj", "self_attn.k_proj", "self_attn.v_proj", "self_attn.attention", "self_attn.out_proj"].map(|part| format!("{prefix}.{part}"));
     let [norm2, wide, narrow] = ["layer_norm2", "mlp.fc1", "mlp.fc2"].map(|part| format!("{prefix}.{part}"));
     // The stream.
     let hidden = pool.tensor(EMBEDDINGS)?;
@@ -57,8 +57,8 @@ fn bind_layer(gpu: &Gpu, weights: &impl WeightBuffers, pool: &ActivationPool, pr
         bind_rows_linear(gpu, weights, &query, &pool.tensor(&norm1)?, Bias::FromWeights, &pool.tensor(&query)?)?,
         bind_rows_linear(gpu, weights, &key, &pool.tensor(&norm1)?, Bias::FromWeights, &pool.tensor(&key)?)?,
         bind_rows_linear(gpu, weights, &value, &pool.tensor(&norm1)?, Bias::FromWeights, &pool.tensor(&value)?)?,
-        // Causal self attention: token i sees tokens 0 to i.
-        bind_attention_into(gpu, &AttentionSlots { query: pool.tensor(&query)?, key: pool.tensor(&key)?, value: pool.tensor(&value)?, scores: pool.tensor(&scores)?, output: pool.tensor(&mixed)?, causal: true })?,
+        // Causal self attention: token i sees tokens 0 to i. All 77 rows fit one chunk.
+        bind_attention_into(gpu, &AttentionSlots { query: pool.tensor(&query)?, key: pool.tensor(&key)?, value: pool.tensor(&value)?, output: pool.tensor(&mixed)?, chunk_rows: TOKENS, causal: true })?,
         // out_proj, then the residual add.
         bind_rows_linear(gpu, weights, &attention, &pool.tensor(&mixed)?, Bias::FromWeights, &pool.tensor(&attention)?)?,
         bind_add(gpu, &hidden, &pool.tensor(&attention)?)?,

@@ -50,21 +50,6 @@ impl Graph {
         output
     }
 
-    // An op that writes an output and a scratch tensor, such as attention with its scores. Nothing reads the scratch later,
-    // so its lifetime is this one op, and the planner can give its bytes to other tensors after it.
-    pub(crate) fn op_with_scratch(&mut self, name: impl Into<String>, reads: &[TensorId], dims: Dims, scratch_dims: Dims) -> TensorId {
-        // The op name, for both tensors.
-        let name = name.into();
-        // The scratch gets its own name, so the report can show it.
-        let scratch = self.new_tensor(format!("{name}.scratch"), scratch_dims);
-        // The output.
-        let output = self.new_tensor(name, dims);
-        // One op writes both.
-        self.ops.push(Op { reads: reads.to_vec(), writes: vec![output, scratch] });
-        // Only the output goes on.
-        output
-    }
-
     // An op that changes `target` in place with the values of `reads`, for example a residual add. No new tensor.
     pub(crate) fn update(&mut self, target: TensorId, reads: &[TensorId]) {
         // The op reads the target and the other tensors. That keeps all of them live at this op.
@@ -159,15 +144,15 @@ mod tests {
     // Bring the graph and the lifetime into the tests.
     use super::{Graph, TensorLife};
 
-    // Each tensor must live from its writer to its last reader, a scratch only at its writer, and a kept tensor to the end.
+    // Each tensor must live from its writer to its last reader, and a kept tensor to the end.
     #[test]
     fn lifetimes_follow_the_reads() {
         // An empty graph.
         let mut graph = Graph::default();
         // Op 0 writes the input, 2 values = 8 bytes.
         let input = graph.op("input", &[], [2, 1, 1]);
-        // Op 1 reads it and writes an output of 3 values with a scratch of 2 x 2 values.
-        let hidden = graph.op_with_scratch("hidden", &[input], [3, 1, 1], [2, 2, 1]);
+        // Op 1 reads it and writes an output of 3 values.
+        let hidden = graph.op("hidden", &[input], [3, 1, 1]);
         // Op 2 adds the input into the output in place.
         graph.update(hidden, &[input]);
         // Op 3 reads the output and writes the result, which lives to the end.
@@ -176,10 +161,9 @@ mod tests {
         graph.op("other", &[], [1, 1, 1]);
         // Keep the result.
         graph.keep(output);
-        // Tensor order: input, scratch, hidden, output, other.
+        // Tensor order: input, hidden, output, other.
         let expected = [
             TensorLife { bytes: 8, first: 0, last: 2 },
-            TensorLife { bytes: 16, first: 1, last: 1 },
             TensorLife { bytes: 12, first: 1, last: 3 },
             TensorLife { bytes: 4, first: 3, last: 4 },
             TensorLife { bytes: 4, first: 4, last: 4 },

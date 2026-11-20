@@ -108,15 +108,18 @@ fn attention_inputs(context: &Context<impl WeightBuffers>, block: &str, number: 
     ])
 }
 
-// Bind attention `name` with `bind`, on its q, k, v, output and scores scratch, as the plan names them.
+// Query rows per attention dispatch. 256 is the chunk that ran on the iPhone in 145.0 ms per submit ("Attention on the iPhone").
+const CHUNK_ROWS: u32 = 256;
+
+// Bind attention `name` with `bind`, on its q, k, v and output, as the plan names them.
 // The slots borrow their names, so they live only inside this call.
 fn bind_on_attention_slots<T>(context: &Context<impl WeightBuffers>, name: &str, bind: impl FnOnce(&AttentionSlots) -> Result<T, EngineError>) -> Result<T, EngineError> {
     // The pool, for short lines.
     let pool = context.pool;
     // The tensor names of the plan.
-    let [query, key, value, output, scores] = ["to_q", "to_k", "to_v", "attention", "attention.scratch"].map(|part| format!("{name}.{part}"));
+    let [query, key, value, output] = ["to_q", "to_k", "to_v", "attention"].map(|part| format!("{name}.{part}"));
     // The UNet attentions are not causal.
-    bind(&AttentionSlots { query: pool.tensor(&query)?, key: pool.tensor(&key)?, value: pool.tensor(&value)?, scores: pool.tensor(&scores)?, output: pool.tensor(&output)?, causal: false })
+    bind(&AttentionSlots { query: pool.tensor(&query)?, key: pool.tensor(&key)?, value: pool.tensor(&value)?, output: pool.tensor(&output)?, chunk_rows: CHUNK_ROWS, causal: false })
 }
 
 // The attention kernel of attention `name`, every chunk in one kernel.
