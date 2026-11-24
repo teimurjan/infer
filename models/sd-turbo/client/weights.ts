@@ -10,7 +10,8 @@ import { urls } from './urls.ts';
 // The engine takes the weights in pieces of at most 1 MiB, so one piece never needs a large WASM copy.
 const PIECE_BYTES = 1 << 20;
 
-export type Source = 'cache' | 'network';
+// 'memory' is a file that the page already holds from an earlier image, such as the small decoder file.
+export type Source = 'cache' | 'network' | 'memory';
 // The progress of one file. length is null if the server did not send Content-Length.
 export type LoadProgress = { from: Source; received: number; length: number | null };
 export type LoadResult = { line: string; from: Source; received: number; seconds: number; cacheError: string | null };
