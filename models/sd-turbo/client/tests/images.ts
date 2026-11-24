@@ -43,13 +43,26 @@ function eventLine(event: PipelineEvent): string | null {
     return null;
 }
 
-// One golden image. `say` gets the stage lines, or nothing if it is null.
-async function goldenImage(ready: Setup, say: TestContext['say'] | null): Promise<{ seconds: number; compare: ByteCompare }> {
+// The time of one part of an image: a file load, or a stage. A stage also says how long its engine run took,
+// so the rest of the stage is the preparation and the freeing.
+function splitPart(event: PipelineEvent): string | null {
+    if (event.kind === 'loaded') return `load ${event.file} ${event.result.seconds.toFixed(2)} s from ${event.result.from}`;
+    if (event.kind !== 'stage-end') return null;
+    // The engine line of a stage has "ran in <seconds> s". The decoder line has no such part.
+    const ran = /ran in ([0-9.]+) s/.exec(event.line);
+    return `${event.stage} ${event.seconds.toFixed(2)} s${ran ? ` (ran ${ran[1]} s)` : ''}`;
+}
+
+// One golden image. `say` gets the stage lines, or nothing if it is null. `split` lists the time of each part, in order.
+async function goldenImage(ready: Setup, say: TestContext['say'] | null): Promise<{ seconds: number; compare: ByteCompare; split: string }> {
+    const parts: string[] = [];
     const image = await generate(ready.engine, ready.inputs, await openCache(), event => {
         const line = eventLine(event);
         if (line && say) say(line);
+        const part = splitPart(event);
+        if (part) parts.push(part);
     });
-    return { seconds: image.seconds, compare: compareBytes(image.rgba, ready.expected) };
+    return { seconds: image.seconds, compare: compareBytes(image.rgba, ready.expected), split: parts.join('; ') };
 }
 
 // The compare line, the same as in the old generate.html.
@@ -80,11 +93,13 @@ export const makeTwentyTest: TestCase = {
         // Forget the submits before the row.
         ready.engine.takeLongestSubmit();
         for (let image = 1; image <= IMAGES_IN_A_ROW; image++) {
-            const { seconds, compare } = await goldenImage(ready, null);
+            const { seconds, compare, split } = await goldenImage(ready, null);
             // The longest submit of this image only. The engine stops the run at 250 ms.
             const longestMs = ready.engine.takeLongestSubmit() * 1000;
             const live = ready.engine.liveBytes();
             say(`image ${image} of ${IMAGES_IN_A_ROW}: ${seconds.toFixed(2)} s; longest submit ${longestMs.toFixed(1)} ms; live ${live} bytes; WASM memory ${ready.wasmMemory.buffer.byteLength} bytes; ${compare.differing} image bytes differ, by at most ${compare.largest}`);
+            // Where the time of this image went: each file load and each stage.
+            say(`image ${image} split: ${split}`);
             metric(`image ${image} seconds`, seconds, 's');
             metric(`image ${image} longest submit`, longestMs, 'ms');
             // Live bytes after an image mean a leak, and the next images would run out of memory.
