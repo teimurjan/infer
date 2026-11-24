@@ -5366,3 +5366,222 @@ Calculations:
 Not done: the text encoder and the UNet do not yet stay on the GPU between images. That is the second half of step 2. Both now fit together: 344.9 + 974.2 = 1319.1 MB, below the 1920 MB tab budget, but this is not measured.
 
 Conclusion: the site loads 1019.5 MB less, and the largest memory peak is 974.2 MB. Next step: keep both models on the GPU for the whole page, so a warm image skips the two weight loads.
+
+## 2026-11-20: The plan brought up to date
+
+The user asked to add the "both models stay loaded" item to the plan file, and to make the file current.
+
+Files changed:
+
+- `plan.md`: rewritten from the entries of this log.
+
+What changed in the plan:
+
+- A table of where the engine is now: download 1219.8 MB, largest peak 974.2 MB, warm image 5.56 s, kernel time about 2.46 s, longest submit 131 ms. A second table lists the four largest kernels.
+- A short list of the next steps, in order.
+- Step 1: the random seed is measured on the iPhone now. The profile run of "Step 3 on the iPhone" printed `seed 42 noise: largest difference from golden/starting_noise 2.384185791015625e-7`. The benchmark run with the 8-bit files is still open.
+- Step 2: part a (the 8-bit text encoder) is done. Part b (both models stay loaded) has the reason, the memory cost (about 1319.1 MB plus TAESD, an estimate), and a first measurement to make before any change.
+- Step 1 said that the tab limit is 2048 MB. `CLAUDE.md` gives about 1920 MB, so the plan now uses 1920 MB.
+- Steps 3, 4 and 5 are done, with their iPhone numbers.
+- Step 6 (float16 math) is measured and dropped, with the reason.
+- Step 7 has the new heat numbers, and a new item: `bun run phone` reads the weights from the network every time.
+- New steps: step 10, a faster `conv3x3_packed`, and step 11, register blocking in `attention`.
+
+Not measured on the iPhone. This step changes no code.
+
+## 2026-11-24: Step 2b, part 1: where the time of a warm image goes
+
+The user asked to continue with the next steps of `plan.md`. The first is to measure what "both models stay loaded" can save, before any change.
+
+Files changed:
+
+- `client/tests/images.ts`: `splitPart` turns each `loaded` and `stage-end` event of the pipeline into one part: the load time of a file and its source, or the time of a stage with the "ran in" time of its engine run. "Make 20" prints one `split` line per image.
+
+Design choice: the pipeline already sent these events, and "Make 20" dropped them. The line needs no engine change. A stage time minus its "ran in" time is the preparation and the freeing of the stage. For the decoder, it also holds the fetch of `taesd`, because the decoder stage fetches its file inside the stage.
+
+Failed first: the scratch Playwright script of earlier steps was gone, because the scratchpad was cleared. Then `bun run phone sd-turbo:make-20 --timeout 25` stopped with `FAILED: the certificate names 10.120.1.197, 127.0.0.1, but the Mac has 10.120.1.55, ...`. `bun run cert` made a new certificate.
+
+Command: `bun run typecheck`, `bun run build`, then `bun run phone sd-turbo:make-20 --timeout 25`. Device: iPhone. Events: `runs/20261124101638-sd-turbo-dev-test-make-20-tk7e.jsonl`.
+
+```
+make-20: image 1 split: load text_encoder_q8 49.06 s from network; text-encoder 0.45 s (ran 0.14 s); load unet_q8 98.69 s from network; unet 3.01 s (ran 2.50 s); decoder 1.41 s (ran 0.56 s)
+make-20: image 1 of 20: 152.61 s; longest submit 78.0 ms; live 0 bytes; WASM memory 25100288 bytes; 1122 image bytes differ, by at most 1
+make-20: image 2 of 20: 5.07 s; longest submit 73.0 ms; live 0 bytes; WASM memory 25100288 bytes; 1122 image bytes differ, by at most 1
+make-20: image 2 split: load text_encoder_q8 0.22 s from cache; text-encoder 0.21 s (ran 0.11 s); load unet_q8 0.52 s from cache; unet 2.52 s (ran 2.23 s); decoder 1.60 s (ran 0.59 s)
+make-20: image 3 of 20: 4.73 s; longest submit 78.0 ms; live 0 bytes; WASM memory 25100288 bytes; 1122 image bytes differ, by at most 1
+make-20: image 3 split: load text_encoder_q8 0.26 s from cache; text-encoder 0.21 s (ran 0.12 s); load unet_q8 0.30 s from cache; unet 2.55 s (ran 2.26 s); decoder 1.40 s (ran 0.59 s)
+make-20: image 4 split: load text_encoder_q8 0.19 s from cache; text-encoder 0.21 s (ran 0.12 s); load unet_q8 0.34 s from cache; unet 2.61 s (ran 2.31 s); decoder 1.50 s (ran 0.56 s)
+make-20: image 4 of 20: 4.85 s; longest submit 82.0 ms; live 0 bytes; WASM memory 25100288 bytes; 1122 image bytes differ, by at most 1
+make-20: image 5 of 20: 4.70 s; longest submit 84.0 ms; live 0 bytes; WASM memory 25100288 bytes; 1122 image bytes differ, by at most 1
+make-20: image 5 split: load text_encoder_q8 0.20 s from cache; text-encoder 0.21 s (ran 0.12 s); load unet_q8 0.34 s from cache; unet 2.67 s (ran 2.36 s); decoder 1.27 s (ran 0.55 s)
+make-20: image 6 split: load text_encoder_q8 0.20 s from cache; text-encoder 0.22 s (ran 0.12 s); load unet_q8 0.35 s from cache; unet 2.74 s (ran 2.42 s); decoder 1.30 s (ran 0.56 s)
+make-20: image 6 of 20: 4.81 s; longest submit 86.0 ms; live 0 bytes; WASM memory 25100288 bytes; 1122 image bytes differ, by at most 1
+make-20: image 7 of 20: 5.56 s; longest submit 87.0 ms; live 0 bytes; WASM memory 25100288 bytes; 1122 image bytes differ, by at most 1
+make-20: image 7 split: load text_encoder_q8 0.24 s from cache; text-encoder 0.21 s (ran 0.11 s); load unet_q8 0.38 s from cache; unet 2.77 s (ran 2.44 s); decoder 1.97 s (ran 0.56 s)
+make-20: image 8 split: load text_encoder_q8 0.21 s from cache; text-encoder 0.22 s (ran 0.12 s); load unet_q8 0.35 s from cache; unet 2.78 s (ran 2.44 s); decoder 1.65 s (ran 0.57 s)
+make-20: image 8 of 20: 5.20 s; longest submit 87.0 ms; live 0 bytes; WASM memory 25100288 bytes; 1122 image bytes differ, by at most 1
+make-20: image 9 of 20: 4.89 s; longest submit 88.0 ms; live 0 bytes; WASM memory 25100288 bytes; 1122 image bytes differ, by at most 1
+make-20: image 9 split: load text_encoder_q8 0.22 s from cache; text-encoder 0.22 s (ran 0.12 s); load unet_q8 0.38 s from cache; unet 2.80 s (ran 2.48 s); decoder 1.26 s (ran 0.56 s)
+make-20: image 10 split: load text_encoder_q8 0.22 s from cache; text-encoder 0.22 s (ran 0.12 s); load unet_q8 0.39 s from cache; unet 2.87 s (ran 2.53 s); decoder 1.39 s (ran 0.57 s)
+make-20: image 10 of 20: 5.09 s; longest submit 90.0 ms; live 0 bytes; WASM memory 25100288 bytes; 1122 image bytes differ, by at most 1
+make-20: image 11 split: load text_encoder_q8 0.20 s from cache; text-encoder 0.22 s (ran 0.12 s); load unet_q8 0.40 s from cache; unet 2.92 s (ran 2.58 s); decoder 1.52 s (ran 0.57 s)
+make-20: image 11 of 20: 5.26 s; longest submit 91.0 ms; live 0 bytes; WASM memory 25100288 bytes; 1122 image bytes differ, by at most 1
+make-20: image 12 of 20: 5.26 s; longest submit 95.0 ms; live 0 bytes; WASM memory 25100288 bytes; 1122 image bytes differ, by at most 1
+make-20: image 12 split: load text_encoder_q8 0.20 s from cache; text-encoder 0.22 s (ran 0.12 s); load unet_q8 0.38 s from cache; unet 3.00 s (ran 2.67 s); decoder 1.47 s (ran 0.57 s)
+make-20: image 13 split: load text_encoder_q8 0.20 s from cache; text-encoder 0.22 s (ran 0.12 s); load unet_q8 0.38 s from cache; unet 3.07 s (ran 2.73 s); decoder 1.63 s (ran 0.57 s)
+make-20: image 13 of 20: 5.51 s; longest submit 98.0 ms; live 0 bytes; WASM memory 25100288 bytes; 1122 image bytes differ, by at most 1
+make-20: image 14 of 20: 5.42 s; longest submit 98.0 ms; live 0 bytes; WASM memory 25100288 bytes; 1122 image bytes differ, by at most 1
+make-20: image 14 split: load text_encoder_q8 0.22 s from cache; text-encoder 0.22 s (ran 0.12 s); load unet_q8 0.38 s from cache; unet 3.08 s (ran 2.74 s); decoder 1.52 s (ran 0.57 s)
+make-20: image 15 of 20: 5.43 s; longest submit 102.0 ms; live 0 bytes; WASM memory 25100288 bytes; 1122 image bytes differ, by at most 1
+make-20: image 15 split: load text_encoder_q8 0.23 s from cache; text-encoder 0.22 s (ran 0.12 s); load unet_q8 0.39 s from cache; unet 3.16 s (ran 2.82 s); decoder 1.43 s (ran 0.56 s)
+make-20: image 16 split: load text_encoder_q8 0.21 s from cache; text-encoder 0.22 s (ran 0.12 s); load unet_q8 0.38 s from cache; unet 3.22 s (ran 2.88 s); decoder 1.70 s (ran 0.56 s)
+make-20: image 16 of 20: 5.74 s; longest submit 105.0 ms; live 0 bytes; WASM memory 25100288 bytes; 1122 image bytes differ, by at most 1
+make-20: image 17 of 20: 5.22 s; longest submit 102.0 ms; live 0 bytes; WASM memory 25100288 bytes; 1122 image bytes differ, by at most 1
+make-20: image 17 split: load text_encoder_q8 0.21 s from cache; text-encoder 0.22 s (ran 0.12 s); load unet_q8 0.37 s from cache; unet 3.13 s (ran 2.80 s); decoder 1.29 s (ran 0.58 s)
+make-20: image 18 of 20: 5.57 s; longest submit 108.0 ms; live 0 bytes; WASM memory 25100288 bytes; 1122 image bytes differ, by at most 1
+make-20: image 18 split: load text_encoder_q8 0.23 s from cache; text-encoder 0.22 s (ran 0.12 s); load unet_q8 0.38 s from cache; unet 3.28 s (ran 2.95 s); decoder 1.46 s (ran 0.56 s)
+make-20: image 19 of 20: 5.42 s; longest submit 107.0 ms; live 0 bytes; WASM memory 25100288 bytes; 1122 image bytes differ, by at most 1
+make-20: image 19 split: load text_encoder_q8 0.23 s from cache; text-encoder 0.22 s (ran 0.12 s); load unet_q8 0.37 s from cache; unet 3.25 s (ran 2.92 s); decoder 1.35 s (ran 0.57 s)
+make-20: image 20 split: load text_encoder_q8 0.24 s from cache; text-encoder 0.22 s (ran 0.12 s); load unet_q8 0.38 s from cache; unet 3.33 s (ran 3.00 s); decoder 1.44 s (ran 0.58 s)
+make-20: image 20 of 20: 5.62 s; longest submit 110.0 ms; live 0 bytes; WASM memory 25100288 bytes; 1122 image bytes differ, by at most 1
+make-20: PASSED: 20 images in 252.15 s
+```
+
+Calculations: the mean of images 2 to 20 (19 images), from the split lines.
+
+| Part | Mean time |
+| --- | --- |
+| load `text_encoder_q8` from the cache | 0.217 s |
+| text encoder stage | 0.217 s, of which the run is 0.119 s, so preparation and freeing 0.098 s |
+| load `unet_q8` from the cache | 0.377 s |
+| UNet stage | 2.934 s, of which the run is 2.608 s, so preparation and freeing 0.326 s |
+| decoder stage | 1.482 s, of which the run is 0.568 s, so the fetch of `taesd`, preparation and freeing 0.913 s |
+
+- The parts add up to 0.217 + 0.217 + 0.377 + 2.934 + 1.482 = 5.227 s. The mean image is (5.07 + 4.73 + ... + 5.62) / 19 = 5.23 s. So the split covers the whole image.
+- Both models stay loaded: this saves the two loads and the two preparations, at most 0.217 + 0.098 + 0.377 + 0.326 = 1.018 s per warm image, 19.5% of 5.23 s. Its cost is about 345 MB more peak memory (an estimate).
+- The decoder: 0.913 s of its 1.482 s is not its run. TAESD weighs 9.8 MB. Keeping its file or its stage between images costs little memory, and it can save up to 0.913 s, about as much as both models together.
+- This run did not read the weights from the network after image 1 (`from cache`). The open item of step 7 is only about the first image of each harness run.
+
+Not changed: the engine and the pages. The images are the same as before: 1122 image bytes differ, by at most 1.
+
+Conclusion: the reloads of the text encoder and the UNet cost 1.02 s per warm image. The decoder loses 0.91 s per image for 9.8 MB of weights. Next step, if the user agrees: find how the 0.91 s of the decoder splits between the fetch and the preparation, and keep what is cheap to keep.
+
+## 2026-11-24: Step 2b, part 2: the decoder file is fetched once for the page
+
+The user agreed to find how the 0.913 s of the decoder splits, and to keep what is cheap to keep.
+
+Files changed:
+
+- `client/pipeline.ts`: the decoder file is fetched before the decoder stage, with its own clock and its own `loaded` event. `loadDecoderFile` keeps the fetched file in the page (`decoderFile`), so only the first image fetches it. A failed fetch is forgotten, so the next image tries again.
+- `client/weights.ts`: `Source` has a third value, `'memory'`, for a file that the page already holds.
+
+Design choices:
+
+- The engine's "ran in" time of the decoder (0.568 s) holds all its engine work, the weight uploads too. So the other 0.913 s happened in the page. The first change only moved the fetch out of the stage clock, to see its share.
+- TAESD is 9.8 MB. The page keeps one copy of the index text and of the bytes. `runDecoder` copies the bytes into WASM memory for each call, so the page's copy stays whole.
+- The promise is kept, not the bytes, so two images that start at the same time share one fetch.
+- The deployed site fetches the file from Hugging Face. There, the fetch for each image cost the same or more, and now it happens once.
+
+Failed first: one run stopped with `FAILED: Could not create a session: Some devices were found, but could not be used:`. The same command then ran.
+
+Run 2, the fetch on its own clock, no other change. Command: `bun run typecheck`, `bun run build`, then `bun run phone sd-turbo:make-20 --timeout 25`. Device: iPhone. Events: `runs/20261124102629-sd-turbo-dev-test-make-20-ts2t.jsonl` (only these lines kept):
+
+```
+make-20: image 2 of 20: 4.88 s; longest submit 76.0 ms; live 0 bytes; WASM memory 25755648 bytes; 1122 image bytes differ, by at most 1
+make-20: image 2 split: load text_encoder_q8 0.24 s from cache; text-encoder 0.20 s (ran 0.11 s); load unet_q8 0.47 s from cache; unet 2.55 s (ran 2.26 s); load taesd 0.82 s from network; decoder 0.59 s (ran 0.58 s)
+make-20: image 3 split: load text_encoder_q8 0.24 s from cache; text-encoder 0.21 s (ran 0.12 s); load unet_q8 0.38 s from cache; unet 2.63 s (ran 2.33 s); load taesd 1.12 s from network; decoder 0.60 s (ran 0.59 s)
+make-20: image 10 split: load text_encoder_q8 0.19 s from cache; text-encoder 0.21 s (ran 0.12 s); load unet_q8 0.35 s from cache; unet 4.48 s (ran 4.13 s); load taesd 0.87 s from network; decoder 0.57 s (ran 0.56 s)
+make-20: image 20 split: load text_encoder_q8 0.24 s from cache; text-encoder 0.21 s (ran 0.12 s); load unet_q8 0.37 s from cache; unet 4.35 s (ran 4.01 s); load taesd 0.85 s from network; decoder 0.57 s (ran 0.56 s)
+make-20: image 20 of 20: 6.60 s; longest submit 167.0 ms; live 0 bytes; WASM memory 25755648 bytes; 1122 image bytes differ, by at most 1
+PASSED: 20 images in 265.13 s
+```
+
+Run 3, the file kept for the page. The same commands. Events: `runs/20261124103130-sd-turbo-dev-test-make-20-c4cx.jsonl` (only these lines kept):
+
+```
+make-20: image 1 of 20: 132.99 s; longest submit 72.0 ms; live 0 bytes; WASM memory 24969216 bytes; 1122 image bytes differ, by at most 1
+make-20: image 1 split: load text_encoder_q8 31.87 s from network; text-encoder 0.21 s (ran 0.11 s); load unet_q8 96.60 s from network; unet 2.63 s (ran 2.32 s); load taesd 1.17 s from network; decoder 0.51 s (ran 0.49 s)
+make-20: image 2 of 20: 4.08 s; longest submit 78.0 ms; live 0 bytes; WASM memory 24969216 bytes; 1122 image bytes differ, by at most 1
+make-20: image 2 split: load text_encoder_q8 0.23 s from cache; text-encoder 0.21 s (ran 0.11 s); load unet_q8 0.49 s from cache; unet 2.65 s (ran 2.35 s); load taesd 0.00 s from memory; decoder 0.50 s (ran 0.49 s)
+make-20: image 3 of 20: 4.26 s; longest submit 85.0 ms; live 0 bytes; WASM memory 24969216 bytes; 1122 image bytes differ, by at most 1
+make-20: image 10 split: load text_encoder_q8 0.22 s from cache; text-encoder 0.25 s (ran 0.15 s); load unet_q8 0.41 s from cache; unet 5.12 s (ran 4.70 s); load taesd 0.00 s from memory; decoder 0.59 s (ran 0.57 s)
+make-20: image 10 of 20: 6.58 s; longest submit 193.0 ms; live 0 bytes; WASM memory 24969216 bytes; 1122 image bytes differ, by at most 1
+make-20: image 20 of 20: 6.26 s; longest submit 193.0 ms; live 0 bytes; WASM memory 24969216 bytes; 1122 image bytes differ, by at most 1
+make-20: image 20 split: load text_encoder_q8 0.24 s from cache; text-encoder 0.24 s (ran 0.14 s); load unet_q8 0.37 s from cache; unet 4.83 s (ran 4.45 s); load taesd 0.00 s from memory; decoder 0.58 s (ran 0.57 s)
+PASSED: 20 images in 252.82 s
+```
+
+Calculations, from all the image lines of the three runs (run 1 is "Step 2b, part 1"):
+
+| Run | images 2 to 5, mean | UNet run, images 2 to 5, mean | `taesd` load, images 2 to 20, mean | longest submit | longest UNet run |
+| --- | --- | --- | --- | --- | --- |
+| 1, before | 4.838 s | 2.290 s | inside the decoder stage | 110 ms | 3.00 s |
+| 2, fetch on its own clock | 5.120 s | 2.350 s | 0.955 s from network | 203 ms | 4.42 s |
+| 3, file kept | 4.567 s | 2.765 s | 0.000 s from memory | 214 ms | 5.59 s |
+
+- Run 2 shows where the 0.913 s went: the fetch took 0.955 s on average, and the decoder stage minus its run is about 0.01 s.
+- Run 3 removes that fetch from every image after the first. Images 2 to 5 are 4.838 - 4.567 = 0.271 s faster than run 1, although the UNet run was 2.765 - 2.290 = 0.475 s slower. With the UNet time of run 1, the expected image is 4.567 - 0.475 = 4.09 s. That is an estimate, not a measurement.
+- The three runs came one after the other, about 13 minutes of GPU work. The phone got hot. The UNet run grew to 5.59 s, and the longest submit to 214 ms, 86% of the 250 ms limit. This is a risk for long use (step 7).
+
+Not changed: the images. Every image of the three runs: 1122 image bytes differ, by at most 1.
+
+Conclusion: the decoder file now loads once for the page. A clean number needs a run on a cool phone. Next step: that run, then the user decides on keeping both models loaded (1.02 s per image, about 345 MB more).
+
+## 2026-11-24: Step 2b, part 3: "Make 20" after a rest, with the kept decoder file
+
+The user asked the agent to run the check itself. The phone rested about 18 minutes after run 3: the last event file was written at 16:35:44 local time, and this run started at 16:54.
+
+Command: `bun run phone sd-turbo:make-20 --timeout 25`. Device: iPhone. Events: `runs/20261124105409-sd-turbo-dev-test-make-20-30e8.jsonl`.
+
+```
+make-20: image 1 of 20: 128.01 s; longest submit 76.0 ms; live 0 bytes; WASM memory 24969216 bytes; 1122 image bytes differ, by at most 1
+make-20: image 1 split: load text_encoder_q8 30.93 s from network; text-encoder 0.26 s (ran 0.13 s); load unet_q8 92.16 s from network; unet 2.87 s (ran 2.52 s); load taesd 1.26 s from network; decoder 0.53 s (ran 0.51 s)
+make-20: image 2 of 20: 4.05 s; longest submit 77.0 ms; live 0 bytes; WASM memory 24969216 bytes; 1122 image bytes differ, by at most 1
+make-20: image 2 split: load text_encoder_q8 0.25 s from cache; text-encoder 0.20 s (ran 0.11 s); load unet_q8 0.53 s from cache; unet 2.57 s (ran 2.28 s); load taesd 0.00 s from memory; decoder 0.50 s (ran 0.49 s)
+make-20: image 3 of 20: 3.97 s; longest submit 84.0 ms; live 0 bytes; WASM memory 24969216 bytes; 1122 image bytes differ, by at most 1
+make-20: image 3 split: load text_encoder_q8 0.21 s from cache; text-encoder 0.21 s (ran 0.11 s); load unet_q8 0.39 s from cache; unet 2.68 s (ran 2.37 s); load taesd 0.00 s from memory; decoder 0.47 s (ran 0.46 s)
+make-20: image 4 of 20: 4.13 s; longest submit 88.0 ms; live 0 bytes; WASM memory 24969216 bytes; 1122 image bytes differ, by at most 1
+make-20: image 4 split: load text_encoder_q8 0.22 s from cache; text-encoder 0.22 s (ran 0.11 s); load unet_q8 0.39 s from cache; unet 2.81 s (ran 2.46 s); load taesd 0.00 s from memory; decoder 0.48 s (ran 0.47 s)
+make-20: image 5 split: load text_encoder_q8 0.24 s from cache; text-encoder 0.22 s (ran 0.11 s); load unet_q8 0.43 s from cache; unet 2.90 s (ran 2.54 s); load taesd 0.00 s from memory; decoder 0.48 s (ran 0.47 s)
+make-20: image 5 of 20: 4.27 s; longest submit 91.0 ms; live 0 bytes; WASM memory 24969216 bytes; 1122 image bytes differ, by at most 1
+make-20: image 6 of 20: 5.79 s; longest submit 161.0 ms; live 0 bytes; WASM memory 24969216 bytes; 1122 image bytes differ, by at most 1
+make-20: image 6 split: load text_encoder_q8 0.22 s from cache; text-encoder 0.23 s (ran 0.11 s); load unet_q8 0.42 s from cache; unet 4.32 s (ran 3.95 s); load taesd 0.00 s from memory; decoder 0.58 s (ran 0.58 s)
+make-20: image 7 split: load text_encoder_q8 0.29 s from cache; text-encoder 0.25 s (ran 0.15 s); load unet_q8 0.41 s from cache; unet 5.14 s (ran 4.73 s); load taesd 0.00 s from memory; decoder 0.60 s (ran 0.59 s)
+make-20: image 7 of 20: 6.68 s; longest submit 203.0 ms; live 0 bytes; WASM memory 24969216 bytes; 1122 image bytes differ, by at most 1
+make-20: image 8 of 20: 6.82 s; longest submit 204.0 ms; live 0 bytes; WASM memory 24969216 bytes; 1122 image bytes differ, by at most 1
+make-20: image 8 split: load text_encoder_q8 0.25 s from cache; text-encoder 0.25 s (ran 0.15 s); load unet_q8 0.39 s from cache; unet 5.33 s (ran 4.92 s); load taesd 0.00 s from memory; decoder 0.60 s (ran 0.59 s)
+make-20: image 9 of 20: 6.78 s; longest submit 202.0 ms; live 0 bytes; WASM memory 24969216 bytes; 1122 image bytes differ, by at most 1
+make-20: image 9 split: load text_encoder_q8 0.25 s from cache; text-encoder 0.25 s (ran 0.15 s); load unet_q8 0.41 s from cache; unet 5.27 s (ran 4.86 s); load taesd 0.00 s from memory; decoder 0.59 s (ran 0.58 s)
+make-20: image 10 split: load text_encoder_q8 0.27 s from cache; text-encoder 0.25 s (ran 0.14 s); load unet_q8 0.45 s from cache; unet 5.06 s (ran 4.63 s); load taesd 0.00 s from memory; decoder 0.57 s (ran 0.56 s)
+make-20: image 10 of 20: 6.60 s; longest submit 197.0 ms; live 0 bytes; WASM memory 24969216 bytes; 1122 image bytes differ, by at most 1
+make-20: image 11 split: load text_encoder_q8 0.26 s from cache; text-encoder 0.24 s (ran 0.14 s); load unet_q8 0.39 s from cache; unet 4.79 s (ran 4.41 s); load taesd 0.00 s from memory; decoder 0.56 s (ran 0.55 s)
+make-20: image 11 of 20: 6.25 s; longest submit 193.0 ms; live 0 bytes; WASM memory 24969216 bytes; 1122 image bytes differ, by at most 1
+make-20: image 12 of 20: 6.13 s; longest submit 186.0 ms; live 0 bytes; WASM memory 24969216 bytes; 1122 image bytes differ, by at most 1
+make-20: image 12 split: load text_encoder_q8 0.26 s from cache; text-encoder 0.24 s (ran 0.14 s); load unet_q8 0.40 s from cache; unet 4.66 s (ran 4.28 s); load taesd 0.00 s from memory; decoder 0.57 s (ran 0.56 s)
+make-20: image 13 of 20: 6.04 s; longest submit 180.0 ms; live 0 bytes; WASM memory 24969216 bytes; 1122 image bytes differ, by at most 1
+make-20: image 13 split: load text_encoder_q8 0.26 s from cache; text-encoder 0.24 s (ran 0.14 s); load unet_q8 0.39 s from cache; unet 4.58 s (ran 4.21 s); load taesd 0.00 s from memory; decoder 0.56 s (ran 0.56 s)
+make-20: image 14 split: load text_encoder_q8 0.26 s from cache; text-encoder 0.24 s (ran 0.14 s); load unet_q8 0.39 s from cache; unet 4.62 s (ran 4.24 s); load taesd 0.00 s from memory; decoder 0.56 s (ran 0.55 s)
+make-20: image 14 of 20: 6.07 s; longest submit 180.0 ms; live 0 bytes; WASM memory 24969216 bytes; 1122 image bytes differ, by at most 1
+make-20: image 15 split: load text_encoder_q8 0.26 s from cache; text-encoder 0.24 s (ran 0.14 s); load unet_q8 0.40 s from cache; unet 4.64 s (ran 4.26 s); load taesd 0.00 s from memory; decoder 0.57 s (ran 0.56 s)
+make-20: image 15 of 20: 6.12 s; longest submit 185.0 ms; live 0 bytes; WASM memory 24969216 bytes; 1122 image bytes differ, by at most 1
+make-20: image 16 of 20: 6.25 s; longest submit 195.0 ms; live 0 bytes; WASM memory 24969216 bytes; 1122 image bytes differ, by at most 1
+make-20: image 16 split: load text_encoder_q8 0.26 s from cache; text-encoder 0.24 s (ran 0.14 s); load unet_q8 0.39 s from cache; unet 4.79 s (ran 4.42 s); load taesd 0.00 s from memory; decoder 0.57 s (ran 0.56 s)
+make-20: image 17 of 20: 6.17 s; longest submit 186.0 ms; live 0 bytes; WASM memory 24969216 bytes; 1122 image bytes differ, by at most 1
+make-20: image 17 split: load text_encoder_q8 0.26 s from cache; text-encoder 0.26 s (ran 0.15 s); load unet_q8 0.39 s from cache; unet 4.69 s (ran 4.31 s); load taesd 0.00 s from memory; decoder 0.57 s (ran 0.56 s)
+make-20: image 18 of 20: 6.22 s; longest submit 188.0 ms; live 0 bytes; WASM memory 24969216 bytes; 1122 image bytes differ, by at most 1
+make-20: image 18 split: load text_encoder_q8 0.26 s from cache; text-encoder 0.24 s (ran 0.14 s); load unet_q8 0.40 s from cache; unet 4.75 s (ran 4.37 s); load taesd 0.00 s from memory; decoder 0.57 s (ran 0.56 s)
+make-20: image 19 of 20: 6.25 s; longest submit 193.0 ms; live 0 bytes; WASM memory 24969216 bytes; 1122 image bytes differ, by at most 1
+make-20: image 19 split: load text_encoder_q8 0.26 s from cache; text-encoder 0.24 s (ran 0.14 s); load unet_q8 0.38 s from cache; unet 4.80 s (ran 4.43 s); load taesd 0.00 s from memory; decoder 0.57 s (ran 0.56 s)
+make-20: image 20 of 20: 6.27 s; longest submit 193.0 ms; live 0 bytes; WASM memory 24969216 bytes; 1122 image bytes differ, by at most 1
+make-20: image 20 split: load text_encoder_q8 0.26 s from cache; text-encoder 0.26 s (ran 0.16 s); load unet_q8 0.39 s from cache; unet 4.79 s (ran 4.40 s); load taesd 0.00 s from memory; decoder 0.57 s (ran 0.56 s)
+make-20: PASSED: 20 images in 239.13 s
+```
+
+Calculations:
+
+- Images 2 to 5: (4.05 + 3.97 + 4.13 + 4.27) / 4 = 4.105 s, against 4.838 s in run 1 of "Step 2b, part 1". That is 1 - 4.105 / 4.838 = 15.2% less. The UNet run of these images is 2.413 s, against 2.290 s in run 1, so the phone was about as cool. The estimate of part 2 was 4.09 s.
+- From image 6 on, the phone slows down. The UNet run goes from 2.54 s (image 5) to 3.95 s (image 6) and 4.92 s (image 8). The longest submit goes from 91 ms to 204 ms (image 8), 82% of the 250 ms limit.
+- Images 2 to 20: 5.835 s mean. In run 1 of part 1 it was 5.229 s, but in that run the UNet run stayed at or below 3.00 s, and the longest submit at or below 110 ms. So the phone slowed less in run 1. The two means cannot show the gain of this step.
+- In "2026-11-20: Step 2 of the plan, part 2", the longest submit of "Make 20" was 131 ms. In "2026-11-19: "Make 20" with the 8-bit UNet", it was 198 ms, from image 5 on. So the iPhone slows down in some runs and not in others. The 18-minute rest was not enough to prevent it in this run.
+
+Conclusion: the kept decoder file makes a cool warm image 15.2% faster, 4.105 s against 4.838 s. But a long run on a warm phone brings the longest submit to 204 ms. If one submit takes 250 ms or more, the device is lost (`CLAUDE.md`). Next step proposal: step 7, smaller submits, before more speed work.
