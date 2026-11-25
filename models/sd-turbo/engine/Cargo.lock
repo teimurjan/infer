@@ -139,6 +139,7 @@ name = "engine"
 version = "0.1.0"
 dependencies = [
  "compare",
+ "engine-core",
  "futures-channel",
  "pollster",
  "regex",
@@ -147,6 +148,17 @@ dependencies = [
  "unicode-normalization",
  "wasm-bindgen",
  "wasm-bindgen-futures",
+ "web-time",
+ "wgpu",
+]
+
+[[package]]
+name = "engine-core"
+version = "0.1.0"
+dependencies = [
+ "futures-channel",
+ "serde",
+ "serde_json",
  "web-time",
  "wgpu",
 ]

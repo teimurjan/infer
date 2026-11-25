@@ -3,16 +3,16 @@ use super::TensorLife;
 
 // The most bytes that are live at one op, and the first op where that happens.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
-pub(crate) struct LivePeak {
+pub struct LivePeak {
     // The bytes of every tensor that is live at `op`.
-    pub(crate) bytes: u64,
+    pub bytes: u64,
     // The position of the op.
-    pub(crate) op: usize,
+    pub op: usize,
 }
 
 // Add up the live bytes at each op and return the largest sum.
 // Every live tensor needs its own bytes, so no slot plan can be smaller than this. The planner is compared with it.
-pub(crate) fn live_peak(tensors: &[TensorLife]) -> LivePeak {
+pub fn live_peak(tensors: &[TensorLife]) -> LivePeak {
     // The number of ops: one more than the last op that any tensor reaches.
     let ops = tensors.iter().map(|tensor| tensor.last + 1).max().unwrap_or(0);
     // The live bytes at each op.

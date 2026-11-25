@@ -34,7 +34,7 @@ impl BenchReport {
     }
 
     // Turn the times into speeds. `work_per_run` is bytes for copy and operations for math.
-    pub(crate) fn new(name: &'static str, unit: &'static str, work_per_run: f64, timing: &Timing) -> Self {
+    pub fn new(name: &'static str, unit: &'static str, work_per_run: f64, timing: &Timing) -> Self {
         // The work in one submit.
         let work_per_submit = work_per_run * f64::from(timing.runs_per_submit);
         // The middle time.

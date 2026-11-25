@@ -8,6 +8,8 @@ edition = "2024"
 crate-type = ["cdylib", "rlib"]
 
 [dependencies]
+# The GPU base that all model engines share: packages/engine-core.
+engine-core = { path = "../../../packages/engine-core" }
 # metal is the native GPU backend on the Mac. webgpu is the browser backend. wgsl lets us load WGSL shaders.
 wgpu = { version = "30", default-features = false, features = ["std", "metal", "webgpu", "wgsl"] }
 # A one-shot channel. It turns the "buffer is mapped" callback into a value we can await.

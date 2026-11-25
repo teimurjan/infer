@@ -8,7 +8,7 @@ use super::{MemoryPlan, TensorLife};
 // The method is "greedy by size": take the tensors from the largest to the smallest.
 // Put each one into the smallest slot that is free for its whole lifetime, or into a new slot.
 // Because the largest tensors come first, a slot rarely has to grow. It still grows to its largest tensor, so the plan stays correct in any order.
-pub(crate) fn assign_slots(tensors: &[TensorLife]) -> MemoryPlan {
+pub fn assign_slots(tensors: &[TensorLife]) -> MemoryPlan {
     // The tensor positions, largest first. Ties go to the earlier tensor, so the result is the same on every run.
     let mut order: Vec<usize> = (0..tensors.len()).collect();
     // Sort by size (descending), then by first op, then by position.

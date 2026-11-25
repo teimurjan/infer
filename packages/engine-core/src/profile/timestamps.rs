@@ -23,7 +23,7 @@ const NANOSECONDS: f64 = 1e9;
 
 // The query set that the GPU writes timestamps into, and the buffer that the CPU reads them from.
 // One of each serves the whole profile. A new query set per submit ran out in Chromium on the Mac after about 167 submits.
-pub(crate) struct Timestamps {
+pub struct Timestamps {
     // 4096 timestamp slots.
     query_set: wgpu::QuerySet,
     // 4096 x 8 bytes. It counts as read-back memory while the profile lives.
@@ -32,7 +32,7 @@ pub(crate) struct Timestamps {
 
 impl Timestamps {
     // Make the query set and its buffer, and fail if the GPU cannot.
-    pub(crate) async fn new(gpu: &Gpu) -> Result<Self, EngineError> {
+    pub async fn new(gpu: &Gpu) -> Result<Self, EngineError> {
         // The GPU reports a failed allocation as an error, not as a result, so catch it.
         caught(gpu, "timestamp query set", async {
             // The slots.

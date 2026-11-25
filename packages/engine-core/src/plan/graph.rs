@@ -6,11 +6,11 @@ const F32_BYTES: u64 = 4;
 
 // A handle to one tensor of a graph: its position in the tensor list.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
-pub(crate) struct TensorId(usize);
+pub struct TensorId(usize);
 
 // The size of a tensor: three sizes, and 1 for each size that a tensor does not use.
 // An image tensor is [channels, height, width]. A token tensor is [tokens, channels, 1]. A vector is [values, 1, 1].
-pub(crate) type Dims = [u32; 3];
+pub type Dims = [u32; 3];
 
 // One tensor: the name of the op that wrote it, and its size.
 struct Tensor {
@@ -30,7 +30,7 @@ struct Op {
 
 // A forward pass, op by op, in the order the engine runs them.
 #[derive(Default)]
-pub(crate) struct Graph {
+pub struct Graph {
     // Every tensor, in the order they were made.
     tensors: Vec<Tensor>,
     // Every op, in run order.
@@ -41,7 +41,7 @@ pub(crate) struct Graph {
 
 impl Graph {
     // An op that reads `reads` and writes one new tensor of size `dims`. The tensor gets the name of the op.
-    pub(crate) fn op(&mut self, name: impl Into<String>, reads: &[TensorId], dims: Dims) -> TensorId {
+    pub fn op(&mut self, name: impl Into<String>, reads: &[TensorId], dims: Dims) -> TensorId {
         // The new tensor.
         let output = self.new_tensor(name.into(), dims);
         // The op that writes it.
@@ -51,50 +51,49 @@ impl Graph {
     }
 
     // An op that changes `target` in place with the values of `reads`, for example a residual add. No new tensor.
-    pub(crate) fn update(&mut self, target: TensorId, reads: &[TensorId]) {
+    pub fn update(&mut self, target: TensorId, reads: &[TensorId]) {
         // The op reads the target and the other tensors. That keeps all of them live at this op.
         self.ops.push(Op { reads: [target].iter().chain(reads).copied().collect(), writes: Vec::new() });
     }
 
     // Keep a tensor live until the last op, for example the output that the next stage reads.
-    pub(crate) fn keep(&mut self, tensor: TensorId) {
+    pub fn keep(&mut self, tensor: TensorId) {
         self.kept.push(tensor);
     }
 
     // The size of a tensor per dimension.
-    pub(crate) fn dims(&self, tensor: TensorId) -> Dims {
+    pub fn dims(&self, tensor: TensorId) -> Dims {
         self.tensors[tensor.0].dims
     }
 
     // The name of a tensor.
-    pub(crate) fn name(&self, tensor: usize) -> &str {
+    pub fn name(&self, tensor: usize) -> &str {
         &self.tensors[tensor].name
     }
 
     // The size of the tensor at position `tensor` of the tensor list.
-    pub(crate) fn dims_at(&self, tensor: usize) -> Dims {
+    pub fn dims_at(&self, tensor: usize) -> Dims {
         self.tensors[tensor].dims
     }
 
     // The number of tensors.
-    pub(crate) fn tensor_count(&self) -> usize {
+    pub fn tensor_count(&self) -> usize {
         self.tensors.len()
     }
 
     // The number of ops.
-    pub(crate) fn op_count(&self) -> usize {
+    pub fn op_count(&self) -> usize {
         self.ops.len()
     }
 
-    // The ids of the tensors that op `op` reads or writes. The plan test uses it to check that they never share a slot.
-    #[cfg(test)]
-    pub(crate) fn tensors_of_op(&self, op: usize) -> impl Iterator<Item = usize> + '_ {
+    // The ids of the tensors that op `op` reads or writes. The plan tests of the models use it to check that they never share a slot.
+    pub fn tensors_of_op(&self, op: usize) -> impl Iterator<Item = usize> + '_ {
         // The reads, then the writes, as positions in the tensor list.
         self.ops[op].reads.iter().chain(&self.ops[op].writes).map(|tensor| tensor.0)
     }
 
     // The name of the first tensor that op `op` writes, or of the tensor it changes in place.
-    pub(crate) fn op_name(&self, op: usize) -> &str {
+    pub fn op_name(&self, op: usize) -> &str {
         // An in-place op has no writes, so name it by its target, which is its first read.
         let tensor = self.ops[op].writes.first().or(self.ops[op].reads.first());
         // Every op reads or writes something, so the fallback is never used.
@@ -103,7 +102,7 @@ impl Graph {
 
     // The lifetime of every tensor, in the order of the tensor list.
     // A tensor is live from the op that writes it to the last op that reads it. A tensor that nothing reads dies at its writer.
-    pub(crate) fn lifetimes(&self) -> Vec<TensorLife> {
+    pub fn lifetimes(&self) -> Vec<TensorLife> {
         // Start with each tensor live only at its writer. Every tensor has a writer, because only ops make tensors.
         let mut lives: Vec<TensorLife> = self.tensors.iter().map(|tensor| TensorLife { bytes: bytes_of(&tensor.dims), first: 0, last: 0 }).collect();
         // Walk the ops in run order.

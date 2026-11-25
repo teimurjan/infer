@@ -15,17 +15,17 @@ use super::{Graph, MemoryPlan};
 const F32_BYTES: u64 = 4;
 
 // A tensor of the plan: the slot buffer that holds it, and its size.
-pub(crate) struct SlotTensor<'a> {
+pub struct SlotTensor<'a> {
     // The tensor name in the plan, for error messages.
-    pub(crate) name: &'a str,
+    pub name: &'a str,
     // The slot buffer. It can be larger than the tensor.
-    pub(crate) buffer: &'a wgpu::Buffer,
+    pub buffer: &'a wgpu::Buffer,
     // The size of the tensor, as in the plan.
-    pub(crate) dims: [u32; 3],
+    pub dims: [u32; 3],
 }
 
 // One GPU buffer per slot of the plan. The buffers are made once, at the start of the stage, and live until the stage ends.
-pub(crate) struct ActivationPool {
+pub struct ActivationPool {
     // One buffer per slot, in the order of the plan.
     slots: Vec<GpuBuffer>,
     // Tensor name to (slot, size).
@@ -34,7 +34,7 @@ pub(crate) struct ActivationPool {
 
 impl ActivationPool {
     // Make the buffer of every slot, and remember where each tensor of `graph` goes.
-    pub(crate) fn new(gpu: &Gpu, graph: &Graph, plan: &MemoryPlan) -> Self {
+    pub fn new(gpu: &Gpu, graph: &Graph, plan: &MemoryPlan) -> Self {
         // Every slot holds f32 values, so its size is a whole number of values.
         let slots = plan.slot_bytes.iter().enumerate().map(|(slot, &bytes)| gpu.empty_storage_buffer(&format!("slot {slot}"), (bytes / F32_BYTES) as usize)).collect();
         // The slot and the size of each tensor, by name.
@@ -44,7 +44,7 @@ impl ActivationPool {
     }
 
     // The slot buffer and the size of the tensor called `name`.
-    pub(crate) fn tensor<'a>(&'a self, name: &'a str) -> Result<SlotTensor<'a>, EngineError> {
+    pub fn tensor<'a>(&'a self, name: &'a str) -> Result<SlotTensor<'a>, EngineError> {
         // A name that the plan does not have is a typo or a plan that is out of date.
         let &(slot, dims) = self.tensors.get(name).ok_or_else(|| EngineError::UnplannedTensor(name.to_string()))?;
         // The buffer of its slot.

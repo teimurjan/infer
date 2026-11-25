@@ -6,19 +6,19 @@ const WORD: usize = WRITE_ALIGNMENT as usize;
 
 // One write: some bytes of the stream that belong to one tensor.
 #[derive(Debug)]
-pub(crate) struct Piece<'a> {
+pub struct Piece<'a> {
     // The position of the tensor in the span list.
-    pub(crate) tensor: usize,
+    pub tensor: usize,
     // Where the bytes go in the tensor's buffer. Always a multiple of 4.
-    pub(crate) offset: u64,
+    pub offset: u64,
     // The bytes. Their count is always a multiple of 4.
-    pub(crate) bytes: &'a [u8],
+    pub bytes: &'a [u8],
 }
 
 // Follows a weight file that arrives in chunks of any size, and cuts it into 4-byte aligned writes, one tensor at a time.
 // A chunk can end in the middle of a 4-byte word. Those 1 to 3 bytes wait in `carry` for the next chunk.
 #[derive(Default)]
-pub(crate) struct StreamCursor {
+pub struct StreamCursor {
     // The file position of the first byte that has not been cut into pieces yet. Always a multiple of 4.
     position: u64,
     // The bytes after `position` that do not fill a whole word yet. At most 3.
@@ -29,7 +29,7 @@ pub(crate) struct StreamCursor {
 
 impl StreamCursor {
     // Take the next chunk of the file, and call `write` for each piece of it that falls inside a tensor.
-    pub(crate) fn push(&mut self, spans: &[Span], chunk: &[u8], write: &mut impl FnMut(Piece)) {
+    pub fn push(&mut self, spans: &[Span], chunk: &[u8], write: &mut impl FnMut(Piece)) {
         // Count the bytes now, before the chunk is cut.
         self.received += chunk.len() as u64;
         // The bytes that the carry needs to become one whole word. 0 if the carry is empty.
@@ -55,7 +55,7 @@ impl StreamCursor {
 
     // The stream has ended. Write the carry, padded with zeros to one word, and give the number of bytes received.
     // The zeros land in the padding at the end of the last tensor buffer, which is zero already.
-    pub(crate) fn finish(&mut self, spans: &[Span], write: &mut impl FnMut(Piece)) -> u64 {
+    pub fn finish(&mut self, spans: &[Span], write: &mut impl FnMut(Piece)) -> u64 {
         // A carry exists only if the file length is not a multiple of 4.
         if !self.carry.is_empty() {
             // Take the carry out and pad it to one word.

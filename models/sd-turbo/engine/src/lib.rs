@@ -1,25 +1,21 @@
 // activation.rs holds the tensor type that flows between layers on the GPU.
+// The shared GPU base, under the same names as before, so `crate::gpu::Gpu` and the other paths keep working.
+use engine_core::{bench, bytes, checks, dispatch, error, gpu, max_error, memory, plan, profile, submit, weights};
 mod activation;
 // attention/ holds the attention kernel and its test cases.
 mod attention;
 // bench/ holds the copy and math benchmarks.
-mod bench;
 // block.rs holds a part of a network that ran, and shows its output to the caller.
 mod block;
 // bytes.rs turns raw bytes into f32 values.
-mod bytes;
 // cases.rs lists the real SD-Turbo layers we test and checks them.
 mod cases;
 // checks.rs holds the size checks that several kernels share.
-mod checks;
 // conv.rs connects a 3x3 convolution whose weights come from the weight file.
 mod conv;
 // dispatch.rs compiles a kernel, connects its buffers and records dispatches.
-mod dispatch;
 // error.rs lists every way the engine can fail.
-mod error;
 // gpu.rs opens the GPU and moves data to it and back.
-mod gpu;
 // image.rs turns the decoded image into RGBA bytes for a canvas.
 mod image;
 // linear.rs connects linear layers whose weights come from the weight file to the slots of the plan.
@@ -31,13 +27,9 @@ mod step;
 // layers/ holds the linear and convolution kernels.
 mod layers;
 // memory/ counts the bytes of our GPU buffers per category, and the peak.
-mod memory;
 // max_error.rs measures how far the GPU result is from the expected result.
-mod max_error;
 // profile/ times each kernel and prints the table of where the time goes.
-mod profile;
 // plan/ works out the lifetime of each tensor of a forward pass and puts the tensors into reusable buffers.
-mod plan;
 // noise/ makes the starting noise of a seed, the same as torch.randn on the CPU.
 mod noise;
 // packed_cases.rs lists the real SD-Turbo layers that we test with packed 4-bit and 8-bit weights.
@@ -45,7 +37,6 @@ mod packed_cases;
 // silu/ holds the SiLU kernel and the Rust code that runs it.
 mod silu;
 // submit.rs times one submit and checks it against the 0.25 s limit.
-mod submit;
 // taesd/ runs the TAESD decoder, which turns a latent into an image.
 mod taesd;
 // pipeline/ runs the three stages one after the other, with the scheduler step between the UNet and the decoder.
@@ -57,7 +48,6 @@ mod tokenizer;
 // unet/ runs the SD-Turbo UNet block by block.
 mod unet;
 // weights/ reads the flat weight files that convert_weights.py writes.
-mod weights;
 // web.rs is the entry point for the browser. It is only built for WASM.
 #[cfg(target_arch = "wasm32")]
 mod web;

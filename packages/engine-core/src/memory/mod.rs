@@ -12,12 +12,12 @@ use std::rc::Rc;
 
 // The parts that other modules use.
 pub use category::MemoryCategory;
-pub(crate) use counter::MemoryCounter;
+pub use counter::MemoryCounter;
 pub use report::MemoryReport;
 
 // A GPU buffer that adds its size to its category when it is made, and removes it when Rust drops it.
 // Dropping a wgpu buffer frees its GPU memory (in the browser, wgpu calls destroy()).
-pub(crate) struct GpuBuffer {
+pub struct GpuBuffer {
     // The real buffer.
     buffer: wgpu::Buffer,
     // The category that counts this buffer.
@@ -28,7 +28,7 @@ pub(crate) struct GpuBuffer {
 
 impl GpuBuffer {
     // Start counting a buffer that was just made.
-    pub(crate) fn new(buffer: wgpu::Buffer, category: MemoryCategory, counter: &Rc<MemoryCounter>) -> Self {
+    pub fn new(buffer: wgpu::Buffer, category: MemoryCategory, counter: &Rc<MemoryCounter>) -> Self {
         // Its bytes are live from now on.
         counter.add(category, buffer.size());
         // Keep the buffer, its category and a handle to the counter.

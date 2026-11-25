@@ -1,0 +1,22 @@
+[package]
+name = "engine-core"
+version = "0.1.0"
+edition = "2024"
+
+# The GPU base that every model engine shares: the GPU connection, kernels ready to run, memory accounting,
+# timed submits, the profiler, the benchmarks, the activation planner and the weight files.
+[dependencies]
+# metal is the native GPU backend on the Mac. webgpu is the browser backend. wgsl lets us load WGSL shaders.
+wgpu = { version = "30", default-features = false, features = ["std", "metal", "webgpu", "wgsl"] }
+# A one-shot channel. It turns the "buffer is mapped" callback into a value we can await.
+futures-channel = "0.3"
+# A clock that works natively and in the browser. std::time::Instant does not work in WASM.
+web-time = "1"
+# Derive turns each line of the weight index into a Rust struct.
+serde = { version = "1", features = ["derive"] }
+# Parses the JSON weight index that convert_weights.py writes.
+serde_json = "1"
+
+[dev-dependencies]
+# Runs one async function to the end on the native test thread.
+pollster = "1"

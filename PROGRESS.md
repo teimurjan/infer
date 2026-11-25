@@ -640,3 +640,74 @@ Files changed:
 - `apps/site/deploy.ts`: `WEIGHTS_URL` reads the Hugging Face commit `eb09c74f3b310cc507a645857a8ebf7317bbdf21`, which has `text_encoder_q8`. The old commit `ad104bd1d8a5dea36cdec628db65e0deb6cf13b0` stays readable, so a site that was deployed before this change still works.
 
 The deploy has not run. Not measured on the iPhone through the deployed site.
+
+## 2026-11-24: The shared engine base, packages/engine-core
+
+The user chose LFM3-Omni-2B as the next model (`models/lfm3-omni/PROGRESS.md`). Its engine needs the same GPU base as SD-Turbo. The user chose to move that base into a shared crate first, with no change in behavior.
+
+Files moved with `git mv`, from `models/sd-turbo/engine/src/` to `packages/engine-core/src/`: `bytes.rs`, `checks.rs`, `error.rs`, `gpu.rs`, `dispatch.rs`, `submit.rs`, `max_error.rs`, and the folders `memory/`, `profile/`, `bench/`, `plan/` and `weights/`, with their shaders.
+
+Files added:
+
+- `packages/engine-core/Cargo.toml` and `src/lib.rs`: the crate `engine-core`, with the dependencies that the moved code needs.
+- `packages/engine-core/src/weights/bits.rs`: `WeightBits`, moved out of `models/sd-turbo/engine/src/layers/packed/mod.rs`, because `weights/buffers.rs` reads it.
+- `models/sd-turbo/engine/tests/weight_files.rs`: the test `stored_lengths_match_the_real_files`, moved out of `weights/index.rs`, because it reads the weight files of SD-Turbo. It now also checks `unet_q8` and `text_encoder_q8`.
+
+Files changed:
+
+- `models/sd-turbo/engine/Cargo.toml`: the dependency `engine-core`.
+- `models/sd-turbo/engine/src/lib.rs`: `use engine_core::{bench, bytes, checks, dispatch, error, gpu, max_error, memory, plan, profile, submit, weights};` in place of the 12 `mod` lines. The modules keep their old names, so every `crate::gpu::Gpu` path of SD-Turbo stays the same.
+- `models/sd-turbo/engine/src/layers/packed/mod.rs`: `pub use engine_core::weights::WeightBits;`.
+- In the moved files, `pub(crate)` became `pub`, because another crate now uses them.
+- `packages/engine-core/src/plan/graph.rs`: `tensors_of_op` is no longer test-only, because the plan test of SD-Turbo is in another crate now.
+- `CLAUDE.md`: the layout names `packages/engine-core/`.
+
+Design choices:
+
+- Only code that has no SD-Turbo shape in it moved. The kernels, the stages and the plans stay in the model.
+- The error type moved whole. Its variants are about GPU, sizes and weight files, and LFM3 needs them too.
+- No Cargo workspace: each engine keeps its own folder and `target/`, and names the shared crate by path.
+
+Commands and outputs. Device: Mac native.
+
+`cargo build --release --all-targets` in `models/sd-turbo/engine`: no warnings. The first build failed with `no method named tensors_of_op found for struct Graph`, fixed as above.
+
+`cargo test --release` in `packages/engine-core`: `test result: ok. 26 passed; 0 failed`. The first run failed in `stored_lengths_match_the_real_files` with `No such file or directory`, because the test looked for the weights next to the shared crate. It moved to SD-Turbo, as above.
+
+`cargo test --release` in `models/sd-turbo/engine` (one line per test binary):
+
+```
+unittests result: ok. 21 passed;
+tests/attention.rs ok. 1 passed; 0
+tests/layers.rs ok. 1 passed; 0
+tests/noise.rs ok. 1 passed; 0
+tests/packed_layers.rs ok. 1 passed; 0
+tests/pipeline.rs ok. 3 passed; 0
+tests/silu.rs ok. 1 passed; 0
+tests/stream_weights.rs ok. 2 passed; 0
+tests/taesd.rs ok. 1 passed; 0
+tests/text.rs ok. 1 passed; 0
+tests/tokenizer.rs ok. 1 passed; 0
+tests/unet.rs ok. 1 passed; 0
+tests/unet_packed.rs ok. 1 passed; 0
+tests/weight_files.rs ok. 1 passed; 0
+```
+
+Calculation: before the move, the unit tests of the engine were 48. Now 21 + 26 = 47 are unit tests, and 1 is in `tests/weight_files.rs`. 47 + 1 = 48.
+
+`bun run build` and `bun run typecheck`: every workspace exited with code 0.
+
+Device: Mac Chromium, the dev pages in Playwright Chromium:
+
+```
+golden-image: PASSED: image bytes: 1178 of 1048576 differ from golden/text_encoder_q8_unet_q8/taesd_image, by at most 1
+make-20: image 2 of 20: 2.46 s; longest submit 116.3 ms; live 0 bytes; WASM memory 25886720 bytes; 1178 image bytes differ, by at most 1
+make-20: image 20 of 20: 2.21 s; longest submit 30.1 ms; live 0 bytes; WASM memory 25886720 bytes; 1178 image bytes differ, by at most 1
+[done] 20 images in 45.01 s true
+```
+
+The 1178 differing bytes are the same count as in Mac Chromium before the move ("2026-11-20: Step 2 of the plan, part 2" in `models/sd-turbo/PROGRESS.md`).
+
+Failed: `bun run phone sd-turbo:golden-image --timeout 12` stopped with `FAILED: no iPhone is connected: plug it in with a cable, unlock it, and tap Trust`. Not measured on the iPhone.
+
+Next step: the LFM3 engine in `models/lfm3-omni/engine/`, on top of `engine-core`.

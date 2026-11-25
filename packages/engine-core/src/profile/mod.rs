@@ -39,7 +39,7 @@ pub enum ProfileMode {
 
 // What times the dispatches of a running profile. A clone is a second handle to the same query set.
 #[derive(Clone)]
-pub(crate) enum Timer {
+pub enum Timer {
     // GPU timestamps, written into this query set.
     Timestamps(Rc<Timestamps>),
     // The CPU clock.
@@ -79,17 +79,17 @@ pub struct Profile {
 
 impl Profile {
     // An empty profile.
-    pub(crate) fn new(timer: Timer, door_gbps: f64) -> Self {
+    pub fn new(timer: Timer, door_gbps: f64) -> Self {
         Self { timer, door_gbps, kernels: BTreeMap::new() }
     }
 
     // What times each dispatch.
-    pub(crate) fn timer(&self) -> Timer {
+    pub fn timer(&self) -> Timer {
         self.timer.clone()
     }
 
     // Add one dispatch that took `seconds`.
-    pub(crate) fn add(&mut self, work: Work, seconds: f64) {
+    pub fn add(&mut self, work: Work, seconds: f64) {
         // The total of this kernel name, made at its first dispatch.
         let totals = self.kernels.entry(work.kernel).or_default();
         // One more call, its time and its bytes.
@@ -131,7 +131,7 @@ pub fn best_mode(gpu: &Gpu) -> ProfileMode {
 
 // Run `dispatches` with timing per dispatch, add each time to the profile, and return the seconds of the step.
 // Each submit is checked against the project limit. A GPU error in the step stops the run, so a skipped submit cannot give a wrong table or image.
-pub(crate) async fn profiled_submit(gpu: &Gpu, timer: &Timer, label: &str, dispatches: &[Dispatch]) -> Result<f64, EngineError> {
+pub async fn profiled_submit(gpu: &Gpu, timer: &Timer, label: &str, dispatches: &[Dispatch]) -> Result<f64, EngineError> {
     // Each timer gives the seconds of the whole step and the seconds of every dispatch.
     let timed = async {
         match timer {

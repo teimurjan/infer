@@ -37,25 +37,8 @@ const WORD_BITS: usize = 32;
 // Two float16 scales share one u32 word.
 const SCALES_PER_WORD: usize = 2;
 
-// How many bits each packed weight has. The kernels need 4 * bits to fill a word exactly, so only 4 and 8 work.
-#[derive(Clone, Copy)]
-pub enum WeightBits {
-    // Integers from -8 to 7.
-    Four,
-    // Integers from -128 to 127.
-    Eight,
-}
-
-impl WeightBits {
-    // The number of bits, as the kernels read it.
-    pub fn value(self) -> u32 {
-        // One number per variant.
-        match self {
-            Self::Four => 4,
-            Self::Eight => 8,
-        }
-    }
-}
+// The bit width of a packed weight lives in the shared weight code, because the weight buffers read it too.
+pub use engine_core::weights::WeightBits;
 
 // The tensors of one packed layer, as raw file bytes or f32 values.
 pub struct PackedTensors<'a> {

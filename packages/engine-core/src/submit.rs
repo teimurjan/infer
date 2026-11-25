@@ -11,10 +11,10 @@ use crate::gpu::Gpu;
 use crate::profile::profiled_submit;
 
 // The project limit for one submit. iOS loses the device near 0.5 s.
-pub(crate) const SUBMIT_LIMIT_SECONDS: f64 = 0.25;
+pub const SUBMIT_LIMIT_SECONDS: f64 = 0.25;
 
 // Send one command list to the GPU, wait until it is done, and return the seconds from submit to done.
-pub(crate) async fn timed_submit(gpu: &Gpu, commands: wgpu::CommandBuffer) -> Result<f64, EngineError> {
+pub async fn timed_submit(gpu: &Gpu, commands: wgpu::CommandBuffer) -> Result<f64, EngineError> {
     // Start the clock after the commands are recorded, so recording is not part of the time.
     let start = Instant::now();
     // Send the commands to the GPU.
@@ -27,7 +27,7 @@ pub(crate) async fn timed_submit(gpu: &Gpu, commands: wgpu::CommandBuffer) -> Re
 
 // Run `dispatches` once, in order, as one submit. Fail if the submit broke the project limit.
 // While a profile runs, the profiler times each dispatch, and every submit it makes is checked against the limit too.
-pub(crate) async fn submit_within_limit(gpu: &Gpu, label: &str, dispatches: &[Dispatch]) -> Result<f64, EngineError> {
+pub async fn submit_within_limit(gpu: &Gpu, label: &str, dispatches: &[Dispatch]) -> Result<f64, EngineError> {
     // In the browser, the GPU process compiles new shaders and copies new buffers in the order it gets them.
     // Wait for that work first, so the timed submit holds only the kernels. In Chromium, the first TAESD submit took 590.9 ms without this wait.
     gpu.finish_uploads().await?;
@@ -41,7 +41,7 @@ pub(crate) async fn submit_within_limit(gpu: &Gpu, label: &str, dispatches: &[Di
 }
 
 // Keep the time of one submit for the page, and fail if it broke the project limit. Returns the same seconds.
-pub(crate) fn check_submit(gpu: &Gpu, label: &str, seconds: f64) -> Result<f64, EngineError> {
+pub fn check_submit(gpu: &Gpu, label: &str, seconds: f64) -> Result<f64, EngineError> {
     // Keep the longest time, so the page can show it.
     gpu.record_submit(seconds);
     // A submit at or past the limit could lose the device on the iPhone.

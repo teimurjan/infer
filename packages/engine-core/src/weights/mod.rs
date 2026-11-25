@@ -15,12 +15,14 @@ mod upload;
 mod gpu_weights;
 // buffers.rs gives the slot kernels their weights as GPU buffers, from a CPU reader or from GpuWeights.
 mod buffers;
+// bits.rs holds the bit width of a packed weight.
+mod bits;
 
 // Our error type.
 use crate::error::EngineError;
 
 // The parsed index.
-pub(crate) use index::WeightIndex;
+pub use index::WeightIndex;
 // The GPU bytes of one weight file.
 pub use index::weight_bytes_on_gpu;
 // The in-memory reader.
@@ -32,7 +34,9 @@ pub use file::{WeightFile, load_to_gpu};
 pub use gpu_weights::{GpuTensor, GpuWeights};
 pub use upload::WeightUpload;
 // The weight buffers of the slot kernels.
-pub(crate) use buffers::{Matrix, MatrixWeight, Uploading, WeightBuffer, WeightBuffers};
+pub use buffers::{Matrix, MatrixWeight, Uploading, WeightBuffer, WeightBuffers};
+// The bit width of a packed weight.
+pub use bits::WeightBits;
 
 // One tensor as it is stored: its shape and its raw float32 bytes, lowest byte first.
 pub struct WeightTensor {

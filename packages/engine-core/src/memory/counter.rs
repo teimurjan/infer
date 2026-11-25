@@ -9,7 +9,7 @@ const CATEGORIES: usize = MemoryCategory::ALL.len();
 
 // Counts the bytes of every GPU buffer that the engine holds right now, per category, and the most it ever held in total.
 #[derive(Default)]
-pub(crate) struct MemoryCounter {
+pub struct MemoryCounter {
     // Bytes in buffers that exist now, one number per category, in the order of MemoryCategory::ALL.
     live: [Cell<u64>; CATEGORIES],
     // The largest total that `live` reached since the last reset.
@@ -45,22 +45,22 @@ impl MemoryCounter {
     }
 
     // The number of buffers made so far, of every category.
-    pub(crate) fn buffers_made(&self) -> u64 {
+    pub fn buffers_made(&self) -> u64 {
         self.made.get()
     }
 
     // The most bytes held at one time since the last reset.
-    pub(crate) fn peak(&self) -> u64 {
+    pub fn peak(&self) -> u64 {
         self.peak.get()
     }
 
     // Start a new measurement from the bytes held now.
-    pub(crate) fn reset_peak(&self) {
+    pub fn reset_peak(&self) {
         self.peak.set(self.total());
     }
 
     // A copy of the numbers right now, for a report.
-    pub(crate) fn report(&self) -> MemoryReport {
+    pub fn report(&self) -> MemoryReport {
         // Pair each category with its number.
         MemoryReport { live: MemoryCategory::ALL.map(|category| (category, self.live[category.slot()].get())), peak: self.peak() }
     }

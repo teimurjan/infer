@@ -5585,3 +5585,7 @@ Calculations:
 - In "2026-11-20: Step 2 of the plan, part 2", the longest submit of "Make 20" was 131 ms. In "2026-11-19: "Make 20" with the 8-bit UNet", it was 198 ms, from image 5 on. So the iPhone slows down in some runs and not in others. The 18-minute rest was not enough to prevent it in this run.
 
 Conclusion: the kept decoder file makes a cool warm image 15.2% faster, 4.105 s against 4.838 s. But a long run on a warm phone brings the longest submit to 204 ms. If one submit takes 250 ms or more, the device is lost (`CLAUDE.md`). Next step proposal: step 7, smaller submits, before more speed work.
+
+## 2026-11-24: The GPU base moved to packages/engine-core
+
+The full entry is "2026-11-24: The shared engine base, packages/engine-core" in `PROGRESS.md` at the repository root. The engine now takes its GPU base from the shared crate. All tests pass, and the golden image in Mac Chromium is unchanged: 1178 bytes differ, by at most 1. Not measured on the iPhone.

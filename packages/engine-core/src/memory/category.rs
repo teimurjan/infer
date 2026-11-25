@@ -16,7 +16,7 @@ impl MemoryCategory {
     pub const ALL: [Self; 4] = [Self::Weights, Self::Activations, Self::Uniforms, Self::ReadBack];
 
     // The position of this category in ALL. The variants are declared in the same order, so the variant number is the position.
-    pub(crate) fn slot(self) -> usize {
+    pub fn slot(self) -> usize {
         self as usize
     }
 

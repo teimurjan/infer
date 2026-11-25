@@ -15,7 +15,7 @@ use crate::error::EngineError;
 // The result type that the native example and the web page print.
 pub use report::BenchReport;
 // The timing loop, which the layer tests use too.
-pub(crate) use measure::{Kernel, measure};
+pub use measure::{Kernel, measure};
 // The copy benchmark alone. The profiler uses its median as the door number.
 pub use copy::copy_benchmark;
 

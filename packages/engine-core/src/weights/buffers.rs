@@ -9,7 +9,7 @@ use crate::memory::GpuBuffer;
 // A kernel ready to record, and the function that records it.
 use crate::dispatch::{Dispatch, Work, encode_runs};
 // The bit width of a packed weight.
-use crate::layers::WeightBits;
+use super::bits::WeightBits;
 
 // The two places that weights come from.
 use super::{GpuWeights, WeightSource};
@@ -22,7 +22,7 @@ const WORKGROUP_SIZE: u32 = 256;
 const F32_BYTES: u64 = 4;
 
 // A weight buffer that a slot kernel binds: one that a loaded weight file owns, or one made for this kernel.
-pub(crate) enum WeightBuffer<'a> {
+pub enum WeightBuffer<'a> {
     // A buffer of `GpuWeights`. The weights must live as long as the kernel, so the UNet stage keeps them.
     Borrowed(&'a wgpu::Buffer),
     // A buffer made for this kernel. The kernel must keep it.
@@ -31,7 +31,7 @@ pub(crate) enum WeightBuffer<'a> {
 
 impl WeightBuffer<'_> {
     // The buffer, for a bind group.
-    pub(crate) fn buffer(&self) -> &wgpu::Buffer {
+    pub fn buffer(&self) -> &wgpu::Buffer {
         // Both kinds hold a wgpu buffer.
         match self {
             Self::Borrowed(buffer) => buffer,
@@ -40,7 +40,7 @@ impl WeightBuffer<'_> {
     }
 
     // The buffer that the kernel must keep, if this one is its own.
-    pub(crate) fn into_owned(self) -> Option<GpuBuffer> {
+    pub fn into_owned(self) -> Option<GpuBuffer> {
         // A borrowed buffer stays with its owner.
         match self {
             Self::Borrowed(_) => None,
@@ -50,15 +50,15 @@ impl WeightBuffer<'_> {
 }
 
 // A float32 tensor on the GPU, with its shape.
-pub(crate) struct FloatWeight<'a> {
+pub struct FloatWeight<'a> {
     // The size of each dimension, in PyTorch's order.
-    pub(crate) shape: Vec<usize>,
+    pub shape: Vec<usize>,
     // The f32 values.
-    pub(crate) buffer: WeightBuffer<'a>,
+    pub buffer: WeightBuffer<'a>,
 }
 
 // The two kinds of weight matrix that the layer kernels read.
-pub(crate) enum Matrix<'a> {
+pub enum Matrix<'a> {
     // f32 values in PyTorch's layout.
     Float(WeightBuffer<'a>),
     // Packed integers and float16 row scales, in the format of pack_weights.py.
@@ -73,15 +73,15 @@ pub(crate) enum Matrix<'a> {
 }
 
 // A weight matrix (of a linear layer or a convolution) with its PyTorch shape.
-pub(crate) struct MatrixWeight<'a> {
+pub struct MatrixWeight<'a> {
     // The size of each dimension, in PyTorch's order, for example [out, in, 3, 3].
-    pub(crate) shape: Vec<usize>,
+    pub shape: Vec<usize>,
     // The values.
-    pub(crate) matrix: Matrix<'a>,
+    pub matrix: Matrix<'a>,
 }
 
 // Where the slot kernels get their weights.
-pub(crate) trait WeightBuffers {
+pub trait WeightBuffers {
     // A tensor as f32 values, such as a bias or a norm scale.
     fn float(&self, gpu: &Gpu, name: &str) -> Result<FloatWeight<'_>, EngineError>;
     // A weight matrix, float or packed.
@@ -89,7 +89,7 @@ pub(crate) trait WeightBuffers {
 }
 
 // Weights from a CPU reader. Each tensor is read and copied to a new GPU buffer when a kernel asks for it.
-pub(crate) struct Uploading<'a, W: WeightSource>(pub(crate) &'a W);
+pub struct Uploading<'a, W: WeightSource>(pub &'a W);
 
 impl<W: WeightSource> WeightBuffers for Uploading<'_, W> {
     // Read the f32 bytes and copy them to the GPU.

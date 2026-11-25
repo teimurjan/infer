@@ -18,20 +18,20 @@ const FLOAT32: &str = "float32";
 
 // One line of the index that convert_weights.py writes.
 #[derive(Deserialize)]
-pub(crate) struct WeightEntry {
+pub struct WeightEntry {
     // The PyTorch name, for example "conv_in.weight".
-    pub(crate) name: String,
+    pub name: String,
     // Where the tensor starts in the .bin file, in bytes.
-    pub(crate) offset: u64,
+    pub offset: u64,
     // The size of each dimension, in PyTorch's order.
-    pub(crate) shape: Vec<usize>,
+    pub shape: Vec<usize>,
     // "float32", "float16", or "int8" and "int4" for packed weights.
-    pub(crate) dtype: String,
+    pub dtype: String,
 }
 
 impl WeightEntry {
     // The number of bytes of this tensor. Fails for any dtype other than float32.
-    pub(crate) fn byte_length(&self) -> Result<usize, EngineError> {
+    pub fn byte_length(&self) -> Result<usize, EngineError> {
         // The kernels read float32 only, so a float16 file must stop here.
         if self.dtype != FLOAT32 {
             return Err(EngineError::WeightDtype { name: self.name.clone(), dtype: self.dtype.clone() });
@@ -42,7 +42,7 @@ impl WeightEntry {
 
     // Where row `row` of this float32 tensor starts in the .bin file, and its length in bytes. A row is everything after dimension 0.
     // The text encoder reads 77 rows of its token table this way, not all 49,408.
-    pub(crate) fn row_range(&self, row: usize) -> Result<(u64, usize), EngineError> {
+    pub fn row_range(&self, row: usize) -> Result<(u64, usize), EngineError> {
         // Dimension 0 counts the rows.
         let &rows = self.shape.first().ok_or_else(|| EngineError::WeightShape { name: self.name.clone(), shape: self.shape.clone(), expected: "at least one dimension for rows".to_string() })?;
         // A row past the end is an error, not bytes of the next tensor.
@@ -56,7 +56,7 @@ impl WeightEntry {
     }
 
     // The number of bytes that this tensor takes in the .bin file, for every dtype that convert_weights.py writes.
-    pub(crate) fn stored_byte_length(&self) -> Result<u64, EngineError> {
+    pub fn stored_byte_length(&self) -> Result<u64, EngineError> {
         // The number of values. An empty shape is one value, as in PyTorch.
         let values = self.shape.iter().map(|&size| size as u64).product::<u64>();
         // Pick the size rule of this dtype.
@@ -87,14 +87,14 @@ impl WeightEntry {
 }
 
 // Every entry of one index, found by name.
-pub(crate) struct WeightIndex {
+pub struct WeightIndex {
     // Tensor name to entry.
     entries: HashMap<String, WeightEntry>,
 }
 
 impl WeightIndex {
     // Parse the JSON text of an index: a list of {name, offset, shape, dtype} objects.
-    pub(crate) fn parse(json: &str) -> Result<Self, EngineError> {
+    pub fn parse(json: &str) -> Result<Self, EngineError> {
         // serde_json checks that every object has the four fields with the right types.
         let list: Vec<WeightEntry> = serde_json::from_str(json).map_err(|error| EngineError::WeightIndex(error.to_string()))?;
         // Key each entry by its name.
@@ -102,7 +102,7 @@ impl WeightIndex {
     }
 
     // Every entry, from the first byte of the file to the last. The weight stream needs this order.
-    pub(crate) fn into_file_order(self) -> Vec<WeightEntry> {
+    pub fn into_file_order(self) -> Vec<WeightEntry> {
         // Take the entries out of the map.
         let mut entries: Vec<WeightEntry> = self.entries.into_values().collect();
         // Sort them by where they start.
@@ -111,7 +111,7 @@ impl WeightIndex {
     }
 
     // The entry with this name.
-    pub(crate) fn entry(&self, name: &str) -> Result<&WeightEntry, EngineError> {
+    pub fn entry(&self, name: &str) -> Result<&WeightEntry, EngineError> {
         // A missing name usually means a typo in the engine or the wrong .bin file.
         self.entries.get(name).ok_or_else(|| EngineError::MissingWeight(name.to_string()))
     }
@@ -172,29 +172,6 @@ mod tests {
         assert_eq!(length("q4").unwrap(), 16);
         // An unknown dtype must stop the loader.
         assert!(matches!(length("odd"), Err(EngineError::UnknownDtype { .. })));
-    }
-
-    // In the real files, each tensor must end in the 256 bytes before the next one starts.
-    // convert_weights.py pads only to the next multiple of 256, so a wrong size rule shows up as a larger gap or an overlap.
-    #[test]
-    fn stored_lengths_match_the_real_files() {
-        // The weights folder is in the project folder, one level above engine/.
-        let folder = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("../weights");
-        // Every index that the converter wrote. unet_packed.json has the int4 and int8 tensors.
-        for name in ["taesd", "unet_packed", "text_encoder", "unet", "vae"] {
-            // Read and parse the index.
-            let json = std::fs::read_to_string(folder.join(format!("{name}.json"))).unwrap();
-            // The entries in file order.
-            let entries = WeightIndex::parse(&json).unwrap().into_file_order();
-            // Each tensor and the one after it.
-            for pair in entries.windows(2) {
-                // Where the first tensor ends.
-                let end = pair[0].offset + pair[0].stored_byte_length().unwrap();
-                // The gap is the alignment padding: 0 to 255 bytes.
-                let gap = pair[1].offset.checked_sub(end).unwrap_or_else(|| panic!("{name}: {} overlaps {}", pair[0].name, pair[1].name));
-                assert!(gap < 256, "{name}: {} bytes between {} and {}", gap, pair[0].name, pair[1].name);
-            }
-        }
     }
 
     // A wrong row offset would give the text encoder the embedding of another token.

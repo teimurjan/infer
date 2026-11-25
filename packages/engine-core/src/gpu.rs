@@ -22,9 +22,9 @@ use crate::profile::{Profile, Timer};
 // One open connection to the GPU. Make it once and use it for every kernel.
 pub struct Gpu {
     // Creates buffers, shaders and pipelines.
-    pub(crate) device: wgpu::Device,
+    pub device: wgpu::Device,
     // Sends finished command lists to the GPU and writes data into buffers.
-    pub(crate) queue: wgpu::Queue,
+    pub queue: wgpu::Queue,
     // The bytes of every buffer made through this Gpu that still exists, per category, and the peak.
     memory: Rc<MemoryCounter>,
     // The number of bind groups made through this Gpu so far. A test uses it to prove that a run makes none.
@@ -54,19 +54,19 @@ impl Gpu {
     }
 
     // True if shaders on this device can use the float16 type ("enable f16;").
-    pub(crate) fn has_shader_f16(&self) -> bool {
+    pub fn has_shader_f16(&self) -> bool {
         self.device.features().contains(wgpu::Features::SHADER_F16)
     }
 
     // The largest number of workgroups that one dispatch can start along x.
-    pub(crate) fn max_workgroups_per_dispatch(&self) -> u32 {
+    pub fn max_workgroups_per_dispatch(&self) -> u32 {
         // WebGPU guarantees at least 65535.
         self.device.limits().max_compute_workgroups_per_dimension
     }
 
     // The most bytes that our GPU buffers held at one time since the last reset_peak_bytes.
     // It counts only buffers that the engine made, not memory that the driver or the browser uses.
-    pub(crate) fn peak_bytes(&self) -> u64 {
+    pub fn peak_bytes(&self) -> u64 {
         self.memory.peak()
     }
 
@@ -81,7 +81,7 @@ impl Gpu {
     }
 
     // Remember one submit time if it is the longest so far. submit.rs calls this after each submit.
-    pub(crate) fn record_submit(&self, seconds: f64) {
+    pub fn record_submit(&self, seconds: f64) {
         self.longest_submit.set(self.longest_submit.get().max(seconds));
     }
 
@@ -96,7 +96,7 @@ impl Gpu {
     }
 
     // Start a profile, or end it with None. start_profile in profile/ calls this.
-    pub(crate) fn set_profile(&self, profile: Option<Profile>) {
+    pub fn set_profile(&self, profile: Option<Profile>) {
         self.profile.replace(profile);
     }
 
@@ -106,12 +106,12 @@ impl Gpu {
     }
 
     // What times each dispatch of the running profile. None for a normal run. The borrow ends before the caller awaits.
-    pub(crate) fn profile_timer(&self) -> Option<Timer> {
+    pub fn profile_timer(&self) -> Option<Timer> {
         self.profile.borrow().as_ref().map(Profile::timer)
     }
 
     // Add dispatches and their seconds to the running profile. Does nothing if no profile runs.
-    pub(crate) fn add_to_profile(&self, dispatches: impl Iterator<Item = (Work, f64)>) {
+    pub fn add_to_profile(&self, dispatches: impl Iterator<Item = (Work, f64)>) {
         // The borrow ends at the end of this call, before any await of the caller.
         if let Some(profile) = self.profile.borrow_mut().as_mut() {
             dispatches.for_each(|(work, seconds)| profile.add(work, seconds));
@@ -119,7 +119,7 @@ impl Gpu {
     }
 
     // Make a buffer that a query set can be copied into, and that read_bytes can copy out of. It counts as read-back memory.
-    pub(crate) fn query_resolve_buffer(&self, bytes: u64) -> GpuBuffer {
+    pub fn query_resolve_buffer(&self, bytes: u64) -> GpuBuffer {
         // QUERY_RESOLVE: resolve_query_set can write it. COPY_SRC: read_bytes can copy out of it.
         let descriptor = wgpu::BufferDescriptor { label: Some("timestamps"), size: bytes, usage: wgpu::BufferUsages::QUERY_RESOLVE | wgpu::BufferUsages::COPY_SRC, mapped_at_creation: false };
         // Make it and count it.
@@ -127,7 +127,7 @@ impl Gpu {
     }
 
     // Count one more bind group. dispatch.rs calls this each time it makes one.
-    pub(crate) fn count_bind_group(&self) {
+    pub fn count_bind_group(&self) {
         self.bind_groups.set(self.bind_groups.get() + 1);
     }
 
@@ -142,7 +142,7 @@ impl Gpu {
     }
 
     // The largest buffer that this device allows, in bytes. The default WebGPU limits give 256 MiB.
-    pub(crate) fn max_buffer_bytes(&self) -> u64 {
+    pub fn max_buffer_bytes(&self) -> u64 {
         self.device.limits().max_buffer_size
     }
 
@@ -152,13 +152,13 @@ impl Gpu {
     }
 
     // Make a storage buffer (GPU memory that a shader can read) that holds `values`.
-    pub(crate) fn storage_buffer_from(&self, label: &str, values: &[f32], category: MemoryCategory) -> GpuBuffer {
+    pub fn storage_buffer_from(&self, label: &str, values: &[f32], category: MemoryCategory) -> GpuBuffer {
         // 4 bytes per value, lowest byte first.
         self.storage_buffer_from_bytes(label, &f32_to_le_bytes(values), category)
     }
 
     // Make a storage buffer that holds raw bytes, for example float32 weights read straight from a file.
-    pub(crate) fn storage_buffer_from_bytes(&self, label: &str, bytes: &[u8], category: MemoryCategory) -> GpuBuffer {
+    pub fn storage_buffer_from_bytes(&self, label: &str, bytes: &[u8], category: MemoryCategory) -> GpuBuffer {
         // Describe the buffer: its name, its bytes, and what we use it for.
         let descriptor = wgpu::util::BufferInitDescriptor {
             // The name shows up in GPU error messages.
@@ -173,7 +173,7 @@ impl Gpu {
     }
 
     // Make an empty weight buffer of `bytes` bytes. The weight loader fills it with queue.write_buffer, one piece at a time.
-    pub(crate) fn empty_weight_buffer(&self, label: &str, bytes: u64) -> GpuBuffer {
+    pub fn empty_weight_buffer(&self, label: &str, bytes: u64) -> GpuBuffer {
         // Describe the buffer.
         let descriptor = wgpu::BufferDescriptor {
             // The tensor name, for GPU error messages.
@@ -190,7 +190,7 @@ impl Gpu {
     }
 
     // Make an empty storage buffer with room for `count` f32 values. A shader writes into it.
-    pub(crate) fn empty_storage_buffer(&self, label: &str, count: usize) -> GpuBuffer {
+    pub fn empty_storage_buffer(&self, label: &str, count: usize) -> GpuBuffer {
         // Describe the buffer.
         let descriptor = wgpu::BufferDescriptor {
             // The name shows up in GPU error messages.
@@ -207,7 +207,7 @@ impl Gpu {
     }
 
     // Make a small uniform buffer (read-only constants for a shader) that holds `values`, such as a tensor shape.
-    pub(crate) fn uniform_buffer(&self, label: &str, values: &[u32]) -> GpuBuffer {
+    pub fn uniform_buffer(&self, label: &str, values: &[u32]) -> GpuBuffer {
         // Pad with zeros to a multiple of 4 values (16 bytes), the size step of WGSL uniform structs.
         let padded: Vec<u32> = values.iter().copied().chain(std::iter::repeat(0)).take(values.len().next_multiple_of(4)).collect();
         // Each u32 becomes 4 bytes, lowest byte first.
@@ -226,7 +226,7 @@ impl Gpu {
     }
 
     // Wait until the GPU has finished every command list submitted so far (WebGPU's onSubmittedWorkDone).
-    pub(crate) async fn wait_for_submitted_work(&self) -> Result<(), EngineError> {
+    pub async fn wait_for_submitted_work(&self) -> Result<(), EngineError> {
         // Ask the queue to call us when the GPU is done, and wait for that call.
         self.wait_for_callback(|sender| {
             // The callback only sends an empty message. If nobody waits, there is nothing to do.
@@ -238,32 +238,32 @@ impl Gpu {
     }
 
     // Write f32 values to the start of a buffer. The upload runs before the next submit.
-    pub(crate) fn write_f32(&self, target: &wgpu::Buffer, values: &[f32]) {
+    pub fn write_f32(&self, target: &wgpu::Buffer, values: &[f32]) {
         // 4 bytes per value, lowest byte first, at offset 0.
         self.queue.write_buffer(target, 0, &f32_to_le_bytes(values));
     }
 
     // Copy a GPU buffer back to the CPU and read it as f32 values.
-    pub(crate) async fn read_f32(&self, source: &wgpu::Buffer) -> Result<Vec<f32>, EngineError> {
+    pub async fn read_f32(&self, source: &wgpu::Buffer) -> Result<Vec<f32>, EngineError> {
         // Read the raw bytes, then build one f32 from each group of 4.
         Ok(f32_from_le_bytes(&self.read_bytes(source).await?))
     }
 
     // Copy the first `count` f32 values of a GPU buffer back to the CPU. A slot of the activation plan can be larger than its tensor.
-    pub(crate) async fn read_f32_prefix(&self, source: &wgpu::Buffer, count: usize) -> Result<Vec<f32>, EngineError> {
+    pub async fn read_f32_prefix(&self, source: &wgpu::Buffer, count: usize) -> Result<Vec<f32>, EngineError> {
         // Read only the bytes of the tensor, then build one f32 from each group of 4.
         Ok(f32_from_le_bytes(&self.read_byte_prefix(source, f32_buffer_size(count)).await?))
     }
 
     // Copy a whole GPU buffer back to the CPU and return its raw bytes.
-    pub(crate) async fn read_bytes(&self, source: &wgpu::Buffer) -> Result<Vec<u8>, EngineError> {
+    pub async fn read_bytes(&self, source: &wgpu::Buffer) -> Result<Vec<u8>, EngineError> {
         // Every byte of the buffer.
         self.read_byte_prefix(source, source.size()).await
     }
 
     // Copy the first `size` bytes of a GPU buffer back to the CPU.
     // The CPU cannot read a STORAGE buffer directly, so we copy into a staging buffer that it can read.
-    pub(crate) async fn read_byte_prefix(&self, source: &wgpu::Buffer, size: u64) -> Result<Vec<u8>, EngineError> {
+    pub async fn read_byte_prefix(&self, source: &wgpu::Buffer, size: u64) -> Result<Vec<u8>, EngineError> {
         // Describe the staging buffer.
         let staging_descriptor = wgpu::BufferDescriptor {
             // The name shows up in GPU error messages.

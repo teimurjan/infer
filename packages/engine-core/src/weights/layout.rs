@@ -5,29 +5,29 @@ use crate::error::EngineError;
 use super::index::WeightEntry;
 
 // write_buffer needs offsets and sizes that are multiples of 4 bytes (WebGPU's COPY_BUFFER_ALIGNMENT).
-pub(crate) const WRITE_ALIGNMENT: u64 = 4;
+pub const WRITE_ALIGNMENT: u64 = 4;
 // CLAUDE.md: one GPU buffer on the iPhone can be at most about 1073 MB.
-pub(crate) const BUFFER_LIMIT_BYTES: u64 = 1_073_000_000;
+pub const BUFFER_LIMIT_BYTES: u64 = 1_073_000_000;
 
 // Where one tensor sits in the weight file. Its GPU buffer has exactly `length` bytes.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
-pub(crate) struct Span {
+pub struct Span {
     // The first byte of the tensor in the file.
-    pub(crate) start: u64,
+    pub start: u64,
     // The stored bytes of the tensor, rounded up to a multiple of 4.
-    pub(crate) length: u64,
+    pub length: u64,
 }
 
 impl Span {
     // One past the last byte of the span.
-    pub(crate) fn end(self) -> u64 {
+    pub fn end(self) -> u64 {
         self.start + self.length
     }
 }
 
 // The span of every entry, in file order. Fails if write_buffer cannot fill a tensor, or if a buffer is too large.
 // `entries` must be in file order. `max_buffer` is the smaller of the iPhone limit and the device limit.
-pub(crate) fn spans(entries: &[WeightEntry], max_buffer: u64) -> Result<Vec<Span>, EngineError> {
+pub fn spans(entries: &[WeightEntry], max_buffer: u64) -> Result<Vec<Span>, EngineError> {
     // Where the previous tensor ended, without its padding. Nothing came before the first tensor.
     let mut previous_end = 0;
     // Build the spans one after another, so each one can be checked against the one before.

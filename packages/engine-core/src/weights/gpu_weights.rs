@@ -13,7 +13,7 @@ use crate::memory::GpuBuffer;
 // One weight tensor that lives in its own GPU buffer.
 pub struct GpuTensor {
     // The buffer. Its size is `bytes` rounded up to a multiple of 4.
-    pub(crate) buffer: GpuBuffer,
+    pub buffer: GpuBuffer,
     // The size of each dimension, in PyTorch's order.
     pub shape: Vec<usize>,
     // "float32", "float16", "int8" or "int4", as in the index.
@@ -30,7 +30,7 @@ pub struct GpuWeights {
 
 impl GpuWeights {
     // Keep the tensors of a finished upload.
-    pub(crate) fn new(tensors: HashMap<String, GpuTensor>) -> Self {
+    pub fn new(tensors: HashMap<String, GpuTensor>) -> Self {
         Self { tensors }
     }
 
