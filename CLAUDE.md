@@ -7,7 +7,8 @@ This repository is a collection of model engines that run in Safari on iPhone wi
 - `models/<model>/`: one model, with its engine, typed client (`client/`), test suite (`client/tests/`), Python scripts, data and log. SD-Turbo is `models/sd-turbo/`.
 - `apps/site/`: the website "infer". The landing lists every inference that runs today. Each model has an entry page (the public demo) and developer pages (tests, benchmark). Built with Bun into `apps/site/dist/`.
 - `packages/ui/`: the design system of infer, a pocket dictionary on bible paper: tokens, self-hosted fonts (Archivo, Source Serif 4), styles and small DOM components. Pages use it, and no UI framework. The product and design records are `apps/site/PRODUCT.md` and `apps/site/DESIGN.md`.
-- `packages/engine-core/`: the Rust base that every model engine shares: the GPU connection, kernels ready to run, memory accounting, timed submits, the profiler, the benchmarks, the activation planner and the weight files. A model engine adds its own kernels and stages.
+- `packages/engine-core/`: the Rust base that every model engine shares: the GPU connection, kernels ready to run, memory accounting, timed submits, the profiler, the benchmarks, the activation planner, the weight files, and the linear and convolution layers (float and packed). A model engine adds its own kernels and stages.
+- `packages/compare/`: a small Rust crate for the engine tests. It reads golden `.safetensors` files and compares tensors.
 - `packages/browser/`: browser helpers that many pages share, the run events (`run-event.ts`, `report.ts`) and the test suite type.
 - `packages/harness/`: drives Safari on the connected iPhone with safaridriver, and waits for the result of a page.
 - `packages/server/`: the development web server, for the Mac and for the iPhone. It saves the run events in `runs/`.

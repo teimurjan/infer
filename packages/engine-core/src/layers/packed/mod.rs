@@ -38,7 +38,7 @@ const WORD_BITS: usize = 32;
 const SCALES_PER_WORD: usize = 2;
 
 // The bit width of a packed weight lives in the shared weight code, because the weight buffers read it too.
-pub use engine_core::weights::WeightBits;
+pub use crate::weights::WeightBits;
 
 // The tensors of one packed layer, as raw file bytes or f32 values.
 pub struct PackedTensors<'a> {
@@ -107,13 +107,13 @@ fn plan_packed_vector(shape: &VectorShape, bits: WeightBits) -> Result<PackedPla
 }
 
 // Connect a packed layer from the `input` slot to the `output` slot, with the packed words, scales and bias that the caller keeps.
-pub(crate) fn bind_packed_into(gpu: &Gpu, shape: &LayerShape, bits: WeightBits, input: &wgpu::Buffer, words: &wgpu::Buffer, scale: &wgpu::Buffer, bias: &wgpu::Buffer, output: &wgpu::Buffer) -> Result<BoundKernel, EngineError> {
+pub fn bind_packed_into(gpu: &Gpu, shape: &LayerShape, bits: WeightBits, input: &wgpu::Buffer, words: &wgpu::Buffer, scale: &wgpu::Buffer, bias: &wgpu::Buffer, output: &wgpu::Buffer) -> Result<BoundKernel, EngineError> {
     // Check the sizes and pick the kernel.
     bind_packed_plan(gpu, &plan_packed(shape, bits)?, input, words, scale, bias, output)
 }
 
 // The same for the one-row layer of the time embedding.
-pub(crate) fn bind_packed_vector_into(gpu: &Gpu, shape: &VectorShape, bits: WeightBits, input: &wgpu::Buffer, words: &wgpu::Buffer, scale: &wgpu::Buffer, bias: &wgpu::Buffer, output: &wgpu::Buffer) -> Result<BoundKernel, EngineError> {
+pub fn bind_packed_vector_into(gpu: &Gpu, shape: &VectorShape, bits: WeightBits, input: &wgpu::Buffer, words: &wgpu::Buffer, scale: &wgpu::Buffer, bias: &wgpu::Buffer, output: &wgpu::Buffer) -> Result<BoundKernel, EngineError> {
     // Check the sizes and pick the kernel.
     bind_packed_plan(gpu, &plan_packed_vector(shape, bits)?, input, words, scale, bias, output)
 }
@@ -141,7 +141,7 @@ fn bind_packed_plan(gpu: &Gpu, plan: &PackedPlan, input: &wgpu::Buffer, words: &
 }
 
 // Copy the tensors to the GPU, check the sizes, and compile the packed kernel for this layer kind.
-pub(crate) fn prepare_packed_layer(gpu: &Gpu, shape: &LayerShape, bits: WeightBits, tensors: &PackedTensors) -> Result<PreparedLayer, EngineError> {
+pub fn prepare_packed_layer(gpu: &Gpu, shape: &LayerShape, bits: WeightBits, tensors: &PackedTensors) -> Result<PreparedLayer, EngineError> {
     // Check the sizes and pick the kernel.
     let plan = plan_packed(shape, bits)?;
     // The input goes to the GPU as it is.

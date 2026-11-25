@@ -26,17 +26,17 @@ use crate::checks::{check_buffer, check_buffer_holds};
 pub use conv1x1::Conv1x1Shape;
 pub use conv3x3::Conv3x3Shape;
 // The output size formula, which the UNet needs to know the shape of each activation.
-pub(crate) use conv3x3::conv3x3_output_size;
+pub use conv3x3::conv3x3_output_size;
 pub use linear::LinearShape;
 // The packed weight types and the function that prepares a packed layer.
 pub use packed::{PackedTensors, WeightBits};
-pub(crate) use packed::prepare_packed_layer;
+pub use packed::prepare_packed_layer;
 // The packed kernels on slots.
 use packed::{bind_packed_into, bind_packed_vector_into};
 // The weight matrix that a binder got: float or packed.
 use crate::weights::Matrix;
 // The one-row linear layer.
-pub(crate) use vector::{VectorShape, bind_vector_into};
+pub use vector::{VectorShape, bind_vector_into};
 
 // Every invocation computes a block of 4 x 4 outputs, so block dimensions must be multiples of 4.
 const BLOCK: u32 = 4;
@@ -104,7 +104,7 @@ fn plan_layer(shape: &LayerShape) -> Result<LayerPlan, EngineError> {
 
 // A layer whose kernel is connected to buffers that are already on the GPU.
 // The UNet chains these: the output of one layer is the input of the next, and nothing goes back to the CPU.
-pub(crate) struct BoundLayer {
+pub struct BoundLayer {
     // The kernel with its buffers.
     dispatch: Dispatch,
     // The buffer the kernel writes.
@@ -115,17 +115,17 @@ pub(crate) struct BoundLayer {
 
 impl BoundLayer {
     // The kernel, ready to record.
-    pub(crate) fn dispatch(&self) -> &Dispatch {
+    pub fn dispatch(&self) -> &Dispatch {
         &self.dispatch
     }
 
     // The buffer the kernel writes, so that another kernel in the same submit can read or change it.
-    pub(crate) fn output(&self) -> &GpuBuffer {
+    pub fn output(&self) -> &GpuBuffer {
         &self.output
     }
 
     // The output buffer. Take it only after the submit that runs the layer.
-    pub(crate) fn into_output(self) -> GpuBuffer {
+    pub fn into_output(self) -> GpuBuffer {
         self.output
     }
 }
@@ -172,7 +172,7 @@ fn connect(gpu: &Gpu, plan: &LayerPlan, inputs: &[Binding], output: &wgpu::Buffe
 
 // Check the sizes, make the output buffer, and connect the kernel to the input, weight and bias buffers.
 // The caller must keep input, weight and bias alive until the GPU has run the dispatch.
-pub(crate) fn bind_layer(gpu: &Gpu, shape: &LayerShape, input: &wgpu::Buffer, weight: &wgpu::Buffer, bias: &wgpu::Buffer) -> Result<BoundLayer, EngineError> {
+pub fn bind_layer(gpu: &Gpu, shape: &LayerShape, input: &wgpu::Buffer, weight: &wgpu::Buffer, bias: &wgpu::Buffer) -> Result<BoundLayer, EngineError> {
     // Check the sizes and pick the kernel.
     let plan = plan_layer(shape)?;
     // The three float tensors, in binding order 1, 2, 3. The output is binding 4.
@@ -187,7 +187,7 @@ pub(crate) fn bind_layer(gpu: &Gpu, shape: &LayerShape, input: &wgpu::Buffer, we
 
 // Like bind_layer, but the kernel writes into `output` and makes no buffer of its own.
 // The result keeps only the uniform. The caller adds the weights with `keeping`.
-pub(crate) fn bind_layer_into(gpu: &Gpu, shape: &LayerShape, input: &wgpu::Buffer, weight: &wgpu::Buffer, bias: &wgpu::Buffer, output: &wgpu::Buffer) -> Result<BoundKernel, EngineError> {
+pub fn bind_layer_into(gpu: &Gpu, shape: &LayerShape, input: &wgpu::Buffer, weight: &wgpu::Buffer, bias: &wgpu::Buffer, output: &wgpu::Buffer) -> Result<BoundKernel, EngineError> {
     // Check the sizes, pick the kernel, and connect the slots.
     bind_plan_into(gpu, &plan_layer(shape)?, input, weight, bias, output)
 }
@@ -214,7 +214,7 @@ fn bind_plan_into(gpu: &Gpu, plan: &LayerPlan, input: &wgpu::Buffer, weight: &wg
 }
 
 // Connect the float or the packed kernel of `shape`, whichever `matrix` needs. The kernel keeps a float matrix that was made for it.
-pub(crate) fn bind_matrix_into(gpu: &Gpu, shape: &LayerShape, input: &wgpu::Buffer, matrix: Matrix, bias: &wgpu::Buffer, output: &wgpu::Buffer) -> Result<BoundKernel, EngineError> {
+pub fn bind_matrix_into(gpu: &Gpu, shape: &LayerShape, input: &wgpu::Buffer, matrix: Matrix, bias: &wgpu::Buffer, output: &wgpu::Buffer) -> Result<BoundKernel, EngineError> {
     // Pick the kernel.
     match matrix {
         // The float kernel, and the matrix buffer if it is its own.
@@ -225,7 +225,7 @@ pub(crate) fn bind_matrix_into(gpu: &Gpu, shape: &LayerShape, input: &wgpu::Buff
 }
 
 // The same for the one-row layer.
-pub(crate) fn bind_vector_matrix_into(gpu: &Gpu, shape: &VectorShape, input: &wgpu::Buffer, matrix: Matrix, bias: &wgpu::Buffer, output: &wgpu::Buffer) -> Result<BoundKernel, EngineError> {
+pub fn bind_vector_matrix_into(gpu: &Gpu, shape: &VectorShape, input: &wgpu::Buffer, matrix: Matrix, bias: &wgpu::Buffer, output: &wgpu::Buffer) -> Result<BoundKernel, EngineError> {
     // Pick the kernel.
     match matrix {
         // The float kernel, and the matrix buffer if it is its own.
@@ -236,7 +236,7 @@ pub(crate) fn bind_vector_matrix_into(gpu: &Gpu, shape: &VectorShape, input: &wg
 }
 
 // A layer with its data copied from the CPU, ready to run many times. The layer tests and benchmarks use it.
-pub(crate) struct PreparedLayer {
+pub struct PreparedLayer {
     // The kernel with its buffers.
     layer: BoundLayer,
     // The buffers the kernel reads. We keep them, because the browser frees a buffer when Rust drops it.
@@ -255,17 +255,17 @@ impl PreparedLayer {
     }
 
     // The kernel, for timing.
-    pub(crate) fn dispatch(&self) -> &Dispatch {
+    pub fn dispatch(&self) -> &Dispatch {
         self.layer.dispatch()
     }
 
     // Bytes that one run must read and write at least.
-    pub(crate) fn bytes_moved(&self) -> u64 {
+    pub fn bytes_moved(&self) -> u64 {
         self.bytes_moved
     }
 
     // Run the layer once and copy the output back to the CPU.
-    pub(crate) async fn run(&self, gpu: &Gpu) -> Result<Vec<f32>, EngineError> {
+    pub async fn run(&self, gpu: &Gpu) -> Result<Vec<f32>, EngineError> {
         // Record one dispatch and send it to the GPU.
         gpu.queue.submit([encode_runs(gpu, std::slice::from_ref(self.dispatch()), 1)]);
         // Copy the output back.
@@ -274,7 +274,7 @@ impl PreparedLayer {
 }
 
 // Copy the tensors to the GPU, check the sizes, and compile the right kernel for this layer kind.
-pub(crate) fn prepare_layer(gpu: &Gpu, shape: &LayerShape, tensors: &Tensors) -> Result<PreparedLayer, EngineError> {
+pub fn prepare_layer(gpu: &Gpu, shape: &LayerShape, tensors: &Tensors) -> Result<PreparedLayer, EngineError> {
     // The input goes to the GPU as it is.
     let input = gpu.storage_buffer_from("layer input", tensors.input, MemoryCategory::Activations);
     // The weights, in PyTorch's layout.
@@ -288,7 +288,7 @@ pub(crate) fn prepare_layer(gpu: &Gpu, shape: &LayerShape, tensors: &Tensors) ->
 }
 
 // A dimension that the kernel splits into blocks of 4. It must be a positive multiple of 4.
-pub(crate) fn block_dimension(dimension: &'static str, value: u32) -> Result<u32, EngineError> {
+pub fn block_dimension(dimension: &'static str, value: u32) -> Result<u32, EngineError> {
     // 0 and values like 6 are not allowed.
     if value == 0 || !value.is_multiple_of(BLOCK) {
         return Err(EngineError::BadDimension { dimension, value });

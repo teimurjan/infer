@@ -58,7 +58,7 @@ pub(super) fn plan_conv3x3(shape: &Conv3x3Shape) -> Result<LayerPlan, EngineErro
 }
 
 // The output height or width of a 3x3 convolution with padding 1. The size must be 1 or more.
-pub(crate) fn conv3x3_output_size(size: u32, stride: u32) -> u32 {
+pub fn conv3x3_output_size(size: u32, stride: u32) -> u32 {
     // The PyTorch formula with kernel 3 and padding 1: (size + 2 - 3) / stride + 1.
     (size - 1) / stride + 1
 }

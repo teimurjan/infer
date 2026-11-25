@@ -16,13 +16,13 @@ const SHADER: &str = include_str!("vector.wgsl");
 const WORKGROUP_SIZE: u32 = 64;
 
 // The sizes of nn.Linear on one row: input [in_features], weight [out_features, in_features], output [out_features].
-pub(crate) struct VectorShape {
+pub struct VectorShape {
     // Values in the input row.
-    pub(crate) in_features: u32,
+    pub in_features: u32,
     // Values in the output row.
-    pub(crate) out_features: u32,
+    pub out_features: u32,
     // Apply SiLU to the input values as the kernel reads them.
-    pub(crate) silu_input: bool,
+    pub silu_input: bool,
 }
 
 // Check the sizes and plan the kernel. The packed one-row plan starts from it.
@@ -40,7 +40,7 @@ pub(super) fn plan_vector(shape: &VectorShape) -> Result<LayerPlan, EngineError>
 }
 
 // Connect the kernel from the `input` slot to the `output` slot. The slots can be longer than the tensors.
-pub(crate) fn bind_vector_into(gpu: &Gpu, shape: &VectorShape, input: &wgpu::Buffer, weight: &wgpu::Buffer, bias: &wgpu::Buffer, output: &wgpu::Buffer) -> Result<BoundKernel, EngineError> {
+pub fn bind_vector_into(gpu: &Gpu, shape: &VectorShape, input: &wgpu::Buffer, weight: &wgpu::Buffer, bias: &wgpu::Buffer, output: &wgpu::Buffer) -> Result<BoundKernel, EngineError> {
     // Check the sizes, plan the kernel, and connect the slots.
     bind_plan_into(gpu, &plan_vector(shape)?, input, weight, bias, output)
 }

@@ -36,5 +36,5 @@ wasm-bindgen-futures = "0.4"
 [dev-dependencies]
 # Runs one async function to the end on the native test thread.
 pollster = "1"
-# Reads the golden safetensors files and compares tensors. It is our own crate in ../compare.
-compare = { path = "../compare" }
+# Reads the golden safetensors files and compares tensors. It is our own crate in packages/compare.
+compare = { path = "../../../packages/compare" }

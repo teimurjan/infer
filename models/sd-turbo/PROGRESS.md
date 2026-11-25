@@ -5589,3 +5589,7 @@ Conclusion: the kept decoder file makes a cool warm image 15.2% faster, 4.105 s 
 ## 2026-11-24: The GPU base moved to packages/engine-core
 
 The full entry is "2026-11-24: The shared engine base, packages/engine-core" in `PROGRESS.md` at the repository root. The engine now takes its GPU base from the shared crate. All tests pass, and the golden image in Mac Chromium is unchanged: 1178 bytes differ, by at most 1. Not measured on the iPhone.
+
+## 2026-11-25: The layers and the golden reader moved to packages
+
+The full entry is "2026-11-25: The layers and the golden reader move to packages" in `PROGRESS.md` at the repository root. `layers/` is now in `packages/engine-core`, and `compare/` is `packages/compare`. All 36 tests of the engine pass. Not measured on the iPhone.

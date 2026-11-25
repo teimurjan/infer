@@ -24,3 +24,5 @@ pub mod bench;
 pub mod plan;
 // Weight files: the index, streaming upload, and the buffers that kernels bind.
 pub mod weights;
+// Linear, 1x1 and 3x3 convolution layers, float and packed, with their kernels.
+pub mod layers;

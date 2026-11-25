@@ -711,3 +711,33 @@ The 1178 differing bytes are the same count as in Mac Chromium before the move (
 Failed: `bun run phone sd-turbo:golden-image --timeout 12` stopped with `FAILED: no iPhone is connected: plug it in with a cable, unlock it, and tap Trust`. Not measured on the iPhone.
 
 Next step: the LFM3 engine in `models/lfm3-omni/engine/`, on top of `engine-core`.
+
+## 2026-11-25: The layers and the golden reader move to packages
+
+The LFM3 engine needs the linear kernel and the golden file reader of SD-Turbo. As in "The shared engine base, packages/engine-core", they moved with no change in behavior. The LFM3 part of this step is in `models/lfm3-omni/PROGRESS.md`, "2026-11-25: Layer 0 of the language model in the engine".
+
+Files moved with `git mv`:
+
+- `models/sd-turbo/engine/src/layers/` to `packages/engine-core/src/layers/`: the linear, 1x1 and 3x3 convolution layers, float and packed, with their shaders. They depend only on code that is in engine-core already.
+- `models/sd-turbo/compare/` to `packages/compare/`.
+
+Files changed:
+
+- `packages/engine-core/src/lib.rs`: `pub mod layers;`. In the moved files, `pub(crate)` became `pub`, and `layers/packed/mod.rs` takes `WeightBits` from `crate::weights`.
+- `models/sd-turbo/engine/src/lib.rs`: `layers` joins the `use engine_core::{...}` line, in place of `mod layers;`.
+- `models/sd-turbo/engine/Cargo.toml`: `compare` comes from `../../../packages/compare`.
+- `CLAUDE.md`: the layout names the layers in engine-core, and `packages/compare/`.
+
+Commands and outputs. Device: Mac native. `cargo build --release --all-targets` in `models/sd-turbo/engine`: no errors and no warnings. Then `cargo test --release` in three crates:
+
+```
+sd-turbo passed 36 failed 0 binaries 15
+test result: ok. 27 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+```
+
+The first line sums the `test result` lines of `models/sd-turbo/engine`. The second is `packages/engine-core`. The third is `packages/compare`.
+
+Calculation: before this move, SD-Turbo had 37 tests and engine-core 26, 63 in total. Now 36 + 27 = 63. One unit test of `layers/` moved with it.
+
+Not measured on the iPhone, and not run in a browser. This move changes no kernel and no page code.

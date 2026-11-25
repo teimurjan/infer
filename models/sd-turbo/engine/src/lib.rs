@@ -1,6 +1,6 @@
 // activation.rs holds the tensor type that flows between layers on the GPU.
 // The shared GPU base, under the same names as before, so `crate::gpu::Gpu` and the other paths keep working.
-use engine_core::{bench, bytes, checks, dispatch, error, gpu, max_error, memory, plan, profile, submit, weights};
+use engine_core::{bench, bytes, checks, dispatch, error, gpu, layers, max_error, memory, plan, profile, submit, weights};
 mod activation;
 // attention/ holds the attention kernel and its test cases.
 mod attention;
@@ -25,7 +25,6 @@ mod kernels;
 // step.rs holds one submit of a stage and the tensors it checks.
 mod step;
 // layers/ holds the linear and convolution kernels.
-mod layers;
 // memory/ counts the bytes of our GPU buffers per category, and the peak.
 // max_error.rs measures how far the GPU result is from the expected result.
 // profile/ times each kernel and prints the table of where the time goes.
