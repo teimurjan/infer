@@ -6,10 +6,16 @@ mod rms_norm;
 mod short_conv;
 // swiglu.rs: silu(gate) * up of the feed-forward layer.
 mod swiglu;
+// rope.rs: rotary positions of the queries and keys.
+mod rope;
+// attention.rs: causal attention with grouped keys and a gate per head.
+mod attention;
 
 pub use rms_norm::{NormMode, bind_rms_norm};
 pub use short_conv::bind_short_conv;
 pub use swiglu::bind_swiglu;
+pub use rope::{RopeShape, bind_rope};
+pub use attention::{AttentionBuffers, AttentionShape, HEAD_DIM, bind_attention};
 
-// Invocations per workgroup of all three kernels. Each .wgsl file has @workgroup_size(256).
+// Invocations per workgroup of the element kernels. Their .wgsl files have @workgroup_size(256).
 const WORKGROUP_SIZE: u32 = 256;

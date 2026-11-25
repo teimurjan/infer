@@ -126,3 +126,78 @@ The bug was then removed, and the test passed again with `2.2649765e-6`.
 Calculation: the parameters of layer 0 are 2048 x 7 + 6144 x 2048 + 2048 x 2048 + 3 x 7680 x 2048 + 4 x 2048 = 63,985,664. In float32 that is 4 x 63,985,664 = 255,942,656 bytes, exactly the size of the file. Every tensor of this layer is a multiple of 256 bytes long, so the file has no padding.
 
 Not measured on the iPhone. Next step: an attention layer (layer 2 is the first full attention layer), with its rotary positions and the keys and values for the memory of earlier tokens.
+
+## 2026-11-25: The attention layers, full and sliding
+
+The user asked for the next step: the first attention layers. Layer 2 is a full attention layer and layer 4 a sliding one. The golden set has their inputs and outputs.
+
+The attention, from `modeling_lfm3.py` of the pinned commit (`Lfm3Attention`, `Lfm3RotaryEmbedding`, `apply_rotary_pos_emb`):
+
+- `n = operator_norm(hidden)`. Then `q_proj(n)` gives 16 heads of 128 values, and `k_proj(n)` and `v_proj(n)` give 4 heads of 128. Query head h uses key head h / 4 (`repeat_kv`).
+- `q_norm` and `k_norm`: an RMSNorm of each head of 128 values.
+- Rotary positions in float32, on the pairs (j, j + 64). Full layers: theta 1,000,000, and `partial_rotary_factor` 0.5 gives 32 rotated pairs. The other 32 have a frequency of 0, so they do not turn. Sliding layers: theta 10,000, and all 64 pairs turn.
+- Causal attention, scores times 1 / sqrt(128). Sliding layers see only keys with `position - key < 256`.
+- The output of each head times `sigmoid(gate_proj(n))`, one gate per head, then `o_proj`, `post_operator_norm` and the residual add. Then the same feed-forward half as layer 0.
+
+Files added:
+
+- `engine/src/kernels/rope.wgsl` and `rope.rs`: the rotation, in place, one invocation per pair. It reads cos and sin from tables.
+- `engine/src/rope_table.rs`: the cos and sin tables on the CPU, in float32 in the same order as PyTorch: `1 / theta^(2j / 128)`, then `position * inv_freq`, then cos and sin. A unit test checks that position 0 does not turn.
+- `engine/src/kernels/attention.wgsl` and `attention.rs`: one workgroup of 128 lanes per query row and head. The keys go by in chunks of 128, with a running maximum and total (the online softmax of SD-Turbo step 4). The kernel takes the number of keys and the position of the first query row, so the memory of earlier tokens can use it later. A key that is not visible has weight 0, so a chunk with no visible key changes nothing.
+- `engine/src/attention_layer.rs`: `AttentionLayer` and `AttentionKind` (Full or Sliding, with the settings of `config.json`).
+- `engine/src/feed_forward.rs`: the feed-forward half, moved out of `conv_layer.rs`, because both kinds of layer use it.
+- `engine/tests/common/mod.rs`: the helpers of the layer tests. `engine/tests/attention_layer.rs`: layers 2 and 4.
+
+Files changed: `engine/src/conv_layer.rs` (uses `bind_feed_forward`), `engine/src/kernels/mod.rs`, `engine/src/lib.rs`, `engine/tests/conv_layer.rs` (uses the shared helpers).
+
+Design choices:
+
+- The rotary tables come from the CPU, because GPU `sin` and `cos` of angles up to 32 radians are less exact than the CPU ones.
+- The head counts come from the shapes of `q_proj` and `k_proj`. The head size of 128 is fixed in the kernel, and the layer divides by it.
+- q and k are normed into new buffers, because one dispatch cannot read and write the same buffer through two bindings.
+
+Commands and outputs. Device: Mac Python, then Mac native.
+
+`uv run python/export_weights.py layer2 layers.2.` and the same for layer 4:
+
+```
+layer2: 14 tensors, 230851584 bytes, float32
+layer4: 14 tensors, 230851584 bytes, float32
+```
+
+`cargo test --release -- --nocapture`, in `engine/` (only these lines kept):
+
+```
+test rope_table::tests::position_zero_is_not_rotated ... ok
+layer 2: largest difference from PyTorch 2.861023e-6, largest value 8.547484
+layer 4: largest difference from PyTorch 4.529953e-6, largest value 12.328884
+test attention_layers_match_pytorch ... ok
+layer 0: largest difference from PyTorch 2.2649765e-6, largest value 0.9128683
+test layer_0_matches_pytorch ... ok
+```
+
+Layer 0 gives the same number as before the move of the feed-forward half.
+
+Deliberate-bug checks, one at a time, with `cargo test --release --test attention_layer -- --nocapture`:
+
+1. `values[first] = a * c - b * s` became `a * c + b * s` in `rope.wgsl`:
+
+```
+layer 2: largest difference from PyTorch 5.8372736e-2, largest value 8.547484
+layer 4: largest difference from PyTorch 1.1593775e-1, largest value 12.328884
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.30s
+```
+
+2. `let kv_head = head / (shape.heads / shape.kv_heads);` became `head % shape.kv_heads` in `attention.wgsl`:
+
+```
+layer 2: largest difference from PyTorch 1.3567052e0, largest value 8.547484
+layer 4: largest difference from PyTorch 4.7960162e-1, largest value 12.328884
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.32s
+```
+
+Both bugs were then removed, and `cargo test --release` passed 3 tests, 0 failed.
+
+Not tested yet: the window of the sliding layers. The prompt has 32 tokens, fewer than 256, so no key is outside the window. A test with more than 256 positions is needed when the memory of earlier tokens comes.
+
+Not measured on the iPhone. Next step: all 24 layers in a row, the token table and the output scores, against `next_logits` and the answer "Paris".
