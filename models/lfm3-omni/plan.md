@@ -14,7 +14,7 @@ Goal: a voice exchange with LFM3-Omni-2B in a web page on the iPhone. You speak,
 ## Steps, in order
 
 1. Reference run and golden set of one text exchange (done).
-2. The language model in the engine, on the Mac: the short convolution layer, the two kinds of attention, the memory of earlier tokens, and the output scores. Check each layer against `golden/text`.
+2. The language model in the engine, on the Mac: the short convolution layer (done for layer 0, 2026-11-25: largest difference 2.26e-6), the two kinds of attention, the memory of earlier tokens, and the output scores. Check each layer against `golden/text`.
 3. The word-by-word loop with greedy choice, and 4-bit weights. Measure passes per second on the iPhone.
 4. Fast matrix-vector kernels. The current matrix kernels reach 4.8 to 6.7 GB/s on the iPhone, against a copy speed of 47.7 GB/s. Real-time speech needs about 12.5 passes per second.
 5. Speech in: the audio encoder and its projector, with a golden set of one spoken question.

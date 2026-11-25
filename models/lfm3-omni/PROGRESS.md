@@ -67,3 +67,62 @@ Calculations:
 - The memory of earlier tokens: 6 full attention layers x 2 (keys and values) x 4 heads x 128 values x 2 bytes (float16) = 12288 bytes per token. For 4,096 tokens: 50.3 MB.
 
 Not measured on the iPhone. Next step: the language model in the engine, layer by layer against `golden/text`, starting with one short convolution layer.
+
+## 2026-11-25: Layer 0 of the language model in the engine
+
+The user asked to start the engine. Layer 0 is a short convolution layer, and the golden set has its input (`hidden_00`) and its output (`hidden_01`).
+
+The layer, from `modeling_lfm3.py` of the pinned commit (`Lfm3DecoderLayer` and `Lfm3ShortConv`), with sandwich norms (`use_sandwich_norm = True`):
+
+1. `n = operator_norm(hidden)`, an RMSNorm with eps 1e-5.
+2. `in_proj(n)` gives three parts of 2048 values per token: B, C and x. No biases (`conv_bias = False`).
+3. `h = B * x`, then a causal depthwise convolution of width 7 over the tokens: token t sees tokens t - 6 to t, and tokens before 0 count as 0.
+4. `y = C * conv(h)`, then `out_proj(y)`.
+5. `hidden += post_operator_norm(out_proj(y))`.
+6. `hidden += post_ffn_norm(w2(silu(w1(m)) * w3(m)))`, with `m = ffn_norm(hidden)`. The feed-forward width is 7680.
+
+Files added:
+
+- `python/export_weights.py`: writes chosen tensors of the language model as float32 in the flat format of engine-core: `weights/<stem>.bin` and `weights/<stem>.json`, each tensor on a multiple of 256 bytes. The names lose `model.language_model.`. Git ignores `weights/`.
+- `engine/Cargo.toml`: the crate `lfm3-engine`, on top of `packages/engine-core`.
+- `engine/src/kernels/rms_norm.wgsl` and `rms_norm.rs`: RMSNorm of each row, one workgroup of 256 per row. With `NormMode::Add`, the result is added to the output: the residual add after a sandwich norm, in the same kernel.
+- `engine/src/kernels/short_conv.wgsl` and `short_conv.rs`: steps 3 and 4 before `out_proj`, in one kernel: one invocation per token and channel.
+- `engine/src/kernels/swiglu.wgsl` and `swiglu.rs`: `gate = silu(gate) * up`, in place.
+- `engine/src/kernels/mod.rs`, `engine/src/linear.rs` (nn.Linear without bias on the linear kernel of engine-core, with a zero bias), `engine/src/conv_layer.rs` (`ConvLayer`: the 11 kernels of one layer), `engine/src/lib.rs`.
+- `engine/tests/conv_layer.rs`: layer 0 against `hidden_01`.
+
+Design choices:
+
+- The sizes come from the weight shapes: the width from `operator_norm`, the feed-forward width from `w1`, the convolution width from `conv.conv`. No size is written twice.
+- The layer changes `hidden` in place, as the residual stream of PyTorch does. The two norms after a branch add into it, so no separate add kernel is needed.
+- The weights stay float32 for this step. The 4-bit weights come with step 3 of `plan.md`.
+
+Commands and outputs. Device: Mac Python, then Mac native.
+
+`uv run python/export_weights.py layer0 layers.0.`, in the model folder:
+
+```
+layer0: 10 tensors, 255942656 bytes, float32
+```
+
+`cargo test --release -- --nocapture`, in `engine/`:
+
+```
+layer 0: largest difference from PyTorch 2.2649765e-6, largest value 0.9128683
+test layer_0_matches_pytorch ... ok
+```
+
+The first version of the test had a tolerance of 1e-3, with a comment that the values reach about 30. The run showed a largest value of 0.913, so the tolerance is now 1e-4.
+
+Deliberate-bug check: `taps[channel * shape.kernel + tap]` became `taps[channel * shape.kernel + (shape.kernel - 1u - tap)]` in `short_conv.wgsl`, so the convolution taps run in reverse. Same command:
+
+```
+layer 0: largest difference from PyTorch 8.243309e-1, largest value 0.9128683
+largest difference 8.243309e-1 is above 1e-4
+```
+
+The bug was then removed, and the test passed again with `2.2649765e-6`.
+
+Calculation: the parameters of layer 0 are 2048 x 7 + 6144 x 2048 + 2048 x 2048 + 3 x 7680 x 2048 + 4 x 2048 = 63,985,664. In float32 that is 4 x 63,985,664 = 255,942,656 bytes, exactly the size of the file. Every tensor of this layer is a multiple of 256 bytes long, so the file has no padding.
+
+Not measured on the iPhone. Next step: an attention layer (layer 2 is the first full attention layer), with its rotary positions and the keys and values for the memory of earlier tokens.
