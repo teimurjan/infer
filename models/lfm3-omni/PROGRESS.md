@@ -201,3 +201,71 @@ Both bugs were then removed, and `cargo test --release` passed 3 tests, 0 failed
 Not tested yet: the window of the sliding layers. The prompt has 32 tokens, fewer than 256, so no key is outside the window. A test with more than 256 positions is needed when the memory of earlier tokens comes.
 
 Not measured on the iPhone. Next step: all 24 layers in a row, the token table and the output scores, against `next_logits` and the answer "Paris".
+
+## 2026-11-25: The whole language model over the prompt
+
+The user asked for the next step: all 24 layers in a row, the token table and the scores of the next token, against `next_logits` and the answer "Paris".
+
+The forward pass, from `Lfm3Model.forward` of the pinned commit: `hidden = embed_tokens(ids)` with no scale, then the 24 layers, then `embedding_norm` (an RMSNorm, the final norm), then the output layer, which shares its weights with `embed_tokens` (`tie_word_embeddings`). `hidden_24` and `last_hidden_state` of the golden set are both after the final norm.
+
+Files added:
+
+- `engine/src/config.rs`: `LAYER_KINDS`, the kind of each of the 24 layers from `layer_types` in `config.json`. The weights tell a convolution layer from an attention layer, but not full from sliding, so the list is written out.
+- `engine/src/language_model.rs`: `LanguageModel` binds the 24 layers, the final norm and the output layer for a prompt. `token_rows` reads the rows of the prompt ids from the token table on the CPU.
+- `engine/tests/language_model.rs`: the whole model against `hidden_00`, `last_hidden_state`, `next_logits`, and the token of "Paris".
+
+Files changed:
+
+- `engine/src/linear.rs`: `bind_linear_matrix` takes a matrix that the caller holds, for the chunks of the output layer. `bind_linear` calls it.
+- `engine/src/lib.rs`: the new modules.
+- `engine/tests/common/mod.rs`: `#![allow(dead_code)]`, because each test file uses only some of the helpers.
+- `packages/compare/src/safetensors.rs`: reads `I64` tensors, for `prompt_ids` and `answer_ids`. The root log has a short entry.
+
+Design choices:
+
+- The float32 token table is 128000 x 2048 x 4 = 1,048,576,000 bytes. With the default WebGPU limits, one buffer holds at most 256 MiB and one storage binding at most 128 MiB. So in this float32 step the token rows come from the CPU, and the output layer runs in 8 chunks of 16000 tokens: 16000 x 2048 x 4 = 131,072,000 bytes each, under 134,217,728. The 4-bit weights of the next steps make the table small enough for the GPU.
+- The weights come in two files: `weights/layers.bin` with the 24 layers, streamed into GPU buffers, and `weights/embed.bin` with the token table and the final norm, read on the CPU.
+- The whole prompt runs in one submit of 350 dispatches. The Mac has no 250 ms limit in this test. The iPhone will need smaller submits.
+
+Commands and outputs. Device: Mac Python, then Mac native.
+
+`uv run python/export_weights.py layers layers.` and `uv run python/export_weights.py embed embed`:
+
+```
+layers: 284 tensors, 5866621952 bytes, float32
+embed: 2 tensors, 1048584192 bytes, float32
+```
+
+The export of `layers` took 15.6 s (`time`).
+
+`cargo test --release -- --nocapture`, in `engine/`:
+
+```
+layer 2: largest difference from PyTorch 2.861023e-6, largest value 8.547484
+layer 4: largest difference from PyTorch 4.529953e-6, largest value 12.328884
+layer 0: largest difference from PyTorch 2.2649765e-6, largest value 0.9128683
+token rows: largest difference from PyTorch 0e0
+last hidden state: largest difference from PyTorch 1.487732e-4
+next scores: largest difference from PyTorch 5.1498413e-5, best token 41176
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 4.38s
+```
+
+The first run of `language_model` printed the same three lines. Its score tolerance was 1e-2. That is about 200 times the result, so it is now 1e-3. The hidden tolerance stays 1e-3, about 7 times the result.
+
+Deliberate-bug check: layer 2 in `LAYER_KINDS` became `Sliding` in place of `Full`. Command: `cargo test --release --test language_model -- --nocapture`.
+
+```
+last hidden state: largest difference from PyTorch 6.024132e0
+next scores: largest difference from PyTorch 1.267034e0, best token 41176
+last hidden state 6.024132e0 is above 1e-3
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 5.55s
+```
+
+With the bug, the best token is still "Paris". So the answer alone is a weak check, and the test also compares the numbers. The bug was then removed, and all 4 tests passed.
+
+Calculations:
+
+- Parameters in `layers.bin`: 5866621952 / 4 = 1,466,655,488. With the token table, 128000 x 2048 = 262,144,000, and the final norm, 2048: 1,466,655,488 + 262,144,000 + 2,048 = 1,728,801,536, the parameter count of `model.language_model`.
+- The prompt run: 4.38 s for the whole test, with the load of 5.87 GB. The time of the GPU work alone is not measured yet.
+
+Not measured on the iPhone. Next step: the word-by-word loop with the memory of earlier tokens (the keys and values of the attention layers, and the last 6 inputs of each convolution layer), on the Mac, against `answer_ids`.

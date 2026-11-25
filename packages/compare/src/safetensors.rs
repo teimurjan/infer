@@ -102,7 +102,7 @@ fn read_tensor(path: &Path, name: &str, entry: &Value, data: &[u8]) -> Result<Te
     let count = shape.iter().try_fold(1usize, |total, &size| total.checked_mul(size))
         // An overflow means a broken shape.
         .ok_or_else(|| header_error(path, &format!("tensor {name} shape is too large")))?;
-    // How many bytes one value takes. Any type other than F32 and F16 is not supported.
+    // How many bytes one value takes. Any type other than F32, F16 and I64 is not supported.
     let value_size = bytes_per_value(dtype)
         // Unknown type: say which tensor and which type.
         .ok_or_else(|| CompareError::UnsupportedDtype { path: path.to_path_buf(), name: name.to_owned(), dtype: dtype.to_owned() })?;
@@ -123,6 +123,8 @@ fn bytes_per_value(dtype: &str) -> Option<usize> {
         "F32" => Some(4),
         // float16 is 2 bytes.
         "F16" => Some(2),
+        // int64 is 8 bytes. Token ids are int64 in PyTorch.
+        "I64" => Some(8),
         // Any other type is not supported.
         _ => None,
     }
@@ -134,6 +136,10 @@ fn decode(raw: &[u8], dtype: &str) -> Vec<f32> {
     if dtype == "F16" {
         // Read 2 bytes at a time, lowest byte first.
         return raw.chunks_exact(2).map(|chunk| f16_to_f32(u16::from_le_bytes([chunk[0], chunk[1]]))).collect();
+    }
+    // I64: every 8 bytes are one whole number. Token ids are below 2^24, so f32 holds them exactly.
+    if dtype == "I64" {
+        return raw.chunks_exact(8).map(|chunk| i64::from_le_bytes(chunk.try_into().expect("chunks_exact gives 8 bytes")) as f32).collect();
     }
     // F32: every 4 bytes are one f32, lowest byte first.
     raw.chunks_exact(4).map(|chunk| f32::from_le_bytes([chunk[0], chunk[1], chunk[2], chunk[3]])).collect()

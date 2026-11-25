@@ -1,4 +1,6 @@
 // Helpers that the layer tests share: the model folder, the golden tensors, the weights, and one layer run.
+// Each test file uses only some of them, so the unused ones are not a warning.
+#![allow(dead_code)]
 // It needs `uv run python/dump_text_golden.py` and the weight files of `python/export_weights.py` in the model folder.
 
 // The paths of the model folder.

@@ -741,3 +741,7 @@ The first line sums the `test result` lines of `models/sd-turbo/engine`. The sec
 Calculation: before this move, SD-Turbo had 37 tests and engine-core 26, 63 in total. Now 36 + 27 = 63. One unit test of `layers/` moved with it.
 
 Not measured on the iPhone, and not run in a browser. This move changes no kernel and no page code.
+
+## 2026-11-25: The golden reader reads int64 tensors
+
+Files changed: `packages/compare/src/safetensors.rs`. `I64` tensors are read as f32 values. Token ids are below 2^24, so f32 holds them exactly. LFM3 saves its token ids as int64, and the test of its language model reads them. The full entry is "2026-11-25: The whole language model over the prompt" in `models/lfm3-omni/PROGRESS.md`. `cargo test --release` in `packages/compare`: 6 passed, 0 failed. SD-Turbo does not read int64 tensors, so it does not change.

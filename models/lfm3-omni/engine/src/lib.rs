@@ -12,6 +12,11 @@ mod feed_forward;
 mod conv_layer;
 // One attention layer of the language model, full or sliding.
 mod attention_layer;
+// The kind of each layer, from config.json.
+mod config;
+// The whole language model over a prompt.
+mod language_model;
 
 pub use attention_layer::{AttentionKind, AttentionLayer};
 pub use conv_layer::ConvLayer;
+pub use language_model::{LanguageModel, token_rows};
