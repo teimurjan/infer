@@ -12,6 +12,7 @@ use engine_core::dispatch::{Dispatch, encode_runs};
 use engine_core::gpu::Gpu;
 use engine_core::memory::{GpuBuffer, MemoryCategory};
 use engine_core::weights::{GpuWeights, load_to_gpu};
+use lfm3_engine::Memory;
 
 // The model folder, one level above engine/.
 pub fn model_folder() -> PathBuf {
@@ -37,6 +38,13 @@ pub fn layer_golden(gpu: &Gpu, layer: usize) -> (GpuBuffer, u32, Vec<f32>) {
     let (input, shape) = golden(&format!("hidden_{layer:02}"));
     let (expected, _) = golden(&format!("hidden_{:02}", layer + 1));
     (gpu.storage_buffer_from("hidden", &input, MemoryCategory::Activations), shape[0] as u32, expected)
+}
+
+// A memory of earlier tokens for a prompt of `rows` tokens, with the step set to positions 0 to rows - 1.
+pub fn prompt_memory(gpu: &Gpu, rows: u32) -> Memory {
+    let memory = Memory::new(gpu, rows);
+    memory.set_step(gpu, 0, rows).unwrap_or_else(|error| panic!("{error}"));
+    memory
 }
 
 // Run `dispatches` in one submit, read `hidden` back, print the largest difference from `expected`, and return it.

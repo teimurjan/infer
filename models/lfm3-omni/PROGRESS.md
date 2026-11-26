@@ -269,3 +269,90 @@ Calculations:
 - The prompt run: 4.38 s for the whole test, with the load of 5.87 GB. The time of the GPU work alone is not measured yet.
 
 Not measured on the iPhone. Next step: the word-by-word loop with the memory of earlier tokens (the keys and values of the attention layers, and the last 6 inputs of each convolution layer), on the Mac, against `answer_ids`.
+
+## 2026-11-26: The word-by-word loop with the memory of earlier tokens
+
+The user asked for the next step: the word-by-word loop, against a golden answer.
+
+The golden answer of `golden/text` is 2 tokens ("Paris", then the end), so it would test one step only. A new golden set has a longer prompt and a longer answer.
+
+Files added:
+
+- `python/dump_loop_golden.py`: the golden set `golden/loop`. The prompt is a passage about bread, written for this test, and a question, 353 tokens, more than the 256-token window of the sliding layers. A greedy loop over `model.model.language_model` with a `DynamicCache` writes the answer and the scores of every step. The official `generate` in text mode must give the same tokens, or the script stops. `generation_config.json` asks for greedy choice: `do_sample` false, `repetition_penalty` 1.0, stop on 124900 or 125014.
+- `engine/src/memory.rs`: `Memory`, the memory of earlier tokens for up to `capacity` positions. An attention layer keeps the keys and values of every position. A convolution layer keeps `h = B * x` of every position. A small uniform buffer, the step, holds `[start, keys]`: the position of the first new token and the positions that exist after the run. It also holds the rotary tables of both attention kinds.
+- `engine/src/kernels/conv_gate.wgsl`: `h = B * x` of the new tokens into the history of the layer, at their positions.
+- `engine/src/kernels/copy_rows.wgsl` and `copy_rows.rs`: copies rows, to a fixed row or from the start of the run. The attention layers store their new keys and values with it, and the model takes its last row with it.
+- `engine/src/output_layer.rs`: the final norm and the output layer, uploaded once. The prompt run and the word run both bind to it.
+- `engine/src/generate.rs`: `Generator`. The prompt goes in one run. Then one run per token, with the model bound once for 1 row. The CPU writes the step and the token row before each run.
+- `engine/tests/generate.rs`: the loop against `golden/loop`, step by step.
+
+Files changed:
+
+- `engine/src/kernels/short_conv.wgsl`: the convolution reads the history in place of computing h itself. `rope.wgsl` and `attention.wgsl` take the first position and the key count from the step. `attention.wgsl` reads the memory of keys and values.
+- `engine/src/config.rs`: `WIDTH`, `KV_HEADS` and `rope_settings`. `AttentionKind` is gone: the kind comes from `LAYER_KINDS`.
+- `engine/src/conv_layer.rs`, `attention_layer.rs`, `language_model.rs`: they bind to the memory, and take the layer index in place of a name prefix. The language model computes the scores of the last row only.
+- `engine/src/lib.rs`, `engine/tests/common/mod.rs` (`prompt_memory`), and the three earlier tests: the new arguments.
+- `packages/engine-core/src/gpu.rs`: `writable_uniform_buffer` and `write_u32`, because the step changes before every run. The root log has an entry.
+
+Design choices:
+
+- One bound model serves every word. Only the step and the token row change between runs, so a word costs no new bind group.
+- The history of a convolution layer has a row per position, like the keys. It costs 512 x 2048 x 4 = 4,194,304 bytes per layer for 512 positions. A ring of the last 6 rows would be smaller. That can come with the memory plan of the iPhone.
+- The keys go into the memory after their norm and rotation, at the index of their position. The window check of the sliding layers uses positions, so it works the same for the prompt and for each word.
+
+Failed first: the first run stopped with `Shader 'copy_rows' parsing error: name `target` is a reserved keyword`. The buffer is now named `destination`.
+
+Commands and outputs.
+
+`uv run python/dump_loop_golden.py`, in the model folder. Device: Mac Python. It took 1 min 43.9 s (`time`).
+
+```
+prompt tokens: 353
+answer ids (24): [41, 5373, 20, 6373, 7359, 6101, 278, 32106, 708, 19317, 1428, 278, 25405, 309, 7315, 296, 278, 14725, 551, 4538, 310, 835, 22, 124900]
+answer: "A slow, cool rise gives the dough more flavor because the yeast and bacteria in the flour have longer to work.<|im_end|>"
+official generate gives the same tokens: True
+golden/loop: 3 tensors
+```
+
+`cargo test --release -- --nocapture`, in `engine/`. Device: Mac native.
+
+```
+layer 2: largest difference from PyTorch 2.861023e-6, largest value 8.547484
+layer 4: largest difference from PyTorch 4.529953e-6, largest value 12.328884
+layer 0: largest difference from PyTorch 2.2649765e-6, largest value 0.9128683
+prompt tokens: 353, answer tokens: 24
+largest score difference per step: ["6.7e-5", "3.3e-5", "3.1e-5", "2.7e-5", "3.1e-5", "3.1e-5", "3.2e-5", "2.6e-5", "3.2e-5", "2.5e-5", "3.3e-5", "2.7e-5", "2.8e-5", "3.0e-5", "2.9e-5", "3.6e-5", "2.9e-5", "3.1e-5", "3.8e-5", "3.2e-5", "4.1e-5", "4.1e-5", "2.8e-5", "4.1e-5"]
+largest score difference of all steps: 6.723404e-5
+same answer as PyTorch: true
+test answer_matches_pytorch_word_by_word ... ok
+token rows: largest difference from PyTorch 0e0
+dispatches: 386
+last hidden state: largest difference from PyTorch 1.487732e-4
+next scores: largest difference from PyTorch 5.1498413e-5, best token 41176
+```
+
+The earlier numbers did not change. The language model has 386 dispatches now, 36 more than before: 2 for the convolution of each of the 12 convolution layers in place of 1 (12 more), 2 copies into the memory in each of the 12 attention layers (24 more), and 1 copy of the last row with 1 chunk run per chunk (the same 8 + 1 as before, plus 1 copy, minus 1).
+
+Deliberate-bug checks, one at a time, with `cargo test --release --test generate -- --nocapture`:
+
+1. The window of the sliding layers became 0 (no window) in `rope_settings`:
+
+```
+largest score difference of all steps: 2.5141022e1
+same answer as PyTorch: false
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 8.98s
+```
+
+2. Each word one position too late: `set_step(gpu, rows + step as u32 + 1, 1)` in `generate.rs`:
+
+```
+largest score difference of all steps: 2.4555809e1
+same answer as PyTorch: false
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 8.83s
+```
+
+Both bugs were then removed, and all 5 tests passed.
+
+The first check is the test of the sliding window that "The attention layers, full and sliding" left open: the prompt has 353 tokens, so the first 97 keys are outside the window of the last query.
+
+Not measured: the time per word. Not measured on the iPhone. Next step: 4-bit weights of the language model, with a golden set of the same exchange from the 4-bit weights, and the first time per word.

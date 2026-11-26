@@ -745,3 +745,7 @@ Not measured on the iPhone, and not run in a browser. This move changes no kerne
 ## 2026-11-25: The golden reader reads int64 tensors
 
 Files changed: `packages/compare/src/safetensors.rs`. `I64` tensors are read as f32 values. Token ids are below 2^24, so f32 holds them exactly. LFM3 saves its token ids as int64, and the test of its language model reads them. The full entry is "2026-11-25: The whole language model over the prompt" in `models/lfm3-omni/PROGRESS.md`. `cargo test --release` in `packages/compare`: 6 passed, 0 failed. SD-Turbo does not read int64 tensors, so it does not change.
+
+## 2026-11-26: A writable uniform buffer in engine-core
+
+Files changed: `packages/engine-core/src/gpu.rs`. `writable_uniform_buffer` makes a uniform buffer with `COPY_DST`, and `write_u32` writes u32 values into a buffer. The LFM3 engine writes the position of each new word into one such buffer before each run. The full entry is "2026-11-26: The word-by-word loop with the memory of earlier tokens" in `models/lfm3-omni/PROGRESS.md`. SD-Turbo does not use them, so it does not change. Not measured on the iPhone.

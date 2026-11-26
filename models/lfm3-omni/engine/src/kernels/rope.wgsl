@@ -13,18 +13,23 @@ struct Shape {
     head_dim: u32,
     // Rotated pairs per head: 32 in the full attention layers, 64 in the sliding ones.
     angles: u32,
-    // The position of row 0. 0 for a prompt.
-    first_position: u32,
+}
+
+// Where this run starts. The CPU writes it before each run (memory.rs). Row r is at position start + r.
+struct Step {
+    start: u32,
+    keys: u32,
 }
 
 // The sizes. "uniform" is a small read-only buffer that every invocation reads.
 @group(0) @binding(0) var<uniform> shape: Shape;
+@group(0) @binding(1) var<uniform> step: Step;
 // The queries or the keys, changed in place.
-@group(0) @binding(1) var<storage, read_write> values: array<f32>;
+@group(0) @binding(2) var<storage, read_write> values: array<f32>;
 // cos of each position and pair: [positions][angles].
-@group(0) @binding(2) var<storage, read> cos_table: array<f32>;
+@group(0) @binding(3) var<storage, read> cos_table: array<f32>;
 // sin in the same layout.
-@group(0) @binding(3) var<storage, read> sin_table: array<f32>;
+@group(0) @binding(4) var<storage, read> sin_table: array<f32>;
 
 // Invocations per workgroup. Rust's WORKGROUP_SIZE in kernels/mod.rs must match.
 @compute @workgroup_size(256)
@@ -43,7 +48,7 @@ fn main(@builtin(global_invocation_id) id: vec3<u32>) {
     let first = (row * shape.heads + head) * shape.head_dim + pair;
     let second = first + shape.head_dim / 2u;
     // The cos and sin of this position and pair.
-    let table = (shape.first_position + row) * shape.angles + pair;
+    let table = (step.start + row) * shape.angles + pair;
     let c = cos_table[table];
     let s = sin_table[table];
     let a = values[first];

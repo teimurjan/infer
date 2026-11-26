@@ -216,6 +216,22 @@ impl Gpu {
         self.counted(self.device.create_buffer_init(&wgpu::util::BufferInitDescriptor { label: Some(label), contents: &bytes, usage: wgpu::BufferUsages::UNIFORM }), MemoryCategory::Uniforms)
     }
 
+    // The same, but the CPU can write it again later with write_u32, for example the position of each new word.
+    pub fn writable_uniform_buffer(&self, label: &str, values: &[u32]) -> GpuBuffer {
+        // Pad with zeros to a multiple of 4 values (16 bytes), the size step of WGSL uniform structs.
+        let padded: Vec<u32> = values.iter().copied().chain(std::iter::repeat(0)).take(values.len().next_multiple_of(4)).collect();
+        let bytes: Vec<u8> = padded.iter().flat_map(|value| value.to_le_bytes()).collect();
+        // COPY_DST lets queue.write_buffer change it.
+        self.counted(self.device.create_buffer_init(&wgpu::util::BufferInitDescriptor { label: Some(label), contents: &bytes, usage: wgpu::BufferUsages::UNIFORM | wgpu::BufferUsages::COPY_DST }), MemoryCategory::Uniforms)
+    }
+
+    // Write u32 values into a buffer, from its start. The next submit sees them.
+    pub fn write_u32(&self, target: &wgpu::Buffer, values: &[u32]) {
+        // Each u32 becomes 4 bytes, lowest byte first.
+        let bytes: Vec<u8> = values.iter().flat_map(|value| value.to_le_bytes()).collect();
+        self.queue.write_buffer(target, 0, &bytes);
+    }
+
     // Send the waiting buffer uploads to the GPU and wait until they are done. In the browser, this also waits for the shader compiles that were asked for before.
     // write_buffer only queues an upload. Without this, the upload runs inside the next submit and adds to its time.
     pub async fn finish_uploads(&self) -> Result<(), EngineError> {

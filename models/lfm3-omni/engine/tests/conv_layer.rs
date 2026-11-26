@@ -3,7 +3,7 @@
 // The shared helpers of the layer tests.
 mod common;
 
-use common::{layer_golden, layer_weights, run_and_compare};
+use common::{layer_golden, layer_weights, prompt_memory, run_and_compare};
 use engine_core::gpu::Gpu;
 use lfm3_engine::ConvLayer;
 
@@ -17,7 +17,8 @@ fn layer_0_matches_pytorch() {
         let gpu = Gpu::new().await.unwrap_or_else(|error| panic!("{error}"));
         let weights = layer_weights(&gpu, 0).await;
         let (hidden, rows, expected) = layer_golden(&gpu, 0);
-        let layer = ConvLayer::bind(&gpu, &weights, "layers.0.", rows, &hidden).unwrap_or_else(|error| panic!("{error}"));
+        let memory = prompt_memory(&gpu, rows);
+        let layer = ConvLayer::bind(&gpu, &weights, 0, rows, &hidden, &memory).unwrap_or_else(|error| panic!("{error}"));
         let largest = run_and_compare(&gpu, "layer 0", &layer.dispatches(), &hidden, &expected).await;
         // `<=` is false for NaN, so a NaN also fails.
         assert!(largest <= TOLERANCE, "largest difference {largest:e} is above {TOLERANCE:e}");

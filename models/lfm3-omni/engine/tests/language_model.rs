@@ -5,12 +5,12 @@
 // The shared helpers of the layer tests.
 mod common;
 
-use common::{golden, model_folder};
+use common::{golden, model_folder, prompt_memory};
 use engine_core::dispatch::encode_runs;
 use engine_core::gpu::Gpu;
 use engine_core::memory::MemoryCategory;
 use engine_core::weights::{WeightFile, load_to_gpu};
-use lfm3_engine::{LanguageModel, token_rows};
+use lfm3_engine::{LanguageModel, OutputLayer, token_rows};
 
 // The token of "Paris", the first answer token of the golden run.
 const PARIS: usize = 41176;
@@ -40,7 +40,9 @@ fn language_model_matches_pytorch() {
         // The 24 layers, streamed into GPU buffers.
         let layers = load_to_gpu(&gpu, &model_folder().join("weights/layers.bin")).await.unwrap_or_else(|error| panic!("{error}. Run python/export_weights.py layers layers. first."));
         let hidden = gpu.storage_buffer_from("hidden", &rows, MemoryCategory::Activations);
-        let model = LanguageModel::bind(&gpu, &layers, &table, ids.len() as u32, &hidden).unwrap_or_else(|error| panic!("{error}"));
+        let output = OutputLayer::new(&gpu, &table).unwrap_or_else(|error| panic!("{error}"));
+        let memory = prompt_memory(&gpu, ids.len() as u32);
+        let model = LanguageModel::bind(&gpu, &layers, &output, &memory, ids.len() as u32, &hidden).unwrap_or_else(|error| panic!("{error}"));
         println!("dispatches: {}", model.dispatches().len());
         // One submit for the whole prompt. The Mac has no 250 ms limit to keep in this test.
         gpu.queue.submit([encode_runs(&gpu, model.dispatches(), 1)]);
@@ -50,7 +52,7 @@ fn language_model_matches_pytorch() {
         let hidden_difference = largest_difference(&last, &expected_last);
         println!("last hidden state: largest difference from PyTorch {hidden_difference:e}");
         // The scores of the next token, from the last prompt row.
-        let scores = model.scores_of_row(&gpu, ids.len() - 1).await.unwrap_or_else(|error| panic!("{error}"));
+        let scores = model.scores(&gpu).await.unwrap_or_else(|error| panic!("{error}"));
         let (expected_scores, _) = golden("next_logits");
         let score_difference = largest_difference(&scores, &expected_scores);
         let best = scores.iter().enumerate().fold((0, f32::MIN), |best, (index, &score)| if score > best.1 { (index, score) } else { best }).0;

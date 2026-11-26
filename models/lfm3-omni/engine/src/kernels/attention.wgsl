@@ -7,14 +7,10 @@
 struct Shape {
     // Query tokens.
     rows: u32,
-    // Keys that exist: the prompt and the earlier tokens.
-    keys: u32,
     // Query heads, 16.
     heads: u32,
     // Key and value heads, 4. Query head h uses key head h / (heads / kv_heads).
     kv_heads: u32,
-    // The position of query row 0.
-    first_position: u32,
     // 0: no window. Otherwise the number of keys that a query sees, its own included.
     window: u32,
     // 1 / sqrt(128), as the bits of an f32.
@@ -22,17 +18,25 @@ struct Shape {
 }
 
 // The sizes. "uniform" is a small read-only buffer that every invocation reads.
+// Where this run starts. The CPU writes it before each run (memory.rs). Query row r is at position start + r,
+// and keys 0 to keys - 1 exist: the earlier tokens and the new ones.
+struct Step {
+    start: u32,
+    keys: u32,
+}
+
 @group(0) @binding(0) var<uniform> shape: Shape;
+@group(0) @binding(1) var<uniform> step: Step;
 // The queries after their norm and rotation: [rows][heads][128].
-@group(0) @binding(1) var<storage, read> query: array<f32>;
-// The keys after their norm and rotation: [keys][kv_heads][128].
-@group(0) @binding(2) var<storage, read> key: array<f32>;
-// The values: [keys][kv_heads][128].
-@group(0) @binding(3) var<storage, read> value: array<f32>;
+@group(0) @binding(2) var<storage, read> query: array<f32>;
+// The memory of keys, after their norm and rotation, by position: [capacity][kv_heads][128].
+@group(0) @binding(3) var<storage, read> key: array<f32>;
+// The memory of values, by position: [capacity][kv_heads][128].
+@group(0) @binding(4) var<storage, read> value: array<f32>;
 // gate_proj before the sigmoid: [rows][heads].
-@group(0) @binding(4) var<storage, read> gate: array<f32>;
+@group(0) @binding(5) var<storage, read> gate: array<f32>;
 // The output: [rows][heads][128], the input of o_proj.
-@group(0) @binding(5) var<storage, read_write> output: array<f32>;
+@group(0) @binding(6) var<storage, read_write> output: array<f32>;
 
 // Values per head. Rust checks that the weights have 128 too.
 const HEAD_DIM: u32 = 128u;
@@ -52,7 +56,7 @@ fn main(@builtin(workgroup_id) group: vec3<u32>, @builtin(local_invocation_index
     let row = group.x;
     let head = group.y;
     let kv_head = head / (shape.heads / shape.kv_heads);
-    let position = shape.first_position + row;
+    let position = step.start + row;
     let scale = bitcast<f32>(shape.scale_bits);
     // Copy the query row into workgroup memory, one value per lane.
     query_row[lane] = query[(row * shape.heads + head) * HEAD_DIM + lane];
@@ -60,13 +64,13 @@ fn main(@builtin(workgroup_id) group: vec3<u32>, @builtin(local_invocation_index
     var largest = -3.4e38;
     var total = 0.0;
     var sum = 0.0;
-    // The loop count depends only on the uniform key count, so every lane reaches every barrier.
-    for (var start = 0u; start < shape.keys; start += CHUNK) {
+    // The loop count depends only on the key count of the step, the same for every lane, so every lane reaches every barrier.
+    for (var start = 0u; start < step.keys; start += CHUNK) {
         // Wait until the query row is there, or the last chunk is done.
         workgroupBarrier();
         // Lane l scores key start + l, if it exists and is visible.
         let key_index = start + lane;
-        var seen = key_index < shape.keys && key_index <= position;
+        var seen = key_index < step.keys && key_index <= position;
         if (shape.window != 0u && seen) {
             seen = position - key_index < shape.window;
         }
