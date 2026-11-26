@@ -156,7 +156,9 @@ fn loaded_token_rows(gpu: &Gpu, weights: &GpuWeights, pool: &ActivationPool) -> 
         Matrix::Float(WeightBuffer::Borrowed(_)) => Ok(TokenRows::Copy { table_rows, own_table: None }),
         Matrix::Float(WeightBuffer::Owned(_)) => Err(EngineError::WeightDtype { name: TOKEN_TABLE.to_string(), dtype: weights.tensor(TOKEN_TABLE)?.dtype.clone() }),
         // The kernel unpacks the rows into the embeddings slot.
-        Matrix::Packed { words, scale, bits } => Ok(TokenRows::Packed(PackedTokenRows::bind(gpu, words, scale, bits, table_rows, pool.tensor(EMBEDDINGS)?.buffer)?)),
+        Matrix::Packed { words, scale, bits, groups: 1 } => Ok(TokenRows::Packed(PackedTokenRows::bind(gpu, words, scale, bits, table_rows, pool.tensor(EMBEDDINGS)?.buffer)?)),
+        // The token rows kernel reads one scale per row.
+        Matrix::Packed { groups, .. } => Err(EngineError::ScaleGroups { groups, rule: "but the token rows kernel reads one scale per row" }),
     }
 }
 

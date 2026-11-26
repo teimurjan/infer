@@ -10,16 +10,15 @@
 
 # argparse reads the stem and the name prefix from the command line.
 import argparse
-# json writes the index.
-import json
 # Path builds file paths.
 from pathlib import Path
 
-# numpy writes the float32 bytes in little-endian order.
-import numpy as np
 # hf_hub_download finds the checkpoint in the local cache. safe_open reads one tensor at a time.
 from huggingface_hub import hf_hub_download
 from safetensors import safe_open
+
+# The writer of the flat weight format.
+from weight_file import write_weight_file
 
 # The checkpoint and its commit, the same as in dump_text_golden.py.
 MODEL_ID = "LiquidAI/LFM3-Omni-2B"
@@ -28,8 +27,6 @@ REVISION = "c01718a568e53ae936e6b5e1ff5ab2de7d7f388b"
 LANGUAGE_MODEL = "model.language_model."
 # The folder of the weight files. Git ignores it.
 OUT_DIR = Path("weights")
-# Each tensor starts on a multiple of this many bytes, as packages/engine-core expects.
-ALIGNMENT = 256
 
 
 # Read the stem of the output file and the name prefix of the tensors to export.
@@ -40,23 +37,21 @@ def read_arguments() -> argparse.Namespace:
     return parser.parse_args()
 
 
+# Each tensor of `names` as float32, one at a time, so the whole model is never in memory.
+def float_tensors(reader, names: list[str]):
+    for name in names:
+        # The checkpoint is bfloat16. Every bfloat16 value is exact in float32.
+        values = reader.get_tensor(name).float().numpy().astype("<f4")
+        yield name.removeprefix(LANGUAGE_MODEL), values, list(values.shape), "float32"
+
+
 arguments = read_arguments()
 OUT_DIR.mkdir(exist_ok=True)
 source = hf_hub_download(MODEL_ID, "model.safetensors", revision=REVISION)
-index = []
-with safe_open(source, framework="pt") as reader, (OUT_DIR / f"{arguments.stem}.bin").open("wb") as writer:
+with safe_open(source, framework="pt") as reader:
     # Sorted names give the same file on every run.
     names = sorted(name for name in reader.keys() if name.startswith(LANGUAGE_MODEL + arguments.prefix))
     if not names:
         raise SystemExit(f"no tensor starts with {LANGUAGE_MODEL + arguments.prefix}")
-    for name in names:
-        # The checkpoint is bfloat16. Every bfloat16 value is exact in float32.
-        values = reader.get_tensor(name).float().numpy().astype("<f4")
-        # Zero bytes up to the next multiple of 256.
-        writer.write(b"\0" * (-writer.tell() % ALIGNMENT))
-        index.append({"name": name.removeprefix(LANGUAGE_MODEL), "offset": writer.tell(), "shape": list(values.shape), "dtype": "float32"})
-        writer.write(np.ascontiguousarray(values).tobytes())
-# One JSON object per line, as the SD-Turbo index files are.
-(OUT_DIR / f"{arguments.stem}.json").write_text("[\n" + ",\n".join(json.dumps(entry) for entry in index) + "\n]\n")
-size = (OUT_DIR / f"{arguments.stem}.bin").stat().st_size
-print(f"{arguments.stem}: {len(index)} tensors, {size} bytes, float32")
+    size = write_weight_file(OUT_DIR / arguments.stem, float_tensors(reader, names))
+print(f"{arguments.stem}: {len(names)} tensors, {size} bytes, float32")

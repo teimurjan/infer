@@ -749,3 +749,7 @@ Files changed: `packages/compare/src/safetensors.rs`. `I64` tensors are read as 
 ## 2026-11-26: A writable uniform buffer in engine-core
 
 Files changed: `packages/engine-core/src/gpu.rs`. `writable_uniform_buffer` makes a uniform buffer with `COPY_DST`, and `write_u32` writes u32 values into a buffer. The LFM3 engine writes the position of each new word into one such buffer before each run. The full entry is "2026-11-26: The word-by-word loop with the memory of earlier tokens" in `models/lfm3-omni/PROGRESS.md`. SD-Turbo does not use them, so it does not change. Not measured on the iPhone.
+
+## 2026-11-26: Packed linear weights with one scale per group of values
+
+Files changed: `packages/engine-core/src/layers/packed/linear.wgsl`, `layers/packed/mod.rs`, `layers/mod.rs`, `weights/buffers.rs`, `error.rs`, and `models/sd-turbo/engine/src/text/mod.rs`. The packed linear kernel reads one float16 scale per group of neighbor values of a row. The loader takes the group count from the shape of the `_scale` tensor, so the SD-Turbo files (one scale per row) load as before. The full entry, with the test outputs, is "2026-11-26: A packed linear kernel with one scale per 32 values" in `models/lfm3-omni/PROGRESS.md`. All SD-Turbo tests pass on the Mac, but their errors moved by rounding, for example `unet_output` from 9.775e-6 to 1.052e-5. Not measured on the iPhone: SD-Turbo runs this kernel, so `bun run phone sd-turbo:make-20` must run again.

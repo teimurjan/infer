@@ -21,6 +21,8 @@ pub enum EngineError {
     TensorLength { tensor: &'static str, actual: usize, expected: usize },
     // A layer dimension is 0 or not a multiple of 4. The kernels work in blocks of 4.
     BadDimension { dimension: &'static str, value: u32 },
+    // A packed matrix has a number of scales per row that this kernel cannot read.
+    ScaleGroups { groups: u32, rule: &'static str },
     // A layer dimension is 0.
     ZeroDimension { dimension: &'static str },
     // A convolution stride of 0.
@@ -95,6 +97,8 @@ impl fmt::Display for EngineError {
             Self::TensorLength { tensor, actual, expected } => write!(formatter, "{tensor} has {actual} values, the shape needs {expected}"),
             // Say which dimension and its value.
             Self::BadDimension { dimension, value } => write!(formatter, "{dimension} is {value}, it must be a positive multiple of 4"),
+            // Say the count and the rule.
+            Self::ScaleGroups { groups, rule } => write!(formatter, "a packed matrix has {groups} scales per row, {rule}"),
             // Say which dimension.
             Self::ZeroDimension { dimension } => write!(formatter, "{dimension} is 0, it must be 1 or more"),
             // Say what is wrong.

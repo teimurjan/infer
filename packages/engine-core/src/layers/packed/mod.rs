@@ -62,8 +62,8 @@ struct PackedPlan {
     scale_words: usize,
 }
 
-// Plan a packed layer from the float plan of the same shape. Only the weight and scale buffers differ.
-fn plan_packed(shape: &LayerShape, bits: WeightBits) -> Result<PackedPlan, EngineError> {
+// Plan a packed layer with `groups` scales per row from the float plan of the same shape. Only the weight and scale buffers differ.
+fn plan_packed(shape: &LayerShape, bits: WeightBits, groups: u32) -> Result<PackedPlan, EngineError> {
     // The float plan checks every size, and gives the lengths and the workgroups.
     let float_plan = plan_layer(shape)?;
     // One bias per output channel.
@@ -72,25 +72,45 @@ fn plan_packed(shape: &LayerShape, bits: WeightBits) -> Result<PackedPlan, Engin
     let row_values = float_plan.lengths.weight / out_channels;
     // Words per row, rounded up, because each row starts on a word.
     let row_words = (row_values * bits.value() as usize).div_ceil(WORD_BITS);
-    // The packed kernel, its label and its workgroups, for each layer kind.
-    let (label, shader, workgroups) = match shape {
-        // Matrix multiply plus bias. Its own grid, because each invocation takes 8 rows, not 4.
-        LayerShape::Linear(linear) => ("linear_packed", LINEAR_SHADER, linear_workgroups(linear)),
-        // 1x1 convolution. Same grid as the float kernel.
-        LayerShape::Conv1x1(_) => ("conv1x1_packed", CONV1X1_SHADER, float_plan.workgroups),
-        // 3x3 convolution. Its own grid, because its workgroup has another shape.
-        LayerShape::Conv3x3(conv) => ("conv3x3_packed", CONV3X3_SHADER, conv3x3_workgroups(conv)),
+    // The packed kernel, its label, its workgroups, and the fields that its Shape struct adds after bits and row_words.
+    let (label, shader, workgroups, group_fields) = match shape {
+        // Matrix multiply plus bias. Its own grid, because each invocation takes 8 rows, not 4. Its Shape adds the vec4s of one group.
+        LayerShape::Linear(linear) => ("linear_packed", LINEAR_SHADER, linear_workgroups(linear), vec![group_vectors(linear.in_features, groups)?]),
+        // 1x1 convolution. Same grid as the float kernel. One scale per row only.
+        LayerShape::Conv1x1(_) => ("conv1x1_packed", CONV1X1_SHADER, float_plan.workgroups, one_group(groups)?),
+        // 3x3 convolution. Its own grid, because its workgroup has another shape. One scale per row only.
+        LayerShape::Conv3x3(conv) => ("conv3x3_packed", CONV3X3_SHADER, conv3x3_workgroups(conv), one_group(groups)?),
     };
-    // The packed Shape structs add bits and row_words after the float fields.
-    let sizes = float_plan.sizes.iter().copied().chain([bits.value(), row_words as u32]).collect();
+    // The packed Shape structs add bits and row_words after the float fields, then the group fields of the linear kernel.
+    let sizes = float_plan.sizes.iter().copied().chain([bits.value(), row_words as u32]).chain(group_fields).collect();
     // Every output channel count is a multiple of 4, so the scales fill whole words.
-    let scale_words = out_channels / SCALES_PER_WORD;
+    let scale_words = out_channels * groups as usize / SCALES_PER_WORD;
     // The packed plan.
     Ok(PackedPlan { layer: LayerPlan { label, shader, sizes, workgroups, ..float_plan }, weight_words: out_channels * row_words, scale_words })
 }
 
+// The vec4s of input that share one scale. Each group must hold whole vec4s, because the kernel reads 4 values at a time.
+fn group_vectors(in_features: u32, groups: u32) -> Result<u32, EngineError> {
+    // At least one group, and the same number of whole vec4s in each.
+    if groups == 0 || !in_features.is_multiple_of(groups) || !(in_features / groups).is_multiple_of(4) {
+        return Err(EngineError::ScaleGroups { groups, rule: "but each group must hold whole vec4s of one row" });
+    }
+    Ok(in_features / groups / 4)
+}
+
+// The convolutions and the one-row layer read one scale per row only. They add no Shape fields.
+fn one_group(groups: u32) -> Result<Vec<u32>, EngineError> {
+    // A matrix with more scales per row would be read with the wrong scales.
+    if groups != 1 {
+        return Err(EngineError::ScaleGroups { groups, rule: "but this kernel reads one scale per row" });
+    }
+    Ok(Vec::new())
+}
+
 // Plan the packed one-row layer from the float one-row plan.
-fn plan_packed_vector(shape: &VectorShape, bits: WeightBits) -> Result<PackedPlan, EngineError> {
+fn plan_packed_vector(shape: &VectorShape, bits: WeightBits, groups: u32) -> Result<PackedPlan, EngineError> {
+    // One scale per row only.
+    one_group(groups)?;
     // The float plan checks the sizes, and gives the lengths and the workgroups.
     let float_plan = plan_vector(shape)?;
     // Two scales share a word, so the output count must be even.
@@ -107,15 +127,15 @@ fn plan_packed_vector(shape: &VectorShape, bits: WeightBits) -> Result<PackedPla
 }
 
 // Connect a packed layer from the `input` slot to the `output` slot, with the packed words, scales and bias that the caller keeps.
-pub fn bind_packed_into(gpu: &Gpu, shape: &LayerShape, bits: WeightBits, input: &wgpu::Buffer, words: &wgpu::Buffer, scale: &wgpu::Buffer, bias: &wgpu::Buffer, output: &wgpu::Buffer) -> Result<BoundKernel, EngineError> {
+pub fn bind_packed_into(gpu: &Gpu, shape: &LayerShape, bits: WeightBits, groups: u32, input: &wgpu::Buffer, words: &wgpu::Buffer, scale: &wgpu::Buffer, bias: &wgpu::Buffer, output: &wgpu::Buffer) -> Result<BoundKernel, EngineError> {
     // Check the sizes and pick the kernel.
-    bind_packed_plan(gpu, &plan_packed(shape, bits)?, input, words, scale, bias, output)
+    bind_packed_plan(gpu, &plan_packed(shape, bits, groups)?, input, words, scale, bias, output)
 }
 
 // The same for the one-row layer of the time embedding.
-pub fn bind_packed_vector_into(gpu: &Gpu, shape: &VectorShape, bits: WeightBits, input: &wgpu::Buffer, words: &wgpu::Buffer, scale: &wgpu::Buffer, bias: &wgpu::Buffer, output: &wgpu::Buffer) -> Result<BoundKernel, EngineError> {
+pub fn bind_packed_vector_into(gpu: &Gpu, shape: &VectorShape, bits: WeightBits, groups: u32, input: &wgpu::Buffer, words: &wgpu::Buffer, scale: &wgpu::Buffer, bias: &wgpu::Buffer, output: &wgpu::Buffer) -> Result<BoundKernel, EngineError> {
     // Check the sizes and pick the kernel.
-    bind_packed_plan(gpu, &plan_packed_vector(shape, bits)?, input, words, scale, bias, output)
+    bind_packed_plan(gpu, &plan_packed_vector(shape, bits, groups)?, input, words, scale, bias, output)
 }
 
 // Check the buffers of a packed plan and connect its kernel. Bindings: 0 sizes, 1 input, 2 words, 3 scales, 4 bias, 5 output.
@@ -140,10 +160,11 @@ fn bind_packed_plan(gpu: &Gpu, plan: &PackedPlan, input: &wgpu::Buffer, words: &
     Ok(BoundKernel::new(vec![dispatch], vec![uniform]))
 }
 
-// Copy the tensors to the GPU, check the sizes, and compile the packed kernel for this layer kind.
+// Copy the tensors to the GPU, check the sizes, and compile the packed kernel for this layer kind. The SD-Turbo layer tests
+// use it, with one scale per row.
 pub fn prepare_packed_layer(gpu: &Gpu, shape: &LayerShape, bits: WeightBits, tensors: &PackedTensors) -> Result<PreparedLayer, EngineError> {
     // Check the sizes and pick the kernel.
-    let plan = plan_packed(shape, bits)?;
+    let plan = plan_packed(shape, bits, 1)?;
     // The input goes to the GPU as it is.
     let input = gpu.storage_buffer_from("packed layer input", tensors.input, MemoryCategory::Activations);
     // The packed words, straight from the file bytes.

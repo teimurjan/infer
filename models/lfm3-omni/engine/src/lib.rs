@@ -29,5 +29,7 @@ pub use config::{LAYER_KINDS, LayerKind};
 pub use conv_layer::ConvLayer;
 pub use generate::{Generator, STOP_IDS};
 pub use language_model::{LanguageModel, token_rows};
+// nn.Linear without bias, float or packed. tests/grouped_linear.rs checks the packed kernel with it.
+pub use linear::bind_linear;
 pub use memory::Memory;
 pub use output_layer::OutputLayer;

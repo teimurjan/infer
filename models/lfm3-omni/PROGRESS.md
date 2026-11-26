@@ -400,3 +400,69 @@ What the numbers say:
 - Most positions of the 377 are inside the passage, where the next word is hard to guess. So "same best token" is low there also for good formats.
 
 Not measured: which layers lose the most, and a format with the token table at 8 bits. Not measured on the iPhone. Next step: a packed matrix kernel in engine-core with one scale per 32 values, checked against `fake_quantize` of this script.
+
+## 2026-11-26: A packed linear kernel with one scale per 32 values
+
+The user asked for the next step: the packed matrix kernel of engine-core with one float16 scale per 32 values, the format that the last entry chose.
+
+Files added:
+
+- `python/group_quant.py`: the weight format. `quantize_groups` rounds a weight [out, in] to integers with one float16 scale per group of neighbor values, `dequantize_groups` gives back integer x scale, `fake_quantize` does both, and `pack_rows` packs the integers into u32 words as engine-core reads them. The scales of a matrix are [out][groups].
+- `python/weight_file.py`: `write_weight_file`, the writer of the flat weight format, moved out of `export_weights.py` so that packed files use it too.
+- `engine/testdata/make_grouped_linear.py`: rounds two real weights of layer 0 to 4 bits with one scale per 32 values, writes them as a small packed weight file (`engine/testdata/grouped_linear/weights.bin` and `.json`), and computes the expected outputs of random inputs of 1 and 9 rows in float64. `conv.in_proj` has 192 scales of 0, the rows near 4e-36 of the last entry. `feed_forward.w2` has rows of 7680 values, so 240 scales per row.
+- `engine/tests/grouped_linear.rs`: loads the file with the engine-core loader and runs each case through `bind_linear`, the path of every LFM3 linear layer.
+
+Files changed:
+
+- `packages/engine-core/src/layers/packed/linear.wgsl`: the sum of each group is scaled on its own and added to a total. The Shape struct has a new field, `group_vectors`. One scale per row is the case of one group.
+- `packages/engine-core/src/weights/buffers.rs`: `Matrix::Packed` has `groups`, the scales per row. The loader takes it from the shape of the `_scale` tensor: [out] gives 1, [out, groups] gives groups.
+- `packages/engine-core/src/layers/packed/mod.rs` and `layers/mod.rs`: the plan checks the groups. The linear kernel needs whole vec4s in each group. The convolutions and the one-row kernel take one scale per row only, and refuse more.
+- `packages/engine-core/src/error.rs`: `ScaleGroups`, for a count of scales per row that a kernel cannot read.
+- `models/sd-turbo/engine/src/text/mod.rs`: the packed token table of SD-Turbo must have one scale per row.
+- `python/export_weights.py`: uses `write_weight_file`. `python/quant_eval.py`: imports `fake_quantize` from `group_quant.py`.
+- `engine/src/lib.rs`: exports `bind_linear` for the test. `.gitignore`: the index of the test weights.
+
+Design choice: one kernel for both formats, not a second kernel for groups. Most of the code is the same, so a copy would differ in only a few lines.
+
+Failed first:
+
+- The first run of the SD-Turbo packed layer test, before any change, failed with `linear_q8: timed submit 8 submit with 64 runs took 367.2 ms, the limit is 250.0 ms`. The next two runs passed (`linear_q4` 15.41 and 11.44 GB/s median). So one slow submit on the Mac, not a fault. A Mac timing cannot show a small change in speed.
+- After the kernel change, the SD-Turbo numbers moved by rounding only. Old code (run again from a stash) against new code, `cargo test --release --test unet_packed --test text`: `unet_output: largest error 9.775161743164063e-6` became `1.0520219802856445e-5`, `up_block_2` `4.8732757568359375e-4` became `5.664825439453125e-4`, `text_encoder` stayed `2.574920654296875e-5`, and `linear_q8` of the packed layer test went from `1.4305115e-6` to `1.1920929e-6`. My guess was the order of the last two operations: the old kernel wrote `sum * s + b`, which the GPU can do in one rounding. I tried `sum * s + (total + b)` for the last group. The numbers stayed `1.0520219802856445e-5`, so the guess was wrong. The kernel went back to the simpler version. The GPU compiler arranges the new loop differently, and WGSL cannot control that.
+- The first try of bug 2 below gave a group count of 0, not 1, and showed `packed scale groups is 0, it must be a positive multiple of 4`. That text was wrong for groups, so `ScaleGroups` replaced `BadDimension` there.
+
+Commands and outputs.
+
+`uv run engine/testdata/make_grouped_linear.py`, in the model folder. Device: Mac Python.
+
+```
+conv.in_proj_1: input (1, 2048) -> output (1, 6144), largest value 4.1561
+conv.in_proj_9: input (9, 2048) -> output (9, 6144), largest value 4.3006
+layers.0.conv.in_proj.weight: 64 scales per row, 192 scales of 0
+feed_forward.w2_1: input (1, 7680) -> output (1, 2048), largest value 6.8767
+feed_forward.w2_9: input (9, 7680) -> output (9, 2048), largest value 15.9061
+layers.0.feed_forward.w2.weight: 240 scales per row, 0 scales of 0
+engine/testdata/grouped_linear/weights.bin: 4 tensors, 15925248 bytes
+```
+
+`cargo test --release --test grouped_linear -- --nocapture`, in `engine/`. Device: Mac native.
+
+```
+conv.in_proj, 1 rows: largest difference from PyTorch 9.536743e-7, largest value 4.1560564
+conv.in_proj, 9 rows: largest difference from PyTorch 1.66893e-6, largest value 4.3006268
+feed_forward.w2, 1 rows: largest difference from PyTorch 2.7418137e-6, largest value 6.876726
+feed_forward.w2, 9 rows: largest difference from PyTorch 5.722046e-6, largest value 15.906133
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.13s
+```
+
+Deliberate-bug checks, one at a time:
+
+1. Every group reads the scale of group 0 (`let index = column * groups;` in `linear.wgsl`): `conv.in_proj, 1 rows: largest difference from PyTorch 2.5666244e0`, test failed.
+2. The loader takes one scale per row (`Ok(1)` in `scale_groups`): `scale has 196608 values, the shape needs 3072`, test failed.
+
+Both bugs were then removed.
+
+`cargo test --release -- --test-threads=1` in `packages/engine-core`, `models/lfm3-omni/engine` and `models/sd-turbo/engine`: every test file passed (27 unit tests in engine-core, 7 test files in LFM3, 19 in SD-Turbo, 0 failed). `bun run build` in the repository folder: `built 4 pages, 13 files, 5 fonts`, exit code 0.
+
+`uv run python/quant_eval.py` again, with the moved rounding code: the same six lines as the last entry, to the last digit (`4-bit, one scale per 32: 972.2 MB, mean KL 0.2154, largest KL 3.3354, same best token 79.3% of 377 positions`). It took 6 min 38 s. `uv run python/export_weights.py layer0 layers.0.` with the moved writer gave the same bytes as before (`cmp` of the .bin and .json files).
+
+Not measured: the speed of the new kernel, and the speed of SD-Turbo on the iPhone after the change. The packed linear layers of the SD-Turbo UNet run this kernel too, so `bun run phone sd-turbo:make-20` must be run again. Next step: export the whole language model in this format with `export_weights.py`, a golden answer from PyTorch with the same rounded weights, and the engine test of the word-by-word loop with it.

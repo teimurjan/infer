@@ -21,6 +21,9 @@ from safetensors.torch import load_file
 # The official model with its own code, and the tokenizer that prints an answer as text.
 from transformers import AutoModelForMultimodalLM, AutoTokenizer
 
+# The rounding of the weight format.
+from group_quant import fake_quantize
+
 # The checkpoint and its commit, the same as in dump_text_golden.py.
 MODEL_ID = "LiquidAI/LFM3-Omni-2B"
 REVISION = "c01718a568e53ae936e6b5e1ff5ab2de7d7f388b"
@@ -60,26 +63,6 @@ FORMATS = (
 # convolution taps [2048, 1, 7] stay float32, because they are small.
 def rounded_names(model: torch.nn.Module) -> list[str]:
     return [name for name, parameter in model.model.language_model.named_parameters() if parameter.dim() == 2]
-
-
-# Round `weight` [out, in] to `bits`-bit integers with one float16 scale per `group` values of a row, and give back
-# integer x scale in float32. The scale maps the largest absolute value of a group to the largest integer.
-def fake_quantize(weight: torch.Tensor, bits: int, group: int | None) -> torch.Tensor:
-    # The largest integer level: 7 for 4 bits, 127 for 8 bits.
-    max_level = 2 ** (bits - 1) - 1
-    out_features, in_features = weight.shape
-    # One group per row when the format has no group size.
-    size = group or in_features
-    # [out][groups][size], so each group gets its own scale.
-    groups = weight.float().reshape(out_features, in_features // size, size)
-    # The scale as the engine would read it: rounded to float16, then back to float32. The minimum avoids a divide by zero.
-    scale = (groups.abs().amax(dim=2, keepdim=True).clamp_min(1e-12) / max_level).half().float()
-    # A few rows of conv.in_proj hold only values near 4e-36, so their float16 scale is 0. Those groups get the integer 0,
-    # and the weight becomes 0, as the engine computes it from a scale of 0. Dividing by 1 there avoids 0 / 0.
-    divisor = torch.where(scale > 0, scale, torch.ones_like(scale))
-    # The nearest integer for that scale, kept inside the range of `bits` bits.
-    levels = torch.clamp(torch.round(groups / divisor), -max_level - 1, max_level)
-    return (levels * scale).reshape(out_features, in_features)
 
 
 # The bytes that the rounded weights take in a format: the integers and the float16 scales, or float32.

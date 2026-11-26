@@ -220,7 +220,7 @@ pub fn bind_matrix_into(gpu: &Gpu, shape: &LayerShape, input: &wgpu::Buffer, mat
         // The float kernel, and the matrix buffer if it is its own.
         Matrix::Float(weight) => Ok(bind_layer_into(gpu, shape, input, weight.buffer(), bias, output)?.keeping(weight.into_owned())),
         // The packed kernel. The packed buffers belong to the loaded weights.
-        Matrix::Packed { words, scale, bits } => bind_packed_into(gpu, shape, bits, input, words, scale, bias, output),
+        Matrix::Packed { words, scale, bits, groups } => bind_packed_into(gpu, shape, bits, groups, input, words, scale, bias, output),
     }
 }
 
@@ -231,7 +231,7 @@ pub fn bind_vector_matrix_into(gpu: &Gpu, shape: &VectorShape, input: &wgpu::Buf
         // The float kernel, and the matrix buffer if it is its own.
         Matrix::Float(weight) => Ok(bind_vector_into(gpu, shape, input, weight.buffer(), bias, output)?.keeping(weight.into_owned())),
         // The packed kernel.
-        Matrix::Packed { words, scale, bits } => bind_packed_vector_into(gpu, shape, bits, input, words, scale, bias, output),
+        Matrix::Packed { words, scale, bits, groups } => bind_packed_vector_into(gpu, shape, bits, groups, input, words, scale, bias, output),
     }
 }
 

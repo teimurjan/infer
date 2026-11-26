@@ -61,14 +61,17 @@ pub struct FloatWeight<'a> {
 pub enum Matrix<'a> {
     // f32 values in PyTorch's layout.
     Float(WeightBuffer<'a>),
-    // Packed integers and float16 row scales, in the format of pack_weights.py.
+    // Packed integers and float16 scales, in the format of pack_weights.py.
     Packed {
         // The packed words, one row per output channel.
         words: &'a wgpu::Buffer,
-        // One float16 scale per output channel, two per word.
+        // `groups` float16 scales per output channel, two per word: [out][groups].
         scale: &'a wgpu::Buffer,
         // 4 or 8 bits per integer.
         bits: WeightBits,
+        // Scales per row. 1: one scale for the whole row, as SD-Turbo stores it. More: each run of in / groups neighbor values
+        // of a row has its own scale, as LFM3 stores it.
+        groups: u32,
     },
 }
 
@@ -142,10 +145,23 @@ impl WeightBuffers for GpuWeights {
             }
         };
         // The float16 scales follow as "<name>_scale", as pack_weights.py writes them.
-        let scale = &self.tensor(&format!("{name}_scale"))?.buffer;
+        let scale = self.tensor(&format!("{name}_scale"))?;
         // The packed words and the scales, as the file stores them.
-        Ok(MatrixWeight { shape: tensor.shape.clone(), matrix: Matrix::Packed { words: &tensor.buffer, scale, bits } })
+        Ok(MatrixWeight { shape: tensor.shape.clone(), matrix: Matrix::Packed { words: &tensor.buffer, scale: &scale.buffer, bits, groups: scale_groups(name, &tensor.shape, &scale.shape)? } })
     }
+}
+
+// The scales per row of a packed matrix: the scale tensor holds [out] or [out, groups] values for a matrix of `out` rows.
+fn scale_groups(name: &str, shape: &[usize], scale_shape: &[usize]) -> Result<u32, EngineError> {
+    // The rows of the matrix, and the scale count.
+    let rows = shape.first().copied().unwrap_or(0);
+    let scales = scale_shape.iter().product::<usize>();
+    // The same number of scales in every row, and at least one. A wrong count would make the kernel read the scales of another row.
+    if rows == 0 || scales == 0 || !scales.is_multiple_of(rows) {
+        return Err(EngineError::WeightShape { name: format!("{name}_scale"), shape: scale_shape.to_vec(), expected: format!("a multiple of the {rows} rows of {name}") });
+    }
+    // The count fits u32, because the matrix kernels index in u32.
+    u32::try_from(scales / rows).map_err(|_| EngineError::TooManyValues { count: scales / rows, max: u32::MAX as usize })
 }
 
 // Make a new f32 buffer with the `count` float16 values of `input`, with one submit of widen.wgsl.
