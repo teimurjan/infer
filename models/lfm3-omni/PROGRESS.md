@@ -356,3 +356,47 @@ Both bugs were then removed, and all 5 tests passed.
 The first check is the test of the sliding window that "The attention layers, full and sliding" left open: the prompt has 353 tokens, so the first 97 keys are outside the window of the last query.
 
 Not measured: the time per word. Not measured on the iPhone. Next step: 4-bit weights of the language model, with a golden set of the same exchange from the 4-bit weights, and the first time per word.
+
+## 2026-11-26: How much 4-bit and 8-bit weights change the language model
+
+The user asked for the next step. The plan says "4-bit weights" next. The packed kernels of engine-core have one float16 scale per row. Before the engine gets packed weights, this step measures in Python which format keeps the answers.
+
+Files added:
+
+- `python/quant_eval.py`: rounds every 2-D weight of the language model (the linear weights of the 24 layers and the token table, 154 tensors, 1,728,413,696 values) to each format and puts the result back into the PyTorch model as float32. The norms and the convolution taps stay float32. The token table is also the output layer (the script checks that they share one tensor), so its rounding changes both ends of the model. For each format, the script prints the size of the rounded weights, the KL divergence (how much information about the next token the rounding loses) from float32 at every position of the bread exchange of `golden/loop` with its golden answer (377 positions), the share of positions where the best token stays the same, and whether the greedy answers of `golden/text` and `golden/loop` stay the same.
+
+Design choices:
+
+- A format with groups has one float16 scale for each run of 32, 64 or 128 neighbor values of a row. The input widths 2048 and 7680 divide by all three.
+- The size counts the integers and the scales of the rounded weights only, not the float32 norms and taps.
+
+Failed first: the first run printed `mean KL nan` and an answer of newlines for every rounded format, also for 8 bits. It took 15 min 40 s. The cause: some rows of `conv.in_proj` in layers 0, 1 and 23 hold only values near 4.4e-36. Their scale rounds to 0 in float16, and the division by 0 gave NaN. The token table has no zero rows (checked: `zero rows 0`). Now a group with a scale of 0 gets the integer 0, as the engine computes it from a scale of 0.
+
+`uv run python/quant_eval.py`, in the model folder. Device: Mac Python, CPU. It took 7 min 42 s (`time`).
+
+```
+output layer shares the token table: True
+rounded weights: 154 tensors, 1728413696 values
+float32: 6913.7 MB, mean KL 0.0000, largest KL 0.0000, same best token 100.0% of 377 positions, same answers (Paris, bread): [True, True]
+  bread answer: 'A slow, cool rise gives the dough more flavor because the yeast and bacteria in the flour have longer to work.<|im_end|>'
+8-bit, one scale per row: 1729.8 MB, mean KL 0.0071, largest KL 1.7892, same best token 97.6% of 377 positions, same answers (Paris, bread): [True, False]
+  bread answer: 'A slow, cool rise gives the dough more flavor because the yeast and bacteria in the flour have longer to work, developing more complex flavors.<|im_end|>'
+4-bit, one scale per row: 865.6 MB, mean KL 0.8778, largest KL 7.0802, same best token 59.4% of 377 positions, same answers (Paris, bread): [True, False]
+  bread answer: 'A slow, cool rise allows the yeast and bacteria in the flour to work more slowly, which develops more complex flavors in the dough.<|im_end|>'
+4-bit, one scale per 128: 891.2 MB, mean KL 0.3223, largest KL 4.2635, same best token 75.9% of 377 positions, same answers (Paris, bread): [True, False]
+  bread answer: 'A slow, cool rise gives bread more flavor because the yeast and bacteria in the flour have longer to work during the longer fermentation time.<|im_end|>'
+4-bit, one scale per 64: 918.2 MB, mean KL 0.2949, largest KL 4.4623, same best token 76.9% of 377 positions, same answers (Paris, bread): [True, False]
+  bread answer: 'A slow, cool rise gives bread more flavor because the yeast and bacteria in the flour have longer to work, allowing more complex flavors to develop.<|im_end|>'
+4-bit, one scale per 32: 972.2 MB, mean KL 0.2154, largest KL 3.3354, same best token 79.3% of 377 positions, same answers (Paris, bread): [True, False]
+  bread answer: 'A slow, cool rise gives bread more flavor because the yeast and bacteria in the flour have longer to work, allowing more complex flavors to develop.<|im_end|>'
+```
+
+What the numbers say:
+
+- Every format answers "Paris", and every bread answer is a correct sentence about the passage. Only float32 gives the golden bread answer word for word.
+- 8 bits lose little (mean KL 0.0071), but 1729.8 MB does not fit next to the rest of the tab in 1920 MB.
+- 4 bits with one scale per row lose the most: mean KL 0.8778, 4.1 times the 0.2154 of one scale per 32. The packed kernels of engine-core read this format only.
+- Groups of 32 cost 106.6 MB more than one scale per row (972.2 against 865.6 MB) and lose the least of the 4-bit formats.
+- Most positions of the 377 are inside the passage, where the next word is hard to guess. So "same best token" is low there also for good formats.
+
+Not measured: which layers lose the most, and a format with the token table at 8 bits. Not measured on the iPhone. Next step: a packed matrix kernel in engine-core with one scale per 32 values, checked against `fake_quantize` of this script.
